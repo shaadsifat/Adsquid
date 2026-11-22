@@ -1,0 +1,9 @@
+# generated builds (dist = upload to hosting, build-pages = GitHub Pages copy)
+dist/
+build-pages/
+# raw downloads (already converted into images/team)
+source-team/
+node_modules/
+*.log
+.DS_Store
+Thumbs.db
