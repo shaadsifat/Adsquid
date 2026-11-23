@@ -110,54 +110,40 @@
     ScrollTrigger.create({ trigger: '.site-footer', start: 'top 80%', onToggle: (s) => rail.classList.toggle('hide', s.isActive) });
   }
 
-  /* ---------- 00 Hero ---------- */
+  /* ---------- 00 Hero: the octopus follows the cursor a little (3D tilt, chips at more depth), hops on click ---------- */
   const hero = $('.hero-home');
-  const poster = $('.hero-poster');
-  const canvas = $('.hero-canvas');
-  const media = $('.hero-media');
-  if (hero && desktop) {
-    let player = null;
-    // Chapter 01 slides up over the pinned hero like a curtain while the camera keeps pushing in.
-    const FRAMES_END = 0.95;
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: hero, start: 'top top', end: '+=100%', pin: true, pinSpacing: false, pinSpacer: $('.hero-spacer'), scrub: true,
-        onUpdate: (self) => {
-          const fp = Math.min(1, self.progress / FRAMES_END);
-          if (player && player.ready) player.setProgress(fp);
-          else poster.style.transform = `scale(${(1 + fp * 0.14).toFixed(4)})`;
-        },
-      },
-    });
-    tl.fromTo('.ch-edge', { opacity: 0 }, { opacity: 1, ease: 'none', duration: 0.2 }, 0)
-      .to('.scroll-cue', { opacity: 0, ease: 'none', duration: 0.1 }, 0)
-      .to('.hero-content', { opacity: 0, y: -80, ease: 'power1.in', duration: 0.38 }, 0)
-      .to('.hero-fade', { opacity: 0.75, ease: 'power1.in', duration: 0.55 }, 0.45);
-    if (finePointer) {
-      // the mark drifts with the mouse (a few px, transform only)
-      gsap.set(media, { scale: 1.04 });
-      const xTo = gsap.quickTo(media, 'x', { duration: 1.2, ease: 'power3' });
-      const yTo = gsap.quickTo(media, 'y', { duration: 1.2, ease: 'power3' });
-      hero.addEventListener('pointermove', (e) => { xTo(-(e.clientX / innerWidth - 0.5) * 24); yTo(-(e.clientY / innerHeight - 0.5) * 14); });
-      hero.addEventListener('pointerleave', () => { xTo(0); yTo(0); });
+  const art = $('.hero-art');
+  const stage = $('.art-stage');
+  if (hero && art && stage) {
+    const hop = $('.art-hop', art);
+    const img = $('.art-img', art);
+    if (img && hop) {
+      img.addEventListener('click', () => { hop.classList.remove('hop'); void hop.offsetWidth; hop.classList.add('hop'); });
+      hop.addEventListener('animationend', () => hop.classList.remove('hop'));
     }
-    const startFrames = () => {
-      if (saveData || !window.AdsqFrames) return;
-      player = window.AdsqFrames.create(canvas, {
-        use: 88,
-        posX: parseFloat(getComputedStyle(media).getPropertyValue('--hx')) || 1,
-        onReady: () => {
-          poster.style.transform = '';
-          player.setProgress(Math.min(1, tl.scrollTrigger.progress / FRAMES_END));
-          canvas.style.opacity = '1';
-        },
+    if (finePointer) {
+      gsap.set(stage, { transformPerspective: 1000 });
+      const rx = gsap.quickTo(stage, 'rotationX', { duration: 1, ease: 'power3' });
+      const ry = gsap.quickTo(stage, 'rotationY', { duration: 1, ease: 'power3' });
+      const sx = gsap.quickTo(stage, 'x', { duration: 1.2, ease: 'power3' });
+      const sy = gsap.quickTo(stage, 'y', { duration: 1.2, ease: 'power3' });
+      const chips = $$('.art-chip', art).map((c) => ({
+        d: +c.dataset.depth || 2,
+        x: gsap.quickTo(c, 'x', { duration: 1.1, ease: 'power3' }),
+        y: gsap.quickTo(c, 'y', { duration: 1.1, ease: 'power3' }),
+      }));
+      hero.addEventListener('pointermove', (e) => {
+        const nx = e.clientX / innerWidth - 0.5;
+        const ny = e.clientY / innerHeight - 0.5;
+        ry(nx * 14); rx(-ny * 10); sx(nx * 22); sy(ny * 14);
+        chips.forEach((c) => { c.x(nx * 10 * c.d); c.y(ny * 8 * c.d); });
       });
-    };
-    if (d.readyState === 'complete') startFrames(); else addEventListener('load', startFrames, { once: true });
-  } else if (hero) {
-    // Phones / tablets: K1m still with a gentle scroll zoom, text lifts away
-    gsap.to(poster, { scale: 1.15, ease: 'none', scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: true } });
-    gsap.to('.hero-content', { y: -40, opacity: 0.2, ease: 'none', scrollTrigger: { trigger: hero, start: 'center center', end: 'bottom top', scrub: true } });
+      hero.addEventListener('pointerleave', () => { rx(0); ry(0); sx(0); sy(0); chips.forEach((c) => { c.x(0); c.y(0); }); });
+    }
+    // Scrolling away: the mascot rises a little slower and fades, the text lifts.
+    gsap.to(art, { yPercent: -12, opacity: 0.25, ease: 'none', scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: true } });
+    gsap.to('.hero-content', { y: -50, opacity: 0.15, ease: 'none', scrollTrigger: { trigger: hero, start: desktop ? 'top top' : 'center top', end: 'bottom top', scrub: true } });
+    gsap.to('.scroll-cue', { opacity: 0, ease: 'none', scrollTrigger: { trigger: hero, start: 'top top', end: '+=120', scrub: true } });
   }
 
   /* ---------- 01 The problem: the line cuts through, cards snap into a row ---------- */
