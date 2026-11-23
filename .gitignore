@@ -7,3 +7,7 @@ node_modules/
 *.log
 .DS_Store
 Thumbs.db
+
+# internal planning / handoff docs (kept local, not published)
+ADSQUID-IMAGES-README.txt
+Adsquid Website Plan & Google Flow Prompts.docx

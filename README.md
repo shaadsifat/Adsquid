@@ -51,7 +51,7 @@ old-URL redirects and the 404 page.
 
 ## How the homepage motion works
 
-- **00 Hero (desktop):** the poster image is the LCP. After `load`, `frames.js` decodes the 120 hero frames and scrubs them on a canvas while the hero is pinned. Skipped below 1024px, with Save-Data and with reduced motion. **Mobile:** K1m still with a gentle scroll zoom.
+- **00 Hero:** the octopus mascot (`images/brand/hero-mascot*.webp`, cleaned from `hero-img.png`) sits right of the text on desktop and above it on phones. It pops in, floats, glints, has floating status chips, tilts toward the cursor in 3D (chips move more for depth) and hops when clicked. Its CSS is inlined on the homepage only. Fonts: Raleway (headings) and Open Sans (everything else), self-hosted.
 - **01:** the violet line draws and the three grey cards snap into a row.
 - **02 (pinned):** SVG lines drawn over `home-03-network`, using the socket coordinates from the image README. Each socket lights up and shows its service object as its card slides in.
 - **03 to 09:** step chips light up, counters roll, bars rise (clip reveal), logo marquee, light-trail canvases (V4, built in code), CTA video (V3, loaded only near view, desktop only).

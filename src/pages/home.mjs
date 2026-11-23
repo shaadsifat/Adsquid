@@ -58,32 +58,43 @@ export function homePage({ posts }) {
   <ol>${CHAPTERS.map((c, i) => `<li><a href="#ch-${String(i).padStart(2, '0')}" data-rail="${i}"><span class="rail-num">${String(i).padStart(2, '0')}</span><span class="rail-label">${c}</span></a></li>`).join('')}</ol>
 </nav>
 
-<div class="hero-spacer">
 <section class="hero hero-home" id="ch-00" data-chapter="0">
-  <div class="hero-media">
-    <picture>
-      <source media="(max-width: 767px)" srcset="/assets/images/brand/key-hero-mark-mobile-720.webp 720w, /assets/images/brand/key-hero-mark-mobile.webp 1080w" sizes="100vw" width="720" height="1290">
-      <img class="hero-poster" src="/assets/images/brand/key-hero-poster.webp" width="1920" height="1080" alt="Glass Adsquid squid mark glowing in front of a violet disc" fetchpriority="high" decoding="async">
-    </picture>
-    <canvas class="hero-canvas" aria-hidden="true"></canvas>
-    <span class="hero-edge" aria-hidden="true"></span>
-    <span class="hero-fade" aria-hidden="true"></span>
-  </div>
-  <div class="container hero-content">
-    <h1 class="eyebrow hero-eyebrow">Digital marketing agency in Dhaka</h1>
-    <p class="display hero-display">${splitWords('Reach every<br> customer.')}</p>
-    <p class="hero-lead">Ads, content, SEO and tech under one roof. One <span class="nowrap">in-house</span> Dhaka team that plans, creates and grows your brand, with clear numbers every month.</p>
-    <div class="btns hero-btns">
-      ${btn('/free-audit/', 'Get a free audit', { cls: 'btn-magnetic' })}
-      ${btn('/work/', 'See our work', { variant: 'ghost', iconName: 'arrow-up-right' })}
+  <div class="hero-bg" aria-hidden="true"></div>
+  <div class="container hero-grid">
+    <div class="hero-content">
+      <h1 class="eyebrow hero-eyebrow">Digital marketing agency in Dhaka</h1>
+      <p class="display hero-display">${splitWords('Reach every<br> customer.')}</p>
+      <p class="hero-lead">Ads, content, SEO and tech under one roof. One <span class="nowrap">in-house</span> Dhaka team that plans, creates and grows your brand, with clear numbers every month.</p>
+      <div class="btns hero-btns">
+        ${btn('/free-audit/', 'Get a free audit', { cls: 'btn-magnetic' })}
+        ${btn('/work/', 'See our work', { variant: 'ghost', iconName: 'arrow-up-right' })}
+      </div>
+    </div>
+    <div class="hero-art">
+      <div class="art-stage">
+        <span class="art-glow" aria-hidden="true"></span>
+        <span class="art-ring" aria-hidden="true"></span>
+        <span class="art-ring art-ring-2" aria-hidden="true"></span>
+        <span class="art-shadow" aria-hidden="true"></span>
+        <div class="art-float">
+          <div class="art-hop">
+            <div class="art-pop">
+              <img class="art-img" src="/assets/images/brand/hero-mascot.webp" srcset="/assets/images/brand/hero-mascot-480.webp 480w, /assets/images/brand/hero-mascot.webp 720w" sizes="(min-width: 960px) 46vw, 88vw" width="720" height="475" alt="The Adsquid octopus at work: laptop, pencil, phone and a cup of coffee" fetchpriority="high" decoding="async" draggable="false">
+              <span class="art-shine" aria-hidden="true"></span>
+            </div>
+          </div>
+        </div>
+        <div class="art-chip c1" data-depth="2.4" aria-hidden="true"><div class="chip-body"><span class="chip-ic">${icon('target')}</span><span><b>Campaign live</b><small>Meta + Google</small></span><i class="chip-dot"></i></div></div>
+        <div class="art-chip c2" data-depth="3.2" aria-hidden="true"><div class="chip-body"><span class="chip-ic">${icon('shopping-cart')}</span><span><b>New order</b><small>just now</small></span></div></div>
+        <div class="art-chip c3" data-depth="1.8" aria-hidden="true"><div class="chip-body"><span class="chip-ic">${icon('calendar')}</span><span><b>Post scheduled</b><small>Today, 7 pm</small></span></div></div>
+        <span class="art-spark k1" aria-hidden="true"></span><span class="art-spark k2" aria-hidden="true"></span><span class="art-spark k3" aria-hidden="true"></span><span class="art-spark k4" aria-hidden="true"></span><span class="art-spark k5" aria-hidden="true"></span>
+      </div>
     </div>
   </div>
   <a class="scroll-cue" href="#ch-01" aria-label="Scroll to the next chapter"><span></span></a>
 </section>
-</div>
 
 <section class="ch ch-noise" id="ch-01" data-chapter="1" aria-labelledby="noise-title">
-  <span class="ch-edge" aria-hidden="true"></span>
   <div class="ch-bg fade-left">${img16('home/home-02-noise')}</div>
   <div class="container">
     <div class="sec-head">
@@ -269,10 +280,9 @@ export function homePage({ posts }) {
     desc: 'Ads, social media, SEO, design, content, websites and software from one Dhaka team. Get a free audit today.',
     bodyClass: 'page-home',
     preload: [
-      '<link rel="preload" as="image" href="/assets/images/brand/key-hero-poster.webp" media="(min-width: 768px)" fetchpriority="high">',
-      '<link rel="preload" as="image" imagesrcset="/assets/images/brand/key-hero-mark-mobile-720.webp 720w, /assets/images/brand/key-hero-mark-mobile.webp 1080w" imagesizes="100vw" media="(max-width: 767px)" fetchpriority="high">',
+      '<link rel="preload" as="image" imagesrcset="/assets/images/brand/hero-mascot-480.webp 480w, /assets/images/brand/hero-mascot.webp 720w" imagesizes="(min-width: 960px) 46vw, 88vw" fetchpriority="high">',
     ],
-    scripts: ['/assets/js/frames.js', '/assets/js/home.js'],
+    scripts: ['/assets/js/home.js'],
     schema: [
       orgSchema(),
       { '@context': 'https://schema.org', '@type': 'WebSite', '@id': abs('/#website'), name: 'Adsquid', url: abs('/'), publisher: { '@id': abs('/#organization') }, inLanguage: 'en-BD' },

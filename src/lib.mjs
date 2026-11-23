@@ -201,7 +201,7 @@ export function splitWords(html) {
 
 // Placeholder client logo (until real logos arrive): inline SVG, same size every time.
 export function clientLogo(label) {
-  return `<span class="client-logo" data-placeholder><svg viewBox="0 0 240 96" width="240" height="96" role="img" aria-label="${esc(label)} logo placeholder"><rect x="1" y="1" width="238" height="94" rx="14" fill="#120E1C" stroke="#2A2340"/><text x="120" y="56" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="16" fill="#B9B3C9">${esc(label)}</text></svg></span>`;
+  return `<span class="client-logo" data-placeholder><svg viewBox="0 0 240 96" width="240" height="96" role="img" aria-label="${esc(label)} logo placeholder"><rect x="1" y="1" width="238" height="94" rx="14" fill="#120E1C" stroke="#2A2340"/><text x="120" y="56" text-anchor="middle" font-family="Open Sans, sans-serif" font-weight="600" font-size="16" fill="#B9B3C9">${esc(label)}</text></svg></span>`;
 }
 
 export function fmtDate(iso) {

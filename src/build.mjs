@@ -47,7 +47,6 @@ const imageMap = {
   services: 'assets/images/services',
   textures: 'assets/images/textures',
   team: 'assets/images/team',
-  frames: 'assets/frames',
   video: 'assets/video',
 };
 for (const [from, to] of Object.entries(imageMap)) {
@@ -83,6 +82,11 @@ const version = (p) => {
 };
 const minifyCss = (css) =>
   css.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\s+/g, ' ').replace(/\s*([{}:;,>])\s*/g, '$1').replace(/;}/g, '}').trim();
+// Split homepage-only critical CSS (marked @home-only-start/end) before minifying strips the marker comments.
+const HOME_RE = /\/\*\s*@home-only-start\s*\*\/([\s\S]*?)\/\*\s*@home-only-end\s*\*\//g;
+const rawCritical = readFileSync(join(DIST, 'assets/css/critical.css'), 'utf8');
+const criticalHome = minifyCss([...rawCritical.matchAll(HOME_RE)].map((m) => m[1]).join(' '));
+writeFileSync(join(DIST, 'assets/css/critical.css'), rawCritical.replace(HOME_RE, ''));
 for (const f of ['critical.css', 'main.css']) {
   const p = join(DIST, 'assets/css', f);
   // critical.css is inlined into the HTML, which gets the base prefix as a whole: prefix main.css only
@@ -94,9 +98,10 @@ if (BASE) {
   writeFileSync(mf, readFileSync(mf, 'utf8').replace(/"\/(?!\/)/g, `"${BASE}/`));
 }
 writeFileSync(join(DIST, '.nojekyll'), ''); // GitHub Pages: serve files as-is
+// Critical CSS is inlined per page (criticalHome is added on the homepage only).
 const critical = readFileSync(join(DIST, 'assets/css/critical.css'), 'utf8');
 rmSync(join(DIST, 'assets/css/critical.css'));
-configureLayout({ version, critical, wordmark, basePath: BASE, noindex: NOINDEX });
+configureLayout({ version, critical, criticalHome, wordmark, basePath: BASE, noindex: NOINDEX });
 
 // 4. Blog posts: src/content/posts/*.html with a JSON front matter comment.
 const POSTS_DIR = join(ROOT, 'src/content/posts');
@@ -174,7 +179,7 @@ writeFileSync(join(DIST, 'robots.txt'), `User-agent: *\nAllow: /\n\nSitemap: ${s
 // 7. Report.
 const dirSize = (d) => readdirSync(d).reduce((t, f) => { const p = join(d, f); const s = statSync(p); return t + (s.isDirectory() ? dirSize(p) : s.size); }, 0);
 console.log(`Built ${pages.length} pages (${indexable.length} in sitemap), ${posts.length} posts. dist = ${(dirSize(DIST) / 1048576).toFixed(1)} MB`);
-console.log(`critical.css inline: ${(Buffer.byteLength(critical) / 1024).toFixed(1)} KB, main.css: ${(statSync(join(DIST, 'assets/css/main.css')).size / 1024).toFixed(1)} KB`);
+console.log(`critical.css inline: ${(Buffer.byteLength(critical) / 1024).toFixed(1)} KB (+${(Buffer.byteLength(criticalHome) / 1024).toFixed(1)} KB on home), main.css: ${(statSync(join(DIST, 'assets/css/main.css')).size / 1024).toFixed(1)} KB`);
 if (problems.length) {
   console.warn('\nChecks:\n  ' + problems.join('\n  '));
 }

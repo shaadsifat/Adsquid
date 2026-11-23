@@ -7,12 +7,14 @@ import { esc, abs, icon, brand, btn, waLink, objImg, serviceUrl } from './lib.mj
 
 let assetVersion = (p) => p;
 let criticalCss = '';
+let criticalHomeCss = '';
 let wm = { w: 1200, h: 240 };
 let base = '';
 let forceNoindex = false;
-export function configureLayout({ version, critical, wordmark, basePath = '', noindex = false }) {
+export function configureLayout({ version, critical, criticalHome = '', wordmark, basePath = '', noindex = false }) {
   assetVersion = version;
   criticalCss = critical;
+  criticalHomeCss = criticalHome;
   if (wordmark) wm = wordmark;
   base = basePath;
   forceNoindex = noindex;
@@ -224,10 +226,10 @@ ${page.noindex || forceNoindex ? '<meta name="robots" content="noindex, follow">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
 <meta name="theme-color" content="#07050D">
-<link rel="preload" href="/assets/fonts/montserrat-800.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/assets/fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/raleway-800.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/open-sans-var.woff2" as="font" type="font/woff2" crossorigin>
 ${preloads}
-<style>${criticalCss}</style>
+<style>${criticalCss}${page.path === '/' ? criticalHomeCss : ''}</style>
 <link rel="preload" href="${assetVersion('/assets/css/main.css')}" as="style">
 <link rel="stylesheet" href="${assetVersion('/assets/css/main.css')}" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="${assetVersion('/assets/css/main.css')}"></noscript>
