@@ -22,11 +22,8 @@ ErrorDocument 404 /404.html
   RewriteRule ^services/digital-ads-management/(.+)$ /services/ads-campaign/$1 [L,R=301]
   RewriteRule ^services/social-media-management/?$ /services/social-media-marketing/ [L,R=301]
   RewriteRule ^services/content-development/?$ /services/video-production/ [L,R=301]
-  RewriteRule ^blog/category/digital-ads-management/?$ /blog/category/ads-campaign/ [L,R=301]
-  RewriteRule ^blog/category/social-media-management/?$ /blog/category/social-media-marketing/ [L,R=301]
-  RewriteRule ^blog/category/content-development/?$ /blog/category/video-production/ [L,R=301]
-  # Sample case-study pages replaced by the portfolio gallery
-  RewriteRule ^work/.+$ /work/ [L,R=301]
+  # Blog category pages were retired: send them to the blog
+  RewriteRule ^blog/category/ /blog/ [L,R=301]
 
   # /index.html and /folder/index.html -> clean URL (only for real browser requests, not internal ones)
   RewriteCond %{THE_REQUEST} \s/+(.*/)?index\.html[\s?] [NC]

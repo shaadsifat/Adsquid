@@ -3,7 +3,9 @@ import { services, team, values, timeline, careers, freeAudit, clients } from '.
 import {
   img16, icon, btn, waBtn, waLink, eyebrow, faqBlock, breadcrumbSchema, faqSchema, orgSchema, teamImg, clientLogo, esc, brand,
 } from '../lib.mjs';
-import { pageHero, heroPreload, heroIcon, teamFan } from './parts.mjs';
+import { pageHero, teamFan } from './parts.mjs';
+import { heroArt } from './art.mjs';
+const teamPhoto = (m) => `img:/assets/images/team/${m.photo}-320.webp`;
 
 export function aboutPage() {
   const crumbs = [{ name: 'About', path: '/about/' }];
@@ -78,7 +80,8 @@ ${pageHero({
   h1: 'Free digital marketing audit',
   display: 'Find your growth leaks. Free.',
   sentence: 'We review your ads, social pages and website, then send a 1-page plan to fix the leaks.',
-  image: 'pages/hero-free-audit',
+  cls: 'hero-type',
+  visual: heroArt(['audit', { items: [['target', 'Ads account check'], ['message-circle', 'Page and content'], ['gauge', 'Website speed'], ['search', 'SEO scan'], ['list-checks', '1-page action plan']] }]),
   buttons: btn('#audit-form', 'Start my audit', { cls: 'btn-magnetic' }) + waBtn('Ask on WhatsApp'),
 })}
 
@@ -96,7 +99,7 @@ ${pageHero({
       <h2 class="h2" id="form-title" data-split>Tell us where to look.</h2>
       <p class="sec-lead">Takes one minute. No payment, no contract.</p>
       <ol class="next-steps">
-        ${freeAudit.next.map((n, i) => `<li${i === 0 ? ' data-placeholder' : ''}><span class="step-dot mono">${i + 1}</span><div><strong>${n.title}</strong><span>${n.text}</span></div></li>`).join('')}
+        ${freeAudit.next.map((n, i) => `<li><span class="step-dot mono">${i + 1}</span><div><strong>${n.title}</strong><span>${n.text}</span></div></li>`).join('')}
       </ol>
     </div>
     <form class="form card glass" data-form="free-audit" novalidate>
@@ -124,7 +127,6 @@ ${faqBlock(freeAudit.faq, { num: '03', title: 'Before you ask.' })}`;
     title: 'Free Digital Marketing Audit | Adsquid',
     desc: 'Get a free review of your ads, social pages and website, plus a 1-page plan to fix the leaks.',
     cta: false,
-    preload: [heroPreload('pages/hero-free-audit')],
     schema: [breadcrumbSchema(crumbs), faqSchema(freeAudit.faq)],
     body,
   };
@@ -138,7 +140,8 @@ ${pageHero({
   h1: 'Contact Adsquid',
   display: "Let's talk.",
   sentence: 'Call, WhatsApp or send a message. We reply fast.',
-  image: 'pages/hero-contact',
+  cls: 'hero-type',
+  visual: heroArt(['chat', { avatar: '/assets/images/brand/logo/adsquid-mark.svg', messages: [['in', 'Hi! We need more orders from Facebook.'], ['out', 'Happy to help. Can you share your page link?'], ['in', 'Sure, here it is.'], ['out', 'Thanks! Your free audit is on the way.']], chips: [['phone', 'Call our hotline'], ['map-pin', 'Mirpur-6, Dhaka'], ['mail', 'Email us']] }]),
   buttons: waBtn('Chat on WhatsApp', 'btn-magnetic') + btn(`tel:${site.phoneHref}`, site.phone, { variant: 'ghost', iconName: 'phone' }),
 })}
 
@@ -164,7 +167,7 @@ ${pageHero({
         <li>${icon('phone')}<div><span class="mono">Hotline</span><a href="tel:${site.phoneHref}">${site.phone}</a></div></li>
         <li>${icon('mail')}<div><span class="mono">Email</span><a href="mailto:${site.email}">${site.email}</a></div></li>
         <li>${icon('map-pin')}<div><span class="mono">Office</span><address>${site.address.street}, ${site.address.locality} ${site.address.postalCode}, Bangladesh</address></div></li>
-        <li>${icon('clock')}<div><span class="mono">Office hours</span><span data-placeholder>${site.hours}</span></div></li>
+        <li>${icon('clock')}<div><span class="mono">Office hours</span><span>${site.hours}</span></div></li>
       </ul>
     </div>
   </div>
@@ -182,7 +185,6 @@ ${pageHero({
     title: 'Contact Adsquid | Digital Marketing Agency Dhaka',
     desc: 'Call, WhatsApp or message us. Office in Mirpur-6, Dhaka. We reply fast.',
     cta: { title: 'Prefer a free audit first?', text: 'Send your page or website link. We reply with a 1-page plan.' },
-    preload: [heroPreload('pages/hero-contact')],
     schema: [breadcrumbSchema(crumbs), orgSchema()],
     body,
   };
@@ -196,7 +198,8 @@ ${pageHero({
   h1: 'Careers at Adsquid',
   display: 'Join Teamsquid.',
   sentence: 'Marketers, designers and developers who like to see their work move numbers.',
-  image: 'pages/hero-careers',
+  cls: 'hero-type',
+  visual: heroArt(['signature', { core: 'rocket', nodes: team.map(teamPhoto), cards: [['graduation-cap', 'Learn every week'], ['users', 'Small, close team']] }]),
   buttons: btn(`mailto:${site.email}?subject=CV%20for%20Adsquid`, 'Send your CV', { cls: 'btn-magnetic', iconName: 'mail' }),
 })}
 <section class="section" aria-labelledby="why-title">
@@ -220,19 +223,17 @@ ${pageHero({
     title: 'Careers at Adsquid | Join Teamsquid in Dhaka',
     desc: 'Work with a Dhaka team of marketers, designers and developers. See open roles at Adsquid or send your CV.',
     cta: { eyebrow: 'Hiring or not', title: 'Good people are always welcome.', text: 'Want to work with us as a client instead? Start with a free audit.' },
-    preload: [heroPreload('pages/hero-careers')],
     schema: [breadcrumbSchema(crumbs)],
     body,
   };
 }
 
-function legal({ path, name, title, desc, sections }) {
+function legal({ path, name, title, desc, sections, art }) {
   const crumbs = [{ name, path }];
   const body = `
-${pageHero({ crumbs, h1: name, display: name + '.', sentence: `Last updated: ${legalUpdated}.`, cls: 'hero-type hero-small', visual: heroIcon('legal') })}
+${pageHero({ crumbs, h1: name, display: name + '.', sentence: `Last updated: ${legalUpdated}.`, cls: 'hero-type hero-small', visual: heroArt(art) })}
 <section class="section section-tight">
   <div class="container narrow prose">
-    <p class="draft-note" data-placeholder>Draft text. Have it reviewed and approved by the agency before launch.</p>
     ${sections.map(([h, ps]) => `<h2>${h}</h2>${ps.map((p) => `<p>${p}</p>`).join('')}`).join('\n')}
   </div>
 </section>`;
@@ -243,6 +244,7 @@ export function privacyPage() {
   return legal({
     path: '/privacy-policy/',
     name: 'Privacy Policy',
+    art: ['radar', { core: 'shield-check', blips: [['lock', 'Secure'], ['eye', 'Transparent'], ['user-check', 'Your rights'], ['file-text', 'Clear terms']] }],
     title: 'Privacy Policy | Adsquid',
     desc: 'How Adsquid collects, uses and protects the information you share through our website, forms and WhatsApp.',
     sections: [
@@ -261,8 +263,9 @@ export function privacyPage() {
 export function termsPage() {
   return legal({
     path: '/terms/',
-    name: 'Terms',
-    title: 'Terms of Use | Adsquid',
+    name: 'Terms and Conditions',
+    art: ['stack', { items: [['handshake', 'Fair use'], ['file-text', 'Clear rules'], ['shield-check', 'Your protection']] }],
+    title: 'Terms and Conditions | Adsquid',
     desc: 'The terms that apply when you use the Adsquid website. Service agreements with clients are covered by separate contracts.',
     sections: [
       ['About these terms', ['These terms apply to your use of this website. Work we do for clients is covered by a separate written agreement or proposal.']],

@@ -6,12 +6,12 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { site } from './config.mjs';
-import { services, adPages } from './data.mjs';
+import { services, works } from './data.mjs';
 import { configureLayout, renderPage } from './layout.mjs';
 import { homePage } from './pages/home.mjs';
-import { servicesHub, servicePage, adPage } from './pages/services.mjs';
-import { workIndex } from './pages/work.mjs';
-import { blogIndex, categoryPage, postPage } from './pages/blog.mjs';
+import { servicesHub, servicePage, subPage } from './pages/services.mjs';
+import { workIndex, workPage } from './pages/work.mjs';
+import { blogIndex, postPage } from './pages/blog.mjs';
 import { aboutPage, auditPage, contactPage, careersPage, privacyPage, termsPage, notFoundPage } from './pages/company.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -138,10 +138,10 @@ const pages = [
   homePage(ctx),
   servicesHub(),
   ...services.map((s) => servicePage(s, ctx)),
-  ...adPages.map((a) => adPage(a, ctx)),
+  ...services.flatMap((s) => s.subs.map((x) => subPage(s, x, ctx))),
   workIndex(),
+  ...works.map(workPage),
   blogIndex(ctx),
-  ...services.map((s) => categoryPage(s, ctx)),
   ...posts.map((p) => postPage(p, ctx)),
   aboutPage(),
   auditPage(),

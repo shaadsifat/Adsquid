@@ -9,7 +9,7 @@ export const groups = [
 
 // The eight services, in the order of the services brief (Adsquid Website Work 2026).
 // key = image family (obj-*, hero-*, cover-*); obj/hero/cover override it where a service has its own art.
-// subs = the sub-services from the brief; `href` links a sub to its own page (Ads Campaign platforms).
+// subs = the sub-services from the brief; every sub has its own page at /services/<service>/<sub slug>/ (copy in src/content/services/).
 export const services = [
   {
     slug: 'ads-campaign',
@@ -32,11 +32,11 @@ export const services = [
       { title: 'One ad, forever', text: 'The same creative runs for months. Costs climb as people stop seeing it.' },
     ],
     subs: [
-      { brand: 'meta', title: 'Meta Ads', text: 'Facebook, Instagram, Messenger and WhatsApp ads.', href: '/services/ads-campaign/meta-ads/' },
-      { brand: 'googleads', title: 'Google Ads', text: 'Search, Display, Shopping and Performance Max.', href: '/services/ads-campaign/google-ads/' },
-      { brand: 'tiktok', title: 'TikTok Ads', text: 'In-feed and Spark ads with native creatives.', href: '/services/ads-campaign/tiktok-ads/' },
-      { brand: 'youtube', title: 'YouTube Ads', text: 'In-stream, Shorts and bumper ads that stop the skip.', href: '/services/ads-campaign/youtube-ads/' },
-      { brand: 'linkedin', title: 'LinkedIn Ads', text: 'B2B lead campaigns for decision makers.', href: '/services/ads-campaign/linkedin-ads/' },
+      { brand: 'meta', slug: 'meta-ads', title: 'Meta Ads', text: 'Facebook, Instagram, Messenger and WhatsApp ads.' },
+      { brand: 'googleads', slug: 'google-ads', title: 'Google Ads', text: 'Search, Display, Shopping and Performance Max.' },
+      { brand: 'tiktok', slug: 'tiktok-ads', title: 'TikTok Ads', text: 'In-feed and Spark ads with native creatives.' },
+      { brand: 'youtube', slug: 'youtube-ads', title: 'YouTube Ads', text: 'In-stream, Shorts and bumper ads that stop the skip.' },
+      { brand: 'linkedin', slug: 'linkedin-ads', title: 'LinkedIn Ads', text: 'B2B lead campaigns for decision makers.' },
     ],
     steps: [
       { title: 'Audit', text: 'We check your account, tracking and past results.' },
@@ -74,14 +74,14 @@ export const services = [
       { title: 'No plan behind posts', text: 'Random posts, random results. Nothing builds on the last one.' },
     ],
     subs: [
-      { brand: 'facebook', title: 'Facebook', text: 'Page management, posts, groups and inbox.' },
-      { brand: 'instagram', title: 'Instagram', text: 'Feed, Reels, Stories and highlights.' },
-      { brand: 'threads', title: 'Threads', text: 'Short daily posts that start conversations.' },
-      { brand: 'tiktok', title: 'TikTok', text: 'Trend-led short videos made for the For You page.' },
-      { brand: 'youtube', title: 'YouTube', text: 'Channel setup, videos, Shorts and SEO.' },
-      { brand: 'linkedin', title: 'LinkedIn', text: 'Company page and founder content for B2B.' },
-      { brand: 'x', title: 'Twitter (X)', text: 'Timely posts, threads and replies.' },
-      { brand: 'pinterest', title: 'Pinterest', text: 'Pins and boards that send buyers to your site.' },
+      { brand: 'facebook', slug: 'facebook-marketing', title: 'Facebook', text: 'Page management, posts, groups and inbox.' },
+      { brand: 'instagram', slug: 'instagram-marketing', title: 'Instagram', text: 'Feed, Reels, Stories and highlights.' },
+      { brand: 'threads', slug: 'threads-marketing', title: 'Threads', text: 'Short daily posts that start conversations.' },
+      { brand: 'tiktok', slug: 'tiktok-marketing', title: 'TikTok', text: 'Trend-led short videos made for the For You page.' },
+      { brand: 'youtube', slug: 'youtube-marketing', title: 'YouTube', text: 'Channel setup, videos, Shorts and SEO.' },
+      { brand: 'linkedin', slug: 'linkedin-marketing', title: 'LinkedIn', text: 'Company page and founder content for B2B.' },
+      { brand: 'x', slug: 'x-twitter-marketing', title: 'Twitter (X)', text: 'Timely posts, threads and replies.' },
+      { brand: 'pinterest', slug: 'pinterest-marketing', title: 'Pinterest', text: 'Pins and boards that send buyers to your site.' },
     ],
     steps: [
       { title: 'Audit', text: 'We review your pages and your competitors.' },
@@ -119,9 +119,9 @@ export const services = [
       { title: 'No rules to follow', text: 'Every designer guesses. The brand drifts a little more each month.' },
     ],
     subs: [
-      { icon: 'pen-tool', title: 'Logo', text: 'A distinctive mark and wordmark in every format you need.' },
-      { icon: 'palette', title: 'Identity', text: 'Colours, typography, patterns and stationery as one system.' },
-      { icon: 'book-marked', title: 'Guideline', text: 'A brand book that keeps every designer and agency consistent.' },
+      { icon: 'pen-tool', slug: 'logo-design', title: 'Logo', text: 'A distinctive mark and wordmark in every format you need.' },
+      { icon: 'palette', slug: 'brand-identity', title: 'Identity', text: 'Colours, typography, patterns and stationery as one system.' },
+      { icon: 'book-marked', slug: 'brand-guidelines', title: 'Guideline', text: 'A brand book that keeps every designer and agency consistent.' },
     ],
     steps: [
       { title: 'Discover', text: 'Your story, audience and competitors.' },
@@ -160,11 +160,11 @@ export const services = [
       { title: 'Slow turnaround', text: 'Campaigns wait days for a banner. Opportunities pass.' },
     ],
     subs: [
-      { icon: 'images', title: 'Social Media Post', text: 'Posts, carousels and stories for every platform.' },
-      { icon: 'layout-template', title: 'Banner', text: 'Web banners, ad creatives and cover designs.' },
-      { icon: 'monitor', title: 'Web Content', text: 'Website graphics, landing visuals and product images.' },
-      { icon: 'package', title: 'Packaging Design', text: 'Boxes, labels and bags that sell on the shelf.' },
-      { icon: 'printer', title: 'Printing Design', text: 'Flyers, brochures, stationery and standees.' },
+      { icon: 'images', slug: 'social-media-post-design', title: 'Social Media Post', text: 'Posts, carousels and stories for every platform.' },
+      { icon: 'layout-template', slug: 'banner-design', title: 'Banner', text: 'Web banners, ad creatives and cover designs.' },
+      { icon: 'monitor', slug: 'web-content-design', title: 'Web Content', text: 'Website graphics, landing visuals and product images.' },
+      { icon: 'package', slug: 'packaging-design', title: 'Packaging Design', text: 'Boxes, labels and bags that sell on the shelf.' },
+      { icon: 'printer', slug: 'print-design', title: 'Printing Design', text: 'Flyers, brochures, stationery and standees.' },
     ],
     steps: [
       { title: 'Brief', text: 'Goal, audience, message and format.' },
@@ -201,11 +201,11 @@ export const services = [
       { title: 'One video, one size', text: 'A wide video squeezed into Reels loses half the frame.' },
     ],
     subs: [
-      { icon: 'video', title: 'Reels Video', text: 'Hook-first vertical videos for Reels, TikTok and Shorts.' },
-      { icon: 'sparkles', title: 'Motion Video', text: 'Motion graphics for ads, explainers and logos.' },
-      { icon: 'clapperboard', title: 'Promo Video', text: 'Product and brand promos shot and edited in-house.' },
-      { icon: 'film', title: 'Animation', text: '2D animated explainers and character stories.' },
-      { icon: 'rotate-3d', title: '3D', text: '3D product videos and CGI ads, no studio needed.' },
+      { icon: 'video', slug: 'reels-video', title: 'Reels Video', text: 'Hook-first vertical videos for Reels, TikTok and Shorts.' },
+      { icon: 'sparkles', slug: 'motion-graphics', title: 'Motion Video', text: 'Motion graphics for ads, explainers and logos.' },
+      { icon: 'clapperboard', slug: 'promo-video', title: 'Promo Video', text: 'Product and brand promos shot and edited in-house.' },
+      { icon: 'film', slug: 'animation', title: 'Animation', text: '2D animated explainers and character stories.' },
+      { icon: 'rotate-3d', slug: '3d-animation', title: '3D', text: '3D product videos and CGI ads, no studio needed.' },
     ],
     steps: [
       { title: 'Idea', text: 'Hooks, angles and a simple script.' },
@@ -242,14 +242,14 @@ export const services = [
       { title: 'Built, then forgotten', text: 'No updates, no backups, no security. Until something breaks.' },
     ],
     subs: [
-      { icon: 'briefcase', title: 'Portfolio', text: 'Show your work beautifully and win clients.' },
-      { icon: 'shopping-cart', title: 'E-commerce', text: 'Online stores with bKash, cards and courier.' },
-      { icon: 'building-2', title: 'Business', text: 'Clear company websites that turn visits into calls.' },
-      { icon: 'pen-line', title: 'Blog', text: 'Content sites built to rank and grow.' },
-      { icon: 'newspaper', title: 'News Media', text: 'Fast news portals with categories and ads.' },
-      { icon: 'graduation-cap', title: 'Education', text: 'Schools, courses and coaching websites.' },
-      { icon: 'hand-heart', title: 'Non-profit', text: 'Websites for causes, with donations built in.' },
-      { icon: 'code', title: 'Custom', text: 'Custom builds on Laravel, Python or React.' },
+      { icon: 'briefcase', slug: 'portfolio-website', title: 'Portfolio', text: 'Show your work beautifully and win clients.' },
+      { icon: 'shopping-cart', slug: 'ecommerce-website', title: 'E-commerce', text: 'Online stores with bKash, cards and courier.' },
+      { icon: 'building-2', slug: 'business-website', title: 'Business', text: 'Clear company websites that turn visits into calls.' },
+      { icon: 'pen-line', slug: 'blog-website', title: 'Blog', text: 'Content sites built to rank and grow.' },
+      { icon: 'newspaper', slug: 'news-portal', title: 'News Media', text: 'Fast news portals with categories and ads.' },
+      { icon: 'graduation-cap', slug: 'education-website', title: 'Education', text: 'Schools, courses and coaching websites.' },
+      { icon: 'hand-heart', slug: 'nonprofit-website', title: 'Non-profit', text: 'Websites for causes, with donations built in.' },
+      { icon: 'code', slug: 'custom-website', title: 'Custom', text: 'Custom builds on Laravel, Python or React.' },
     ],
     steps: [
       { title: 'Plan', text: 'Pages, features and content map.' },
@@ -287,10 +287,10 @@ export const services = [
       { title: 'No local presence', text: 'Your Google Business Profile is empty or missing. Map searches go elsewhere.' },
     ],
     subs: [
-      { icon: 'file-text', title: 'On-Page', text: 'Titles, content, headings and internal links per keyword.' },
-      { icon: 'link', title: 'Off-Page', text: 'Clean, relevant links and mentions from real sites.' },
-      { icon: 'wrench', title: 'Technical', text: 'Speed, indexing, schema and site structure.' },
-      { icon: 'map-pin', title: 'Local', text: 'Google Business Profile, reviews and local listings.' },
+      { icon: 'file-text', slug: 'on-page-seo', title: 'On-Page', text: 'Titles, content, headings and internal links per keyword.' },
+      { icon: 'link', slug: 'off-page-seo', title: 'Off-Page', text: 'Clean, relevant links and mentions from real sites.' },
+      { icon: 'wrench', slug: 'technical-seo', title: 'Technical', text: 'Speed, indexing, schema and site structure.' },
+      { icon: 'map-pin', slug: 'local-seo', title: 'Local', text: 'Google Business Profile, reviews and local listings.' },
     ],
     steps: [
       { title: 'Audit', text: 'Technical scan, keyword gaps and competitors.' },
@@ -327,12 +327,12 @@ export const services = [
       { title: 'Off-the-shelf misfit', text: 'Generic software forces your team to work its way, not yours.' },
     ],
     subs: [
-      { icon: 'store', title: 'POS', text: 'Point of sale for shops and restaurants, online and offline.' },
-      { icon: 'layers', title: 'ERP', text: 'Stock, purchase, sales and production in one system.' },
-      { icon: 'contact', title: 'CRM', text: 'Leads, customers and follow-ups in one place.' },
-      { icon: 'users', title: 'HR', text: 'Staff, attendance, leave and payroll.' },
-      { icon: 'calculator', title: 'Accounting', text: 'Invoices, expenses and reports that add up.' },
-      { icon: 'code', title: 'Custom', text: 'Web apps and dashboards for your exact process.' },
+      { icon: 'store', slug: 'pos-software', title: 'POS', text: 'Point of sale for shops and restaurants, online and offline.' },
+      { icon: 'layers', slug: 'erp-software', title: 'ERP', text: 'Stock, purchase, sales and production in one system.' },
+      { icon: 'contact', slug: 'crm-software', title: 'CRM', text: 'Leads, customers and follow-ups in one place.' },
+      { icon: 'users', slug: 'hr-software', title: 'HR', text: 'Staff, attendance, leave and payroll.' },
+      { icon: 'calculator', slug: 'accounting-software', title: 'Accounting', text: 'Invoices, expenses and reports that add up.' },
+      { icon: 'code', slug: 'custom-software', title: 'Custom', text: 'Web apps and dashboards for your exact process.' },
     ],
     steps: [
       { title: 'Discover', text: 'We map your workflow and pain points.' },
@@ -346,140 +346,6 @@ export const services = [
       { q: 'How long does a project take?', a: 'A focused first version usually takes 6-12 weeks. We ship in small steps so you see progress early.' },
       { q: 'Who owns the code?', a: 'You do. Full source code and documentation are handed over on final payment.' },
       { q: 'Do you provide support after launch?', a: 'Yes. We offer monthly support plans for fixes, updates and new features.' },
-    ],
-  },
-];
-
-export const adPages = [
-  {
-    slug: 'meta-ads',
-    key: 'meta-ads',
-    name: 'Meta Ads',
-    brands: ['meta', 'facebook', 'instagram'],
-    h1: 'Facebook ads agency in Bangladesh',
-    display: 'Sell where your buyers scroll.',
-    sentence: 'Facebook, Instagram, Messenger and WhatsApp ads, with tracking that proves every sale.',
-    title: 'Facebook Ads Agency in Bangladesh | Meta Ads by Adsquid',
-    desc: 'Facebook and Instagram ads that sell. Pixel and CAPI setup, catalog ads, creatives and daily optimization.',
-    intro: 'As a Facebook ads agency in Bangladesh, we build Meta campaigns around sales and messages, not likes.',
-    types: [
-      { icon: 'shopping-cart', title: 'Sales campaigns', text: 'Optimized for purchases on your site or shop.' },
-      { icon: 'message-circle', title: 'Messenger and WhatsApp', text: 'Click-to-message ads for inbox orders.' },
-      { icon: 'layers', title: 'Catalog and dynamic ads', text: 'Show each visitor the products they viewed.' },
-      { icon: 'users', title: 'Lead ads', text: 'Instant forms for services and B2B.' },
-      { icon: 'repeat', title: 'Retargeting', text: 'Win back visitors and past buyers.' },
-      { icon: 'video', title: 'Reels ads', text: 'Vertical video ads made for Reels and Stories.' },
-    ],
-    faq: [
-      { q: 'Boost post or Ads Manager?', a: 'Ads Manager, almost always. It gives you real targeting, testing and sales optimization. Boost is built for reach, not revenue.' },
-      { q: 'Do you set up the Pixel and Conversions API?', a: 'Yes. Correct tracking is the first thing we fix, because Meta learns from it.' },
-      { q: 'Can you run ads for my Facebook shop?', a: 'Yes. We connect your catalog and run dynamic product ads.' },
-      { q: 'What if my ad account is restricted?', a: 'We help you check the reason and file a review, and we set up campaigns to avoid common policy problems.' },
-    ],
-  },
-  {
-    slug: 'google-ads',
-    key: 'google-ads',
-    name: 'Google Ads',
-    brands: ['googleads', 'google'],
-    h1: 'Google Ads agency in Bangladesh',
-    display: 'Show up when they search.',
-    sentence: 'Search, Shopping and Performance Max campaigns that reach buyers the moment they search.',
-    title: 'Google Ads Agency in Bangladesh | Adsquid',
-    desc: 'Search, Shopping and Performance Max campaigns that reach buyers the moment they search.',
-    intro: 'Our Google Ads agency in Bangladesh puts your business in front of people who are already searching to buy.',
-    types: [
-      { icon: 'search', title: 'Search ads', text: 'Text ads on the keywords buyers type.' },
-      { icon: 'shopping-cart', title: 'Shopping ads', text: 'Product listings with price and photo.' },
-      { icon: 'zap', title: 'Performance Max', text: 'One campaign across all Google channels.' },
-      { icon: 'image', title: 'Display ads', text: 'Banner ads across millions of sites.' },
-      { icon: 'repeat', title: 'Remarketing', text: 'Follow up with past visitors.' },
-      { icon: 'map-pin', title: 'Local campaigns', text: 'Calls and visits for local businesses.' },
-    ],
-    faq: [
-      { q: 'Google Ads or Facebook ads?', a: 'Google catches people already searching. Facebook creates demand. Many businesses need both, in the right balance.' },
-      { q: 'What is a good starting budget?', a: 'It depends on keyword costs in your industry. We estimate it from real keyword data before you spend.' },
-      { q: 'Do you handle Merchant Center?', a: 'Yes. We set up and fix Google Merchant Center feeds for Shopping ads.' },
-      { q: 'How do you stop wasted spend?', a: 'Negative keywords, tight match types, conversion tracking and weekly search term reviews.' },
-    ],
-  },
-  {
-    slug: 'tiktok-ads',
-    key: 'tiktok-ads',
-    name: 'TikTok Ads',
-    brands: ['tiktok'],
-    h1: 'TikTok ads agency in Bangladesh',
-    display: 'Win the For You page.',
-    sentence: 'In-feed and Spark ads with native creatives built for how TikTok is watched.',
-    title: 'TikTok Ads Agency in Bangladesh | Adsquid',
-    desc: 'TikTok in-feed and Spark ads with native creatives built to win the For You page.',
-    intro: 'We are a TikTok ads agency in Bangladesh making ads that feel like TikTok, so people watch instead of swiping.',
-    types: [
-      { icon: 'play', title: 'In-feed ads', text: 'Full-screen video ads in the For You feed.' },
-      { icon: 'sparkles', title: 'Spark ads', text: 'Boost real posts from you or creators.' },
-      { icon: 'store', title: 'Shop ads', text: 'Product ads for TikTok Shop.', confirm: true },
-      { icon: 'video', title: 'Native creatives', text: 'Hook-first edits made for TikTok.' },
-      { icon: 'activity', title: 'Pixel and events', text: 'TikTok Pixel and events API setup.' },
-      { icon: 'users', title: 'Creator partnerships', text: 'Find creators who fit your brand.' },
-    ],
-    faq: [
-      { q: 'Does TikTok work for my business?', a: 'If your buyers are 18-35 and your product is visual, very likely. We will tell you honestly after a quick review.' },
-      { q: 'Can I reuse my Facebook videos?', a: 'Sometimes, with a re-edit. Ads that look native to TikTok almost always perform better.' },
-      { q: 'What are Spark ads?', a: 'Ads that boost an organic post from your account or a creator, keeping likes and comments visible.' },
-      { q: 'Do you make the videos?', a: 'Yes. Our content team scripts, shoots and edits TikTok-native ads.' },
-    ],
-  },
-  {
-    slug: 'youtube-ads',
-    key: 'youtube-ads',
-    name: 'YouTube Ads',
-    brands: ['youtube', 'youtubeshorts'],
-    h1: 'YouTube ads in Bangladesh',
-    display: "Ads they don't skip.",
-    sentence: 'In-stream, Shorts and bumper ads with scripts and edits made to stop the skip.',
-    title: 'YouTube Ads Service in Bangladesh | Adsquid',
-    desc: 'In-stream, Shorts and bumper ads with scripts and edits made to stop the skip.',
-    intro: 'Our YouTube ads in Bangladesh are built around the first five seconds, the only part everyone sees.',
-    types: [
-      { icon: 'play', title: 'Skippable in-stream', text: 'Ads before and during videos.' },
-      { icon: 'smartphone', title: 'Shorts ads', text: 'Vertical ads between Shorts.' },
-      { icon: 'timer', title: 'Bumper ads', text: 'Six seconds, unskippable, memorable.' },
-      { icon: 'search', title: 'In-feed video ads', text: 'Show up in YouTube search results.' },
-      { icon: 'repeat', title: 'Video remarketing', text: 'Reach people who watched your videos.' },
-      { icon: 'pencil-line', title: 'Scripts and edits', text: 'Hook-first scripts and fast edits.' },
-    ],
-    faq: [
-      { q: 'Do I pay when people skip?', a: 'For skippable in-stream ads you usually pay only when someone watches 30 seconds (or the full ad if shorter) or clicks.' },
-      { q: 'Do I need a big video budget?', a: 'No. A clear script and a simple, well-edited video often beat expensive productions.' },
-      { q: 'Can YouTube ads drive sales?', a: 'Yes, with conversion tracking and the right campaign type. They also lift your other channels.' },
-      { q: 'Do you make the video?', a: 'Yes. Our content team writes, shoots and edits ads built for YouTube.' },
-    ],
-  },
-  {
-    slug: 'linkedin-ads',
-    key: 'linkedin-ads',
-    hero: 'services/hero-digital-ads',
-    name: 'LinkedIn Ads',
-    brands: ['linkedin'],
-    h1: 'LinkedIn ads agency in Bangladesh',
-    display: 'Reach the decision makers.',
-    sentence: 'Lead gen and awareness campaigns that put your offer in front of the right job titles.',
-    title: 'LinkedIn Ads Agency in Bangladesh | B2B Lead Generation | Adsquid',
-    desc: 'LinkedIn ads for B2B: lead gen forms, sponsored content and retargeting aimed at the job titles and companies that buy from you.',
-    intro: 'Our LinkedIn ads team in Bangladesh targets by job title, company and industry, so B2B budgets reach people who can actually sign.',
-    types: [
-      { icon: 'contact', title: 'Lead gen forms', text: 'Pre-filled forms that turn clicks into qualified leads.' },
-      { icon: 'newspaper', title: 'Sponsored content', text: 'Native posts in the feed of your ideal buyers.' },
-      { icon: 'send', title: 'Message ads', text: 'Direct messages to decision makers.' },
-      { icon: 'video', title: 'Video ads', text: 'Short videos that explain your offer fast.' },
-      { icon: 'repeat', title: 'Retargeting', text: 'Follow up with website visitors and video viewers.' },
-      { icon: 'building-2', title: 'Account targeting', text: 'Reach named companies and their teams.' },
-    ],
-    faq: [
-      { q: 'Is LinkedIn worth it for my business?', a: 'If you sell to businesses and one deal is worth a lot, usually yes. Clicks cost more, but leads are far better qualified.' },
-      { q: 'What budget do I need?', a: 'LinkedIn needs a higher budget than Meta. We estimate it from your audience size and deal value before you spend.' },
-      { q: 'Do you write the ads?', a: 'Yes. We write the copy, design the creatives and build the lead forms.' },
-      { q: 'Can leads go to my CRM?', a: 'Yes. We connect LinkedIn lead forms to your CRM or email so no lead is lost.' },
     ],
   },
 ];
@@ -512,12 +378,12 @@ export const workFilters = [
 // Team, in the order of the numbered portraits (01-07). Photos: images/team/<photo>.webp
 export const team = [
   { name: 'Nirjhar Khan', role: 'Creative Director', photo: 'nirjhar-khan', linkedin: 'https://www.linkedin.com/in/nirjharkhan' },
-  { name: 'Sakib Malik', role: 'Creative Advisor', photo: 'sakib-malik' },
-  { name: 'Kazi Asif', role: 'Brand Strategist', photo: 'kazi-asif', linkedin: 'https://www.linkedin.com/in/kaziasifuzzaman' },
+  { name: 'Sakib Malik', role: 'Creative Advisor', photo: 'sakib-malik', linkedin: 'https://www.linkedin.com/in/sakibmalik/' },
+  { name: 'Kazi Asif', role: 'Brand Strategist', photo: 'kazi-asif', linkedin: 'https://www.linkedin.com/in/kaziasifuzzaman/' },
   { name: 'Zaeid Sikder Tomal', role: 'Content Specialist', photo: 'zaeid-sikder-tomal', linkedin: 'https://www.linkedin.com/in/tomal-sikder-856464257' },
   { name: 'Fuad Al Hassan', role: 'Creative Designer', photo: 'fuad-al-hassan', linkedin: 'https://www.linkedin.com/in/fuad-al-hassan-6091a1219/' },
-  { name: 'Shaad Sifat', role: 'Tech Specialist', photo: 'shaad-sifat' },
-  { name: 'Mezbahul Rafi', role: 'Marketing Specialist', photo: 'mezbahul-rafi' },
+  { name: 'Md Shaad Uddin Sifat', role: 'Tech Specialist', photo: 'shaad-sifat', linkedin: 'https://www.linkedin.com/in/shaad-sifat/' },
+  { name: 'Mezbahul Alam Rafi', role: 'Marketing Specialist', photo: 'mezbahul-rafi', linkedin: 'https://www.linkedin.com/in/mezbahul-alam-rafi/' },
 ];
 
 export const counters = [
@@ -528,12 +394,14 @@ export const counters = [
 ];
 
 export const whyUs = [
-  { icon: 'users', title: 'In-house team', text: 'No outsourcing. The people you meet do the work.' },
-  { icon: 'file-text', title: 'Clear monthly reports', text: 'Plain numbers: what we spent, what it brought, what is next.' },
-  { icon: 'headphones', title: 'One point of contact', text: 'One manager who knows your account. No ticket queues.' },
-  { icon: 'globe', title: 'Local roots, global reach', text: 'Born in Bangladesh, serving brands in five countries.' },
+  { icon: 'users', title: 'In-house team', text: 'No outsourcing. Marketers, designers, video editors and developers work in one office, so ideas move from plan to live in days.' },
+  { icon: 'file-text', title: 'Clear monthly reports', text: 'Plain numbers every month: what we spent, what it brought back and what we will test next. No jargon, no vanity metrics.' },
+  { icon: 'headphones', title: 'One point of contact', text: 'One account manager who knows your business and answers on WhatsApp. No ticket queues, no passing you around.' },
+  { icon: 'globe', title: 'Local roots, global reach', text: 'Born in Bangladesh and serving brands in five countries. We know bKash and courier as well as global ad platforms.' },
 ];
 
+// Home "Why Adsquid": what a client gets.
+export const whyPromises = ['Free audit before any contract', 'Tracking set up before we spend', 'You own every account and file', 'Same-day replies on working days'];
 export const processSteps = [
   { title: 'Audit', text: 'Find the leaks.' },
   { title: 'Strategy', text: 'Pick the channels.' },
@@ -575,7 +443,7 @@ export const freeAudit = {
     { icon: 'list-checks', title: 'A 1-page action plan', text: 'The top fixes, in order of impact.' },
   ],
   next: [
-    { title: 'We review', text: 'Within 24-48 hours.' }, // CONFIRM reply time
+    { title: 'We review', text: 'Within 24-48 hours.' },
     { title: 'We call you', text: 'A short call to walk through what we found.' },
     { title: 'You get the plan', text: 'Keep it, use it, with or without us.' },
   ],

@@ -2,8 +2,8 @@
 // Header and footer are written into every HTML file at build time
 // (never injected by JavaScript), so all menu links are crawlable.
 import { site, year } from './config.mjs';
-import { groups, services, adPages } from './data.mjs';
-import { esc, abs, icon, brand, btn, waLink, serviceUrl, subId, hexIcon, ctaBand } from './lib.mjs';
+import { services } from './data.mjs';
+import { esc, abs, icon, brand, btn, waLink, serviceUrl, subUrl, hexIcon, ctaBand } from './lib.mjs';
 
 let assetVersion = (p) => p;
 let criticalCss = '';
@@ -31,7 +31,7 @@ function megaMenu() {
   // Eight services, each with its sub-services underneath (sub links go to the sub page or its card on the service page).
   const block = (s, i) => `<li class="mega-svc" style="--i:${i}">
           <a class="mega-head" href="${serviceUrl(s)}">${hexIcon(s.icon)}<span><span class="mega-name">${s.name}</span><span class="mega-pitch">${s.pitch}</span></span></a>
-          <ul class="mega-subs">${s.subs.map((x) => `<li><a href="${x.href || serviceUrl(s) + '#' + subId(x)}">${x.title}</a></li>`).join('')}</ul>
+          <ul class="mega-subs">${s.subs.map((x) => `<li><a href="${subUrl(s, x)}">${x.title}</a></li>`).join('')}</ul>
         </li>`;
   return `<div class="mega" id="mega-menu">
     <div class="container mega-inner">
@@ -126,7 +126,7 @@ function footer() {
       <div>
         <p class="footer-h">Services</p>
         <ul>
-          ${services.map((x) => `<li><a href="${serviceUrl(x)}">${x.name}</a></li>`).join('\n          ')}
+          ${services.filter((x) => !['seo', 'software-development'].includes(x.slug)).map((x) => `<li><a href="${serviceUrl(x)}">${x.name}</a></li>`).join('\n          ')}
         </ul>
       </div>
       <div>
@@ -157,8 +157,8 @@ function footer() {
     <span class="wm-star"></span>
   </div>
   <div class="container footer-bottom">
-    <p class="copy">Copyright &copy; <span class="js-year">${year}</span> | All rights are reserved by Adsquid <span class="legal"><a href="/privacy-policy/">Privacy Policy</a> &middot; <a href="/terms/">Terms</a> &middot; <a href="/sitemap.xml">Sitemap</a></span></p>
-    <p class="credit">Design &amp; Developed by <strong>Shaad Sifat</strong></p>
+    <p class="copy">Copyright &copy; <span class="js-year">${year}</span> | All rights are reserved by Adsquidbd</p>
+    <p class="legal"><a href="/privacy-policy/">Privacy Policy</a><a href="/terms/">Terms &amp; Conditions</a></p>
   </div>
 </footer>`;
 }

@@ -48,7 +48,7 @@ export function teamImg(m, { sizes = '(min-width: 1024px) 25vw, 50vw', eager = f
 
 export const serviceBySlug = (slug) => services.find((s) => s.slug === slug);
 export const serviceUrl = (s) => `/services/${s.slug}/`;
-export const adUrl = (a) => `/services/ads-campaign/${a.slug}/`;
+export const subUrl = (s, x) => `/services/${s.slug}/${x.slug}/`;
 // Per-service art: obj-<key> thumbnails, page hero and blog cover (a service can override hero/cover).
 export const heroOf = (s) => s.hero || `services/hero-${s.key}`;
 export const coverOf = (s) => s.cover || `blog/cover-${s.key}`;

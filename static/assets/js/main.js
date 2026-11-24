@@ -31,8 +31,8 @@
   let lenis = null;
   if (hasGsap) gsap.registerPlugin(ScrollTrigger);
   if (!reduce && window.Lenis) {
-    // Carousels scroll natively (cheap) instead of making Lenis inspect every ancestor on each wheel event.
-    lenis = new Lenis({ lerp: 0.1, smoothWheel: true, prevent: (node) => !!(node.classList && (node.classList.contains('car-track'))) });
+    // Vertical wheel always goes through Lenis (also over the team carousel, which only scrolls sideways); the open mega menu scrolls natively.
+    lenis = new Lenis({ lerp: 0.1, smoothWheel: true, prevent: (node) => !!(node.classList && node.classList.contains('mega')) });
     lenis.updateClassName = () => {}; // no lenis-* classes on <html> (nothing uses them; avoids root class churn)
     if (hasGsap) {
       lenis.on('scroll', ScrollTrigger.update);
@@ -726,19 +726,20 @@
   const lb = $('.lightbox');
   const lbLinks = $$('[data-lightbox]');
   if (lb && lb.showModal && lbLinks.length) {
-    const img = $('.lb-img', lb), name = $('.lb-name', lb), cat = $('.lb-cat', lb), count = $('.lb-count', lb);
+    const img = $('.lb-img', lb), name = $('.lb-name', lb), cat = $('.lb-cat', lb), count = $('.lb-count', lb), goLink = $('.lb-go', lb);
     let list = lbLinks, at = 0, opener = null;
     const show = (k) => {
       at = (k + list.length) % list.length;
       const a = list[at];
-      img.src = a.getAttribute('href');
+      img.src = a.dataset.src || a.getAttribute('href');
+      if (goLink) { goLink.hidden = !a.dataset.href; if (a.dataset.href) goLink.href = a.dataset.href; }
       img.alt = a.dataset.title;
       name.textContent = a.dataset.title;
       cat.textContent = a.dataset.cat;
       count.textContent = `${at + 1} / ${list.length}`;
       img.style.animation = 'none'; void img.offsetWidth; img.style.animation = '';
       const nx = list[(at + 1) % list.length];
-      if (nx) new Image().src = nx.getAttribute('href'); // preload the next one
+      if (nx) new Image().src = nx.dataset.src || nx.getAttribute('href'); // preload the next one
     };
     lbLinks.forEach((a) => a.addEventListener('click', (e) => {
       if (e.metaKey || e.ctrlKey || e.shiftKey || e.button) return;

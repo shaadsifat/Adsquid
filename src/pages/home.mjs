@@ -1,8 +1,9 @@
 import { site } from '../config.mjs';
-import { services, works, team, counters, whyUs, processSteps, clients } from '../data.mjs';
-import { esc, icon, img16, teamImg, btn, eyebrow, serviceUrl, orgSchema, clientLogo, abs, brand, splitWords, hexIcon } from '../lib.mjs';
+import { services, works, team, counters, whyUs, whyPromises, processSteps, clients } from '../data.mjs';
+import { esc, icon, img16, teamImg, btn, eyebrow, serviceUrl, serviceBySlug, orgSchema, clientLogo, abs, brand, splitWords, hexIcon } from '../lib.mjs';
 import { postCard } from './blog.mjs';
-import { workTile, lightbox } from './work.mjs';
+import { workUrl } from './work.mjs';
+import { lightbox } from './parts.mjs';
 
 // Platform tops on home-04-process, in % of the image box.
 const PLATFORMS = [
@@ -49,7 +50,8 @@ export function servicesInfographic({ headingTag = 'h3' } = {}) {
 }
 
 export function homePage({ posts }) {
-  const featured = ['social-media-post-design', 'custom-website-design', 'logo-design-branding'].map((slug) => works.find((w) => w.slug === slug));
+  // The six pieces on the Proof film reel.
+  const reel = ['custom-website-design', 'social-media-post-design', 'logo-design-branding', 'burger-social-media', 'software-dashboard', 'fashion-branding-design'].map((slug) => works.find((w) => w.slug === slug));
   const latest = posts.slice(0, 3);
   const half = Math.ceil(clients.length / 2);
   const row = (list) => [...list, ...list].map((c, i) => clientLogo(c, { hidden: i >= list.length })).join('');
@@ -143,12 +145,14 @@ export function homePage({ posts }) {
   </div>
 </section>
 
+<div class="proof-spacer">
 <section class="ch ch-proof" id="ch-04" data-chapter="4" aria-labelledby="proof-title">
-  <div class="proof-bg">${img16('home/home-05-proof')}</div>
-  <div class="container">
-    <div class="proof-head">
-      ${eyebrow('Proof', '04')}
-      <h2 class="h2 h2-xl" id="proof-title" data-split>Numbers,<br> not noise.</h2>
+  <div class="container proof-wrap">
+    <div class="proof-top">
+      <div class="proof-head">
+        ${eyebrow('Proof', '04')}
+        <h2 class="h2" id="proof-title" data-split>Numbers, not noise.</h2>
+      </div>
       <dl class="counters">
         ${counters
           .map(
@@ -157,13 +161,39 @@ export function homePage({ posts }) {
           .join('')}
       </dl>
     </div>
-    <div class="work-grid proof-cards">
-      ${featured.map((w) => workTile(w)).join('')}
+    <div class="reel" data-reel>
+      <div class="reel-stage">
+        <div class="reel-ring">
+          ${reel
+            .map(
+              (w, i) => `<div class="reel-frame" style="--k:${i}" data-k="${i}">
+            <button class="reel-open" type="button" data-lightbox data-src="/assets/images/work/${w.slug}.webp" data-title="${esc(w.title)}" data-cat="${esc(serviceBySlug(w.service).name)}" data-href="${workUrl(w)}" aria-label="View ${esc(w.title)} full screen">
+              <span class="reel-holes" aria-hidden="true"></span>
+              <img src="/assets/images/work/${w.slug}-640.webp" srcset="/assets/images/work/${w.slug}-640.webp 640w, /assets/images/work/${w.slug}.webp 1280w" sizes="(min-width: 1024px) 720px, 82vw" width="1280" height="715" alt="${esc(w.title)}" loading="lazy" decoding="async">
+              <span class="reel-holes bottom" aria-hidden="true"></span>
+              <span class="reel-zoom" aria-hidden="true">${icon('maximize-2')}</span>
+            </button>
+            <a class="reel-go" href="${workUrl(w)}" aria-label="Open the ${esc(w.title)} project">${icon('arrow-up-right')}</a>
+            <span class="reel-shade" aria-hidden="true"></span>
+          </div>`
+            )
+            .join('')}
+        </div>
+      </div>
+      <div class="reel-meta">
+        <div class="reel-caps" aria-live="polite">
+          ${reel.map((w, i) => `<p class="reel-cap${i === 0 ? ' on' : ''}" data-k="${i}"><span class="mono">${pad(i + 1)} / ${pad(reel.length)} &middot; ${esc(serviceBySlug(w.service).name)}</span><a href="${workUrl(w)}">${esc(w.title)} ${icon('arrow-up-right')}</a></p>`).join('')}
+        </div>
+        <div class="reel-nav">
+          <ol class="reel-dots">${reel.map((w, i) => `<li><button type="button" data-k="${i}" aria-label="Show ${esc(w.title)}"${i === 0 ? ' aria-current="true"' : ''}><span></span></button></li>`).join('')}</ol>
+          ${btn('/work/', 'See all our work', { variant: 'ghost', iconName: 'arrow-up-right' })}
+        </div>
+      </div>
     </div>
-    <div class="proof-more reveal">${btn('/work/', 'See all our work', { variant: 'ghost', iconName: 'arrow-up-right' })}</div>
   </div>
   ${lightbox()}
 </section>
+</div>
 
 <section class="ch ch-clients" id="ch-05" data-chapter="5" aria-labelledby="clients-title">
   <div class="clients-bg">${img16('textures/grid-floor')}</div>
@@ -179,9 +209,17 @@ export function homePage({ posts }) {
 <section class="ch ch-why grid-bg" id="ch-06" data-chapter="6" aria-labelledby="why-title">
   <canvas class="trails" data-trails data-density="0.9" data-speed="0.7" data-opacity="0.45" aria-hidden="true"></canvas>
   <div class="container">
-    <div class="sec-head">${eyebrow('Why Adsquid', '06')}<h2 class="h2" id="why-title" data-split>Why teams pick us.</h2></div>
-    <div class="cards-2x2">
-      ${whyUs.map((w) => `<article class="card line-card reveal"><span class="card-line" aria-hidden="true"></span>${icon(w.icon, 'card-icon')}<h3>${w.title}</h3><p>${w.text}</p></article>`).join('')}
+    <div class="why-grid">
+      <div class="why-intro">
+        ${eyebrow('Why Adsquid', '06')}
+        <h2 class="h2" id="why-title" data-split>Why teams pick us.</h2>
+        <p class="sec-lead reveal">Since 2015 we have run ads, content, websites and software for 50+ brands. The reason they stay is simple: one team that owns the result, explains every number and moves fast.</p>
+        <ul class="why-promises reveal">${whyPromises.map((t) => `<li>${icon('check')}<span>${t}</span></li>`).join('')}</ul>
+        <div class="btns reveal">${btn('/free-audit/', 'Get a free audit', { cls: 'btn-magnetic' })}${btn('/about/', 'Meet the team', { variant: 'ghost' })}</div>
+      </div>
+      <div class="why-cards">
+        ${whyUs.map((w, i) => `<article class="card line-card why-card reveal"><span class="card-line" aria-hidden="true"></span><span class="why-top">${icon(w.icon, 'card-icon')}<span class="why-num mono">${pad(i + 1)}</span></span><h3>${w.title}</h3><p>${w.text}</p></article>`).join('')}
+      </div>
     </div>
   </div>
 </section>

@@ -1,45 +1,49 @@
 import { services, team } from '../data.mjs';
-import { img16, icon, btn, eyebrow, faqBlock, breadcrumbSchema, faqSchema, serviceBySlug, serviceUrl, coverOf, esc, abs, fmtDate, teamImg } from '../lib.mjs';
-import { pageHero, heroPreload, heroIcon } from './parts.mjs';
+import { img16, icon, btn, eyebrow, hexIcon, faqBlock, breadcrumbSchema, faqSchema, serviceBySlug, serviceUrl, coverOf, esc, abs, fmtDate, teamImg } from '../lib.mjs';
+import { pageHero, heroPreload } from './parts.mjs';
+import { heroArt } from './art.mjs';
+
 
 const cover = (p) => coverOf(serviceBySlug(p.category));
 
-export function postCard(p, { large = false, headingTag = 'h3' } = {}) {
+// Each service gets its own cover colour on blog cards.
+const HUE = { 'ads-campaign': 272, 'social-media-marketing': 300, 'brand-identity-design': 285, 'graphic-design': 325, 'video-production': 250, 'website-development': 200, seo: 165, 'software-development': 225 };
+const authorOf = (p) => team.find((m) => m.name === p.author) || team[0];
+
+export function postCard(p, { headingTag = 'h3' } = {}) {
   const s = serviceBySlug(p.category);
-  return `<article class="card post-card reveal${large ? ' post-large' : ''}">
+  const a = authorOf(p);
+  return `<article class="card post-card reveal">
   <a href="/blog/${p.slug}/" class="card-link">
-    <span class="post-cover">${img16(cover(p), { sizes: large ? '(min-width: 1024px) 60vw, 100vw' : '(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw', alt: '' })}<span class="post-cover-title" aria-hidden="true">${esc(s.short)}</span></span>
-    <span class="post-meta mono"><span class="cat">${esc(s.short)}</span> &middot; ${p.readingMins} min read</span>
-    <${headingTag} class="post-title">${esc(p.title)}</${headingTag}>
-    ${large ? `<p>${esc(p.description)}</p>` : ''}
+    <span class="pc-art" style="--h:${HUE[s.slug] || 272}" aria-hidden="true"><span class="pc-grid"></span>${hexIcon(s.icon, 'pc-hex')}<span class="pc-cat">${esc(s.short)}</span><span class="pc-mins mono">${p.readingMins} min read</span></span>
+    <span class="pc-body">
+      <${headingTag} class="post-title">${esc(p.title)}</${headingTag}>
+      <span class="pc-desc">${esc(p.description)}</span>
+      <span class="pc-author"><img src="/assets/images/team/${a.photo}-320.webp" width="40" height="40" alt="" loading="lazy" decoding="async"><span><b>${esc(a.name)}</b><small><time datetime="${p.date}">${fmtDate(p.date)}</time></small></span>${icon('arrow-up-right', 'pc-go')}</span>
+    </span>
   </a>
 </article>`;
 }
 
-function categoryChips(active) {
-  return `<ul class="chip-row cats" aria-label="Categories">
-    <li><a class="chip" href="/blog/"${!active ? ' aria-current="page"' : ''}>All</a></li>
-    ${services.map((s) => `<li><a class="chip" href="/blog/category/${s.slug}/"${active === s.slug ? ' aria-current="page"' : ''}>${s.short}</a></li>`).join('')}
-  </ul>`;
-}
 
 export function blogIndex({ posts }) {
   const crumbs = [{ name: 'Blog', path: '/blog/' }];
-  const [first, ...rest] = posts;
   const body = `
 ${pageHero({
   crumbs,
   h1: 'Digital marketing blog for Bangladesh',
   display: 'Tips that pay back.',
-  sentence: 'Practical guides on ads, social media, SEO, design and websites for growing businesses.',
+  sentence: 'Practical guides on ads, social media, SEO, design, video, websites and software, written by the people who do the work.',
   cls: 'hero-type',
-  visual: heroIcon('blog'),
+  visual: heroArt(['editor', { avatars: team.slice(0, 5).map((m) => `/assets/images/team/${m.photo}-320.webp`), chips: [['list-checks', 'Checklists'], ['calculator', 'Real cost examples']] }]),
 })}
 <section class="section section-tight" aria-label="Articles">
   <div class="container">
-    ${categoryChips()}
-    ${first ? `<div class="featured">${postCard(first, { large: true, headingTag: 'h2' })}</div>` : '<p>New articles coming soon.</p>'}
-    <div class="cards-3 stagger">${rest.map((p) => postCard(p, { headingTag: 'h2' })).join('')}</div>
+    <div class="blog-bar reveal">
+      <p class="blog-count"><b>${posts.length}</b> practical guides</p>
+      <div class="blog-team">${[...new Set(posts.map((x) => x.author))].map((n) => team.find((m) => m.name === n)).filter(Boolean).map((m) => `<img src="/assets/images/team/${m.photo}-320.webp" width="38" height="38" alt="${esc(m.name)}" title="${esc(m.name)}, ${esc(m.role)}" loading="lazy" decoding="async">`).join('')}<span>Written by our specialists</span></div>
+    </div>
+    <div class="cards-3 stagger blog-grid">${posts.map((p) => postCard(p, { headingTag: 'h2' })).join('')}</div>
   </div>
 </section>`;
   return {
@@ -51,48 +55,15 @@ ${pageHero({
   };
 }
 
-export function categoryPage(s, { posts }) {
-  const path = `/blog/category/${s.slug}/`;
-  const crumbs = [
-    { name: 'Blog', path: '/blog/' },
-    { name: s.short, path },
-  ];
-  const list = posts.filter((p) => p.category === s.slug);
-  const body = `
-${pageHero({
-  crumbs,
-  h1: `${s.name} articles`,
-  display: `${s.short}, explained.`,
-  sentence: `Guides and answers about ${s.name.toLowerCase()} for businesses in Bangladesh.`,
-  image: coverOf(s),
-  buttons: btn(serviceUrl(s), `Our ${s.short.toLowerCase()} service`, { variant: 'ghost' }),
-})}
-<section class="section section-tight" aria-label="Articles">
-  <div class="container">
-    ${categoryChips(s.slug)}
-    ${list.length ? `<div class="cards-3 stagger">${list.map((p) => postCard(p, { headingTag: 'h2' })).join('')}</div>` : `<p class="empty">New ${esc(s.short)} articles are on the way. Meanwhile, see <a href="${serviceUrl(s)}">our ${esc(s.name)} service</a>.</p>`}
-  </div>
-</section>`;
-  return {
-    path,
-    title: `${s.name} Articles | Adsquid Blog`,
-    desc: `Guides and answers about ${s.name.toLowerCase()} for businesses in Bangladesh, from the Adsquid team in Dhaka.`.slice(0, 155),
-    preload: [heroPreload(coverOf(s))],
-    schema: [breadcrumbSchema(crumbs)],
-    noindex: list.length === 0,
-    body,
-  };
-}
 
 export function postPage(p, { posts }) {
   const s = serviceBySlug(p.category);
   const path = `/blog/${p.slug}/`;
   const crumbs = [
     { name: 'Blog', path: '/blog/' },
-    { name: s.short, path: `/blog/category/${s.slug}/` },
     { name: p.title, path },
   ];
-  const author = team.find((m) => m.name === p.author) || team[0];
+  const author = authorOf(p);
   const related = [...posts.filter((x) => x !== p && x.category === p.category), ...posts.filter((x) => x !== p && x.category !== p.category)].slice(0, 3);
   const ctaBox = `<aside class="cta-box">
     <p class="eyebrow">${esc(s.name)}</p>
@@ -107,8 +78,8 @@ export function postPage(p, { posts }) {
 <article class="post">
   <header class="post-hero">
     <div class="container narrow">
-      <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/blog/">Blog</a></li><li><a href="/blog/category/${s.slug}/">${s.short}</a></li></ol></nav>
-      <a class="chip chip-cat" href="/blog/category/${s.slug}/">${s.short}</a>
+      <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/blog/">Blog</a></li></ol></nav>
+      <a class="chip chip-cat" href="${serviceUrl(s)}">${s.name}</a>
       <h1 class="post-h1">${esc(p.title)}</h1>
       <div class="byline">
         <img src="/assets/images/team/${author.photo}-320.webp" width="48" height="48" alt="" class="avatar">
@@ -149,6 +120,7 @@ ${related.length ? `<section class="section" aria-labelledby="rel-title"><div cl
     title: `${p.title} | Adsquid Blog`,
     desc: p.description,
     ogType: 'article',
+    lastmod: p.updated || p.date,
     ogImage: `/assets/images/${cover(p)}-1280.webp`,
     preload: [heroPreload(cover(p))],
     schema: [

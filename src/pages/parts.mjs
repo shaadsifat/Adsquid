@@ -1,6 +1,15 @@
 import { breadcrumbs, img16, esc, splitWords, icon, teamImg } from '../lib.mjs';
 import { team } from '../data.mjs';
 
+// Full-screen image viewer (opened by main.js for any [data-lightbox] element on the page).
+export function lightbox() {
+  return `<dialog class="lightbox" aria-label="Image viewer">
+  <div class="lb-top"><div class="lb-title"><span class="lb-cat"></span><b class="lb-name"></b></div><div class="lb-actions"><a class="btn btn-primary btn-sm lb-go" href="/work/"><span>View project</span>${icon('arrow-up-right')}</a><button class="lb-btn lb-close" type="button" aria-label="Close">${icon('x')}</button></div></div>
+  <div class="lb-stage"><button class="lb-btn lb-prev" type="button" aria-label="Previous">${icon('arrow-left')}</button><img class="lb-img" src="data:," width="1280" height="715" alt=""><button class="lb-btn lb-next" type="button" aria-label="Next">${icon('arrow-right')}</button></div>
+  <div class="lb-nav"><span class="lb-count"></span></div>
+</dialog>`;
+}
+
 export function heroPreload(name) {
   const b = `/assets/images/${name}`;
   return `<link rel="preload" as="image" imagesrcset="${b}-768.webp 768w, ${b}-1280.webp 1280w, ${b}.webp 1920w" imagesizes="100vw" fetchpriority="high">`;
@@ -30,11 +39,11 @@ export function heroIcon(kind = 'work') {
 
 // About hero: the real team, fanned out (order 01-07).
 export function teamFan() {
-  const mid = (team.length - 1) / 2;
+  // serial 01 in front, then pairs on either side: 06 04 02 01 03 05 07
   return `<div class="fan" aria-label="Teamsquid">
       ${team
         .map((m, i) => {
-          const o = i - mid;
+          const o = i === 0 ? 0 : (i % 2 ? -1 : 1) * Math.ceil(i / 2);
           return `<figure class="fan-card${o < 0 ? ' fl' : o > 0 ? ' fr' : ' fc'}" style="--o:${o};--a:${Math.abs(o)};--z:${10 - Math.abs(Math.round(o))}">${teamImg(m, { sizes: '180px', eager: true })}<b class="fan-num">${String(i + 1).padStart(2, '0')}</b><figcaption>${esc(m.name)}<span>${esc(m.role)}</span></figcaption></figure>`;
         })
         .join('')}

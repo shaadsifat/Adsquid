@@ -53,7 +53,7 @@ button { cursor: pointer; background: none; border: 0; padding: 0; }
 .eyebrow { display: inline-block; font-family: var(--f-mono); font-weight: 500; font-size: .8125rem; line-height: 1.4; letter-spacing: .12em; text-transform: uppercase; color: var(--lilac); }
 .eyebrow-num { color: var(--white); }
 .display { font-family: var(--f-head); font-weight: 800; font-size: clamp(2.6rem, 1.1rem + 5.6vw, 6.25rem); line-height: .98; letter-spacing: -.02em; color: var(--white); text-wrap: balance; }
-.h2 { font-family: var(--f-head); font-weight: 800; font-size: clamp(2rem, 1.15rem + 3.1vw, 3.75rem); line-height: 1.05; letter-spacing: -.02em; color: var(--white); text-wrap: balance; }
+.h2 { font-family: var(--f-head); font-weight: 800; font-size: clamp(1.8rem, 1rem + 3.3vw, 3.75rem); line-height: 1.05; letter-spacing: -.02em; color: var(--white); text-wrap: balance; }
 .hero-lead { font-size: clamp(1.0625rem, .95rem + .5vw, 1.375rem); color: #DCD7E7; max-width: 21em; text-wrap: balance; }
 .hero-home .hero-lead { max-width: 21em; font-size: clamp(.9375rem, .86rem + .3vw, 1.125rem); line-height: 1.6; }
 .btns { display: flex; flex-wrap: wrap; gap: 12px; }
@@ -216,6 +216,7 @@ button { cursor: pointer; background: none; border: 0; padding: 0; }
 .page-hero-visual > * { position: absolute; inset: 0; }
 .hero-team .page-hero-visual { width: 100%; max-width: 540px; aspect-ratio: 1.5; }
 .page-hero.has-visual.hero-type { padding-bottom: 40px; }
+.page-hero.has-visual .hero-display { font-size: clamp(2.2rem, .9rem + 3.4vw, 4rem); text-wrap: balance; }
 .hero-oneline .hero-display { white-space: nowrap; font-size: min(8.2vw, 4.25rem); }
 @media (min-width: 900px) {
   .page-hero.has-visual, .page-hero.has-visual.hero-type { padding: calc(var(--header-h) + 48px) 0 56px; }
@@ -301,7 +302,7 @@ main > section:not(.hero):not(.page-hero):not(.nf), main > .sample-banner, .post
 .post-hero .narrow { display: grid; gap: 18px; justify-items: start; }
 .post-hero .crumbs { margin-bottom: 0; }
 .chip-cat { min-height: 32px; font-family: var(--f-mono); font-size: .75rem; letter-spacing: .1em; text-transform: uppercase; color: var(--lilac); }
-.post-h1 { font-family: var(--f-head); font-weight: 800; font-size: clamp(2rem, 1.3rem + 2.8vw, 3.5rem); line-height: 1.08; letter-spacing: -.02em; color: #fff; text-wrap: balance; }
+.post-h1 { font-family: var(--f-head); font-weight: 800; font-size: clamp(1.5rem, .9rem + 2.4vw, 3rem); line-height: 1.08; letter-spacing: -.02em; color: #fff; text-wrap: balance; }
 .byline { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 14px; }
 .byline .avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; }
 .byline div { display: grid; line-height: 1.3; }
