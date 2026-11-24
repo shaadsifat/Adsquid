@@ -3,7 +3,7 @@
 // (never injected by JavaScript), so all menu links are crawlable.
 import { site, year } from './config.mjs';
 import { groups, services, adPages } from './data.mjs';
-import { esc, abs, icon, brand, btn, waLink, objImg, serviceUrl } from './lib.mjs';
+import { esc, abs, icon, brand, btn, waLink, serviceUrl, subId, hexIcon, ctaBand } from './lib.mjs';
 
 let assetVersion = (p) => p;
 let criticalCss = '';
@@ -28,30 +28,19 @@ const navLinks = [
 ];
 
 function megaMenu() {
-  const col = (g) => `<div class="mega-col">
-        <p class="mega-group">${g.name}</p>
-        <ul>
-          ${services
-            .filter((s) => s.group === g.id)
-            .map(
-              (s) => `<li>
-            <a class="mega-link" href="${serviceUrl(s)}">
-              <span class="mega-thumb">${objImg(s.key, { sizes: '56px' })}</span>
-              <span><span class="mega-name">${s.name}</span><span class="mega-pitch">${s.pitch}</span></span>
-            </a>
-            ${
-              s.slug === 'digital-ads-management'
-                ? `<ul class="mega-sub">${adPages.map((a) => `<li><a href="/services/digital-ads-management/${a.slug}/">${a.name}</a></li>`).join('')}</ul>`
-                : ''
-            }
-          </li>`
-            )
-            .join('')}
-        </ul>
-      </div>`;
+  // Eight services, each with its sub-services underneath (sub links go to the sub page or its card on the service page).
+  const block = (s, i) => `<li class="mega-svc" style="--i:${i}">
+          <a class="mega-head" href="${serviceUrl(s)}">${hexIcon(s.icon)}<span><span class="mega-name">${s.name}</span><span class="mega-pitch">${s.pitch}</span></span></a>
+          <ul class="mega-subs">${s.subs.map((x) => `<li><a href="${x.href || serviceUrl(s) + '#' + subId(x)}">${x.title}</a></li>`).join('')}</ul>
+        </li>`;
   return `<div class="mega" id="mega-menu">
     <div class="container mega-inner">
-      ${groups.map(col).join('')}
+      <div class="mega-main">
+        <p class="mega-label">Our services <span>${services.length}</span></p>
+        <ul class="mega-grid">
+        ${services.map(block).join('\n        ')}
+        </ul>
+      </div>
       <div class="mega-feature">
         <p class="eyebrow">Free audit</p>
         <p class="mega-feature-title">Find your growth leaks.</p>
@@ -93,7 +82,7 @@ function header(path) {
         <button class="m-link m-toggle" type="button" aria-expanded="false" aria-controls="m-services"><span class="m-num mono">01</span><span class="m-label">Services</span><span class="m-plus" aria-hidden="true"></span></button>
         <div class="m-sub" id="m-services">
           <div class="m-sub-inner">
-            <ul class="m-svc">${services.map((s) => `<li><a href="${serviceUrl(s)}"><span class="m-thumb">${objImg(s.key, { sizes: '44px' })}</span><span>${s.short}</span></a></li>`).join('')}</ul>
+            <ul class="m-svc">${services.map((s) => `<li><a href="${serviceUrl(s)}">${hexIcon(s.icon, 'hex-sm')}<span>${s.short}</span></a></li>`).join('')}</ul>
             <a class="m-all" href="/services/">All services ${icon('arrow-right')}</a>
           </div>
         </div>
@@ -116,10 +105,6 @@ function header(path) {
 }
 
 function footer() {
-  const svcLink = (slug) => {
-    const s = services.find((x) => x.slug === slug);
-    return `<li><a href="${serviceUrl(s)}">${s.short === 'Content' ? 'Content Development' : s.short === 'Website' ? 'Website Development' : s.short === 'Software' ? 'Software Development' : s.short}</a></li>`;
-  };
   const socials = [
     site.social.facebook && ['facebook', site.social.facebook],
     site.social.linkedin && ['linkedin', site.social.linkedin],
@@ -131,28 +116,17 @@ function footer() {
   return `<footer class="site-footer">
   <canvas class="trails" data-trails data-density="1.1" data-speed="0.8" data-opacity="0.6" aria-hidden="true"></canvas>
   <div class="container">
-    <div class="footer-cta">
-      <p class="footer-cta-title">Ready to grow?</p>
-      <div class="btns">
-        ${btn('/free-audit/', 'Get a free audit', { cls: 'btn-magnetic' })}
-        <a class="btn btn-ghost" href="${waLink()}" target="_blank" rel="noopener">${brand('whatsapp', { mono: true, size: 20 })}<span>WhatsApp</span></a>
-      </div>
-    </div>
     <div class="footer-grid">
       <div class="footer-brand">
         <a href="/" class="logo" aria-label="Adsquid home"><img src="/assets/images/brand/logo/adsquid-logo-on-dark.svg" width="160" height="48" alt="Adsquid" loading="lazy"></a>
-        <p>${site.tagline} We plan, create and run ads, social, SEO, design, content, websites and software for brands across Bangladesh.</p>
+        <p>${site.tagline} We plan, create and run ads, social, SEO, design, video, websites and software for brands in Bangladesh and beyond.</p>
         <p>One in-house team and clear monthly reports, so you know what your marketing brings back.</p>
         <ul class="socials">${socials.map(([n, u]) => `<li><a href="${u}" target="_blank" rel="noopener" aria-label="Adsquid on ${n[0].toUpperCase() + n.slice(1)}">${brand(n, { mono: true, size: 20 })}</a></li>`).join('')}</ul>
       </div>
       <div>
         <p class="footer-h">Services</p>
         <ul>
-          <li><a href="/services/digital-ads-management/">Digital Ads Management</a></li>
-          ${svcLink('graphic-design')}
-          ${svcLink('content-development')}
-          ${svcLink('website-development')}
-          ${svcLink('software-development')}
+          ${services.map((x) => `<li><a href="${serviceUrl(x)}">${x.name}</a></li>`).join('\n          ')}
         </ul>
       </div>
       <div>
@@ -241,6 +215,7 @@ ${schemas}
 ${header(page.path)}
 <main id="main">
 ${page.body}
+${page.cta === false ? '' : ctaBand(page.cta || {})}
 </main>
 ${footer()}
 <div class="cursor" aria-hidden="true"><span class="cursor-pos"><span class="cursor-body"><span class="cursor-dance"><img src="/assets/images/brand/logo/adsquid-mark-strokes.svg" width="34" height="34" alt="" decoding="async"></span></span><span class="cursor-label"></span></span><span class="cursor-dot"></span></div>

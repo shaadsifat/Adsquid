@@ -1,21 +1,68 @@
-import { breadcrumbs, img16, esc, splitWords } from '../lib.mjs';
+import { breadcrumbs, img16, esc, splitWords, icon, teamImg } from '../lib.mjs';
+import { team } from '../data.mjs';
 
 export function heroPreload(name) {
   const b = `/assets/images/${name}`;
   return `<link rel="preload" as="image" imagesrcset="${b}-768.webp 768w, ${b}-1280.webp 1280w, ${b}.webp 1920w" imagesizes="100vw" fetchpriority="high">`;
 }
 
+// Workflow visual for text-only heroes: a hexagon core with four steps orbiting it, joined by a flowing loop.
+const FLOWS = {
+  work: { core: 'layout-grid', steps: [['lightbulb', 'Idea'], ['pen-tool', 'Design'], ['rocket', 'Launch'], ['trending-up', 'Grow']] },
+  network: { core: 'workflow', steps: [['megaphone', 'Ads'], ['palette', 'Creative'], ['code', 'Tech'], ['search', 'SEO']] },
+  blog: { core: 'book-open', steps: [['lightbulb', 'Learn'], ['list-checks', 'Plan'], ['rocket', 'Apply'], ['trending-up', 'Grow']] },
+  legal: { core: 'shield-check', steps: [['file-text', 'Clear'], ['eye', 'Open'], ['handshake', 'Fair'], ['badge-check', 'Safe']] },
+};
+export function heroIcon(kind = 'work') {
+  const f = FLOWS[kind] || FLOWS.work;
+  return `<div class="flow" aria-hidden="true">
+      <svg class="flow-svg" viewBox="0 0 400 400">
+        <circle class="flow-orbit" cx="200" cy="200" r="150"/>
+        <circle class="flow-run" cx="200" cy="200" r="150" pathLength="100"/>
+        <circle class="flow-orbit inner" cx="200" cy="200" r="96"/>
+        ${[0, 1, 2, 3].map((i) => `<path class="flow-spoke" d="M200 200 L${200 + 150 * Math.cos(((i * 90 - 135) * Math.PI) / 180)} ${200 + 150 * Math.sin(((i * 90 - 135) * Math.PI) / 180)}" pathLength="1"/>`).join('')}
+      </svg>
+      <span class="flow-glow"></span>
+      <span class="flow-core hex">${icon(f.core)}</span>
+      ${f.steps.map(([ic, label], i) => `<span class="flow-step s${i}" style="--i:${i}"><span class="flow-dot">${icon(ic)}</span><span class="flow-label">${String(i + 1).padStart(2, '0')} ${label}</span></span>`).join('')}
+    </div>`;
+}
+
+// About hero: the real team, fanned out (order 01-07).
+export function teamFan() {
+  const mid = (team.length - 1) / 2;
+  return `<div class="fan" aria-label="Teamsquid">
+      ${team
+        .map((m, i) => {
+          const o = i - mid;
+          return `<figure class="fan-card${o < 0 ? ' fl' : o > 0 ? ' fr' : ' fc'}" style="--o:${o};--a:${Math.abs(o)};--z:${10 - Math.abs(Math.round(o))}">${teamImg(m, { sizes: '180px', eager: true })}<b class="fan-num">${String(i + 1).padStart(2, '0')}</b><figcaption>${esc(m.name)}<span>${esc(m.role)}</span></figcaption></figure>`;
+        })
+        .join('')}
+    </div>`;
+}
+
 // Inner page hero: small H1 keyword (eyebrow style), big display line, one sentence, buttons.
-export function pageHero({ crumbs, h1, display, sentence, image, imageAlt = '', buttons = '', extra = '', cls = '' }) {
-  return `<section class="page-hero${image ? '' : ' no-media'}${cls ? ' ' + cls : ''}">
-  ${image ? `<div class="page-hero-media">${img16(image, { priority: true, alt: imageAlt })}</div>` : `<canvas class="trails hero-trails" data-trails data-fade="left" data-density="1.8" data-speed="0.8" data-opacity="0.85" aria-hidden="true"></canvas>`}
-  <div class="container page-hero-content">
-    ${crumbs ? breadcrumbs(crumbs) : ''}
+// image = full-bleed render behind the text; visual = HTML art on the right (text-only heroes).
+export function pageHero({ crumbs, h1, display, sentence, image, imageAlt = '', buttons = '', extra = '', cls = '', visual = '' }) {
+  const content = `${crumbs ? breadcrumbs(crumbs) : ''}
     <h1 class="eyebrow hero-eyebrow">${esc(h1)}</h1>
     <p class="display hero-display">${splitWords(display)}</p>
     ${sentence ? `<p class="hero-lead">${sentence}</p>` : ''}
     ${extra}
-    ${buttons ? `<div class="btns hero-btns">${buttons}</div>` : ''}
-  </div>
+    ${buttons ? `<div class="btns hero-btns">${buttons}</div>` : ''}`;
+  return `<section class="page-hero${image ? '' : ' no-media'}${visual ? ' has-visual' : ''}${cls ? ' ' + cls : ''}">
+  ${image ? `<div class="page-hero-media">${img16(image, { priority: true, alt: imageAlt })}</div>` : `<canvas class="trails hero-trails" data-trails data-fade="left" data-density="1.8" data-speed="0.8" data-opacity="0.85" aria-hidden="true"></canvas>`}
+  ${
+    visual
+      ? `<div class="container page-hero-grid">
+    <div class="page-hero-content">
+    ${content}
+    </div>
+    <div class="page-hero-visual">${visual}</div>
+  </div>`
+      : `<div class="container page-hero-content">
+    ${content}
+  </div>`
+  }
 </section>`;
 }

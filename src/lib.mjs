@@ -41,13 +41,23 @@ export function objImg(key, { sizes = '320px', alt = '', cls = '' } = {}) {
   return `<img src="${b}-640.webp" srcset="${b}-320.webp 320w, ${b}-640.webp 640w, ${b}.webp 1024w" sizes="${sizes}" width="640" height="640" alt="${esc(alt)}"${cls ? ` class="${cls}"` : ''} loading="lazy" decoding="async">`;
 }
 
-export function teamImg(m, { sizes = '(min-width: 1024px) 25vw, 50vw' } = {}) {
+export function teamImg(m, { sizes = '(min-width: 1024px) 25vw, 50vw', eager = false } = {}) {
   const b = `/assets/images/team/${m.photo}`;
-  return `<img src="${b}.webp" srcset="${b}-320.webp 320w, ${b}.webp 640w" sizes="${sizes}" width="640" height="800" alt="${esc(m.name)}, ${esc(m.role)} at Adsquid" loading="lazy" decoding="async" data-placeholder>`;
+  return `<img src="${b}.webp" srcset="${b}-320.webp 320w, ${b}.webp 640w" sizes="${sizes}" width="640" height="800" alt="${esc(m.name)}, ${esc(m.role)} at Adsquid"${eager ? '' : ' loading="lazy"'} decoding="async">`;
 }
 
 export const serviceBySlug = (slug) => services.find((s) => s.slug === slug);
 export const serviceUrl = (s) => `/services/${s.slug}/`;
+export const adUrl = (a) => `/services/ads-campaign/${a.slug}/`;
+// Per-service art: obj-<key> thumbnails, page hero and blog cover (a service can override hero/cover).
+export const heroOf = (s) => s.hero || `services/hero-${s.key}`;
+export const coverOf = (s) => s.cover || `blog/cover-${s.key}`;
+// Sub-service anchor on the service page (mega menu and infographic link straight to it).
+export const subId = (x) => 'sub-' + x.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+// Hexagon icon badge (service icons in menus, infographic and cards).
+export const hexIcon = (name, cls = '') => `<span class="hex${cls ? ' ' + cls : ''}" aria-hidden="true">${icon(name)}</span>`;
+// A sub-service mark: brand logo when it is a platform, otherwise a line icon.
+export const subMark = (x, size = 20) => (x.brand ? brand(x.brand, { size }) : icon(x.icon));
 
 export function btn(href, label, { variant = 'primary', iconName = 'arrow-right', cls = '', attrs = '' } = {}) {
   const ext = /^https?:/.test(href) ? ' target="_blank" rel="noopener"' : '';
@@ -91,12 +101,14 @@ export function faqBlock(items, { title = 'Questions, answered.', num } = {}) {
 </section>`;
 }
 
-export function ctaBand({ title = 'Find your growth leaks.', text = 'Free audit of your ads, page and website. A 1-page plan in 48 hours.' } = {}) {
-  return `<section class="cta-band" aria-label="Free audit">
+// The one closing call-to-action section of every page (layout.mjs adds it after the page body).
+export function ctaBand({ eyebrow: eb = 'Ready to grow?', title = 'Your brand could be next.', text = 'Start with a free audit. We will show you where the growth is hiding.' } = {}) {
+  return `<section class="cta-band" aria-labelledby="cta-band-title">
   <canvas class="trails" data-trails data-density="1.4" data-speed="0.9" data-opacity="0.7" aria-hidden="true"></canvas>
   <div class="container cta-band-inner">
-    <div>
-      <h2 class="h2" data-split>${title}</h2>
+    <div class="cta-band-text">
+      <p class="eyebrow">${eb}</p>
+      <h2 class="h2 cta-band-title" id="cta-band-title" data-split>${title}</h2>
       <p class="reveal">${text}</p>
     </div>
     <div class="btns reveal">
@@ -199,9 +211,9 @@ export function splitWords(html) {
     .join('');
 }
 
-// Placeholder client logo (until real logos arrive): inline SVG, same size every time.
-export function clientLogo(label) {
-  return `<span class="client-logo" data-placeholder><svg viewBox="0 0 240 96" width="240" height="96" role="img" aria-label="${esc(label)} logo placeholder"><rect x="1" y="1" width="238" height="94" rx="14" fill="#120E1C" stroke="#2A2340"/><text x="120" y="56" text-anchor="middle" font-family="Open Sans, sans-serif" font-weight="600" font-size="16" fill="#B9B3C9">${esc(label)}</text></svg></span>`;
+// Client logo (white on transparent, 238x92).
+export function clientLogo(c, { hidden = false } = {}) {
+  return `<span class="client-logo"${hidden ? ' aria-hidden="true"' : ''}><img src="/assets/images/clients/${c.logo}.webp" width="238" height="92" alt="${hidden ? '' : esc(c.name) + ' logo'}" loading="lazy" decoding="async"></span>`;
 }
 
 export function fmtDate(iso) {

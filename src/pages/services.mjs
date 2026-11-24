@@ -1,11 +1,12 @@
-import { services, groups, adPages, work } from '../data.mjs';
+import { services, groups, adPages, works } from '../data.mjs';
 import {
-  icon, brand, brandTitle, objImg, btn, waBtn, eyebrow, sectionHead, faqBlock, ctaBand, signalLine,
-  breadcrumbSchema, faqSchema, serviceSchema, serviceUrl, esc,
+  icon, brand, brandTitle, objImg, btn, waBtn, eyebrow, sectionHead, faqBlock, signalLine,
+  breadcrumbSchema, faqSchema, serviceSchema, serviceUrl, adUrl, heroOf, subId, subMark, hexIcon, esc,
 } from '../lib.mjs';
-import { pageHero, heroPreload } from './parts.mjs';
+import { pageHero, heroPreload, heroIcon } from './parts.mjs';
 import { postCard } from './blog.mjs';
-import { workCard } from './work.mjs';
+import { workTile, lightbox } from './work.mjs';
+import { servicesInfographic } from './home.mjs';
 
 export function serviceCard(s, { headingTag = 'h3' } = {}) {
   return `<article class="card svc-tile reveal">
@@ -13,6 +14,7 @@ export function serviceCard(s, { headingTag = 'h3' } = {}) {
     <span class="svc-tile-media">${objImg(s.key, { sizes: '(min-width: 1024px) 280px, 45vw' })}</span>
     <${headingTag} class="svc-tile-name">${s.name}</${headingTag}>
     <p>${s.pitch}</p>
+    <p class="svc-tile-subs">${s.subs.map((x) => esc(x.title)).join(' · ')}</p>
     <span class="more">Explore ${icon('arrow-right')}</span>
   </a>
 </article>`;
@@ -31,19 +33,21 @@ function toolsRow(tools) {
   return `<ul class="tools">${tools.map((t) => `<li title="${esc(brandTitle(t))}">${brand(t, { size: 32 })}<span>${esc(brandTitle(t))}</span></li>`).join('')}</ul>`;
 }
 
-const confirmAttr = (x) => (x.confirm ? ' data-placeholder data-confirm' : '');
-
 export function servicesHub() {
   const crumbs = [{ name: 'Services', path: '/services/' }];
   const body = `
 ${pageHero({
   crumbs,
   h1: 'Digital marketing services in Bangladesh',
-  display: 'Seven arms.<br> One team.',
+  display: 'Eight arms. One team.',
   sentence: 'Marketing, creative and technology services that plug into each other, so nothing gets lost between agencies.',
-  image: 'home/home-03-network',
+  cls: 'hero-type',
+  visual: heroIcon('network'),
   buttons: btn('/free-audit/', 'Get a free audit', { cls: 'btn-magnetic' }) + btn('/work/', 'See our work', { variant: 'ghost', iconName: 'arrow-up-right' }),
 })}
+<section class="section section-tight" aria-label="Our eight services">
+  <div class="container">${servicesInfographic()}</div>
+</section>
 ${groups
   .map(
     (g, gi) => `<section class="section" aria-labelledby="g-${g.id}">
@@ -60,16 +64,14 @@ ${groups
   <div class="container">
     <div class="sec-head">${eyebrow('Ad platforms')}<h2 class="h2" id="ads-children" data-split>Every platform your buyers use.</h2></div>
     <div class="platform-row">
-      ${adPages.map((a) => `<a class="card platform reveal" href="/services/digital-ads-management/${a.slug}/"><span class="platform-logos">${a.brands.slice(0, 1).map((b) => brand(b, { size: 28 })).join('')}</span><span class="platform-name">${a.name}</span><span class="platform-line">${a.display}</span>${icon('arrow-up-right', 'svc-arrow')}</a>`).join('')}
+      ${adPages.map((a) => `<a class="card platform reveal" href="${adUrl(a)}"><span class="platform-logos">${brand(a.brands[0], { size: 28 })}</span><span class="platform-name">${a.name}</span><span class="platform-line">${a.display}</span>${icon('arrow-up-right', 'svc-arrow')}</a>`).join('')}
     </div>
   </div>
-</section>
-${ctaBand()}`;
+</section>`;
   return {
     path: '/services/',
     title: 'Digital Marketing Services in Bangladesh | Adsquid',
-    desc: 'Ads, social media, SEO, graphic design, content, websites and software. Seven services from one Dhaka team, working as one.',
-    preload: [heroPreload('home/home-03-network')],
+    desc: 'Ads campaigns, social media, brand, visual and video content, websites, SEO and software. Eight services from one team, working as one.',
     schema: [breadcrumbSchema(crumbs)],
     body,
   };
@@ -80,9 +82,8 @@ export function servicePage(s, { posts }) {
     { name: 'Services', path: '/services/' },
     { name: s.name, path: serviceUrl(s) },
   ];
-  const related = work.filter((w) => w.services.includes(s.slug)).slice(0, 3);
+  const related = works.filter((w) => w.service === s.slug || (w.also || []).includes(s.slug)).slice(0, 3);
   const relPosts = posts.filter((p) => p.category === s.slug).slice(0, 3);
-  const isAds = s.slug === 'digital-ads-management';
 
   const body = `
 ${pageHero({
@@ -90,7 +91,7 @@ ${pageHero({
   h1: s.h1,
   display: s.display,
   sentence: s.sentence,
-  image: `services/hero-${s.key}`,
+  image: heroOf(s),
   buttons: btn('/free-audit/', 'Get a free audit', { cls: 'btn-magnetic' }) + waBtn('Ask on WhatsApp'),
 })}
 
@@ -110,10 +111,10 @@ ${pageHero({
     <div class="cards-3 subs">
       ${s.subs
         .map((x) => {
-          const inner = `${icon(x.icon, 'card-icon')}<h3>${x.title}</h3><p>${x.text}</p>${x.href ? `<span class="more">${x.title} page ${icon('arrow-right')}</span>` : ''}`;
+          const inner = `<span class="sub-mark">${subMark(x, 26)}</span><h3>${x.title}</h3><p>${x.text}</p>${x.href ? `<span class="more">${x.title} page ${icon('arrow-right')}</span>` : ''}`;
           return x.href
-            ? `<a class="card sub reveal card-link" href="${x.href}"${confirmAttr(x)}>${inner}</a>`
-            : `<article class="card sub reveal"${confirmAttr(x)}>${inner}</article>`;
+            ? `<a class="card sub reveal card-link" id="${subId(x)}" href="${x.href}">${inner}</a>`
+            : `<article class="card sub reveal" id="${subId(x)}">${inner}</article>`;
         })
         .join('')}
     </div>
@@ -129,7 +130,7 @@ ${pageHero({
 
 <section class="section section-tight" aria-labelledby="tools-title">
   <div class="container">
-    <div class="sec-head">${eyebrow('Tools we use', '04')}<h2 class="h3-lg" id="tools-title">The stack behind the work.</h2></div>
+    <div class="sec-head">${eyebrow('Tools and platforms', '04')}<h2 class="h3-lg" id="tools-title">The stack behind the work.</h2></div>
     ${toolsRow(s.tools)}
   </div>
 </section>
@@ -138,13 +139,10 @@ ${
   related.length
     ? `<section class="section" aria-labelledby="proof-title">
   <div class="container">
-    <div class="sec-head split"><div>${eyebrow('Proof', '05')}<h2 class="h2" id="proof-title" data-split>Work that moved numbers.</h2></div>${btn('/work/', 'All work', { variant: 'ghost' })}</div>
-    <div class="cards-3">${related.map((w) => workCard(w, { tilt: true })).join('')}</div>
-    <figure class="testimonial reveal" data-placeholder>
-      <blockquote><p>"Sample testimonial. Replace with a real quote from a ${esc(s.short.toLowerCase())} client before launch."</p></blockquote>
-      <figcaption><strong>Client name</strong><span>Role, Company</span></figcaption>
-    </figure>
+    <div class="sec-head split"><div>${eyebrow('Our work', '05')}<h2 class="h2" id="proof-title" data-split>Recent ${esc(s.name.toLowerCase())} work.</h2></div>${btn('/work/', 'All work', { variant: 'ghost' })}</div>
+    <div class="work-grid">${related.map((w) => workTile(w)).join('')}</div>
   </div>
+  ${lightbox()}
 </section>`
     : ''
 }
@@ -159,7 +157,6 @@ ${
 </section>
 
 ${faqBlock(s.faq, { num: '06' })}
-${ctaBand()}
 
 ${
   relPosts.length
@@ -172,32 +169,28 @@ ${
     : ''
 }
 
-${
-  isAds
-    ? ''
-    : `<section class="section section-tight"><div class="container"><p class="eyebrow">Other services</p><ul class="chip-row">${services.filter((x) => x !== s).map((x) => `<li><a class="chip" href="${serviceUrl(x)}">${x.name}</a></li>`).join('')}</ul></div></section>`
-}`;
+<section class="section section-tight"><div class="container"><p class="eyebrow">Other services</p><ul class="chip-row">${services.filter((x) => x !== s).map((x) => `<li><a class="chip" href="${serviceUrl(x)}">${x.name}</a></li>`).join('')}</ul></div></section>`;
 
   return {
     path: serviceUrl(s),
     title: s.title,
     desc: s.desc,
-    preload: [heroPreload(`services/hero-${s.key}`)],
+    preload: [heroPreload(heroOf(s))],
     schema: [breadcrumbSchema(crumbs), serviceSchema({ name: s.name, desc: s.desc, path: serviceUrl(s), serviceType: s.name }), faqSchema(s.faq)],
     body,
   };
 }
 
 export function adPage(a, { posts }) {
-  const parent = services[0];
-  const path = `/services/digital-ads-management/${a.slug}/`;
+  const parent = services.find((x) => x.slug === 'ads-campaign');
+  const path = adUrl(a);
   const crumbs = [
     { name: 'Services', path: '/services/' },
     { name: parent.name, path: serviceUrl(parent) },
     { name: a.name, path },
   ];
-  const caseStudy = work.find((w) => w.services.includes('digital-ads-management'));
-  const relPosts = posts.filter((p) => p.category === 'digital-ads-management').slice(0, 3);
+  const relPosts = posts.filter((p) => p.category === parent.slug).slice(0, 3);
+  const hero = a.hero || `ads/hero-${a.key}`;
   const audiences = [
     { icon: 'shopping-cart', title: 'E-commerce', text: 'Online stores and Facebook shops that need more orders at a lower cost.' },
     { icon: 'map-pin', title: 'Local business', text: 'Restaurants, clinics, salons and showrooms that need calls and visits.' },
@@ -216,7 +209,7 @@ ${pageHero({
   h1: a.h1,
   display: a.display,
   sentence: a.sentence,
-  image: `ads/hero-${a.key}`,
+  image: hero,
   extra: `<ul class="badges" aria-label="Platforms">${a.brands.map((b) => `<li>${brand(b, { size: 22 })}<span>${esc(brandTitle(b))}</span></li>`).join('')}</ul>`,
   buttons: btn('/free-audit/', 'Get a free ads audit', { cls: 'btn-magnetic' }) + waBtn('Ask on WhatsApp'),
 })}
@@ -225,7 +218,7 @@ ${pageHero({
   <div class="container">
     <p class="intro reveal">${a.intro}</p>
     <div class="sec-head">${eyebrow('Campaign types', '01')}<h2 class="h2" id="types-title" data-split>Campaigns we run.</h2></div>
-    <div class="cards-3 subs">${a.types.map((t) => `<article class="card sub reveal"${confirmAttr(t)}>${icon(t.icon, 'card-icon')}<h3>${t.title}</h3><p>${t.text}</p></article>`).join('')}</div>
+    <div class="cards-3 subs">${a.types.map((t) => `<article class="card sub reveal">${icon(t.icon, 'card-icon')}<h3>${t.title}</h3><p>${t.text}</p></article>`).join('')}</div>
   </div>
 </section>
 
@@ -246,20 +239,6 @@ ${pageHero({
   </div>
 </section>
 
-${
-  caseStudy
-    ? `<section class="section" aria-labelledby="result-title">
-  <div class="container">
-    <div class="sec-head">${eyebrow('Results', '04')}<h2 class="h2" id="result-title" data-split>${esc(caseStudy.headline)}</h2></div>
-    <div class="result-strip card reveal" data-placeholder>
-      ${caseStudy.numbers.map((n) => `<div><span class="big-num">${n.value}</span><span>${n.label}</span></div>`).join('')}
-      ${btn(`/work/${caseStudy.slug}/`, 'Read the case', { variant: 'ghost' })}
-    </div>
-  </div>
-</section>`
-    : ''
-}
-
 <section class="section section-tight">
   <div class="container">
     <div class="pricing card reveal" data-placeholder>
@@ -269,15 +248,14 @@ ${
   </div>
 </section>
 
-${faqBlock(a.faq, { num: '05' })}
-${ctaBand({ title: 'Is your ad money leaking?', text: 'Get a free ads audit: tracking, structure, creatives and wasted spend.' })}
+${faqBlock(a.faq, { num: '04' })}
 
 <section class="section section-tight">
   <div class="container">
     <p class="eyebrow">More ad platforms</p>
     <ul class="chip-row">
-      <li><a class="chip" href="${serviceUrl(parent)}">All digital ads</a></li>
-      ${adPages.filter((x) => x !== a).map((x) => `<li><a class="chip" href="/services/digital-ads-management/${x.slug}/">${x.name}</a></li>`).join('')}
+      <li><a class="chip" href="${serviceUrl(parent)}">All ads campaigns</a></li>
+      ${adPages.filter((x) => x !== a).map((x) => `<li><a class="chip" href="${adUrl(x)}">${x.name}</a></li>`).join('')}
     </ul>
   </div>
 </section>
@@ -292,7 +270,8 @@ ${
     path,
     title: a.title,
     desc: a.desc,
-    preload: [heroPreload(`ads/hero-${a.key}`)],
+    cta: { title: 'Is your ad money leaking?', text: 'Get a free ads audit: tracking, structure, creatives and wasted spend.' },
+    preload: [heroPreload(hero)],
     schema: [breadcrumbSchema(crumbs), serviceSchema({ name: a.name, desc: a.desc, path, serviceType: `${a.name} management` }), faqSchema(a.faq)],
     body,
   };

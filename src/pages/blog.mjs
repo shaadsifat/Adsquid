@@ -1,8 +1,8 @@
 import { services, team } from '../data.mjs';
-import { img16, icon, btn, eyebrow, ctaBand, faqBlock, breadcrumbSchema, faqSchema, serviceBySlug, serviceUrl, esc, abs, fmtDate, teamImg } from '../lib.mjs';
-import { pageHero, heroPreload } from './parts.mjs';
+import { img16, icon, btn, eyebrow, faqBlock, breadcrumbSchema, faqSchema, serviceBySlug, serviceUrl, coverOf, esc, abs, fmtDate, teamImg } from '../lib.mjs';
+import { pageHero, heroPreload, heroIcon } from './parts.mjs';
 
-const cover = (p) => `blog/cover-${serviceBySlug(p.category).key}`;
+const cover = (p) => coverOf(serviceBySlug(p.category));
 
 export function postCard(p, { large = false, headingTag = 'h3' } = {}) {
   const s = serviceBySlug(p.category);
@@ -31,8 +31,9 @@ ${pageHero({
   crumbs,
   h1: 'Digital marketing blog for Bangladesh',
   display: 'Tips that pay back.',
-  sentence: 'Practical guides on ads, social media, SEO, design and websites for businesses in Bangladesh.',
+  sentence: 'Practical guides on ads, social media, SEO, design and websites for growing businesses.',
   cls: 'hero-type',
+  visual: heroIcon('blog'),
 })}
 <section class="section section-tight" aria-label="Articles">
   <div class="container">
@@ -63,7 +64,7 @@ ${pageHero({
   h1: `${s.name} articles`,
   display: `${s.short}, explained.`,
   sentence: `Guides and answers about ${s.name.toLowerCase()} for businesses in Bangladesh.`,
-  image: `blog/cover-${s.key}`,
+  image: coverOf(s),
   buttons: btn(serviceUrl(s), `Our ${s.short.toLowerCase()} service`, { variant: 'ghost' }),
 })}
 <section class="section section-tight" aria-label="Articles">
@@ -76,7 +77,7 @@ ${pageHero({
     path,
     title: `${s.name} Articles | Adsquid Blog`,
     desc: `Guides and answers about ${s.name.toLowerCase()} for businesses in Bangladesh, from the Adsquid team in Dhaka.`.slice(0, 155),
-    preload: [heroPreload(`blog/cover-${s.key}`)],
+    preload: [heroPreload(coverOf(s))],
     schema: [breadcrumbSchema(crumbs)],
     noindex: list.length === 0,
     body,
@@ -110,7 +111,7 @@ export function postPage(p, { posts }) {
       <a class="chip chip-cat" href="/blog/category/${s.slug}/">${s.short}</a>
       <h1 class="post-h1">${esc(p.title)}</h1>
       <div class="byline">
-        <img src="/assets/images/team/${author.photo}-320.webp" width="48" height="48" alt="" class="avatar" data-placeholder>
+        <img src="/assets/images/team/${author.photo}-320.webp" width="48" height="48" alt="" class="avatar">
         <div><strong>${esc(author.name)}</strong><span>${esc(author.role)}</span></div>
         <span class="mono byline-meta"><time datetime="${p.date}">${fmtDate(p.date)}</time>${p.updated ? ` &middot; Updated <time datetime="${p.updated}">${fmtDate(p.updated)}</time>` : ''} &middot; ${p.readingMins} min read</span>
       </div>

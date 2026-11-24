@@ -17,6 +17,16 @@ ErrorDocument 404 /404.html
   RewriteRule ^portfolio/?$ /work/ [L,R=301]
   RewriteRule ^about-us/?$ /about/ [L,R=301]
   RewriteRule ^contact-us/?$ /contact/ [L,R=301]
+  # Service slugs renamed in the 2026 service lineup (eight services)
+  RewriteRule ^services/digital-ads-management/?$ /services/ads-campaign/ [L,R=301]
+  RewriteRule ^services/digital-ads-management/(.+)$ /services/ads-campaign/$1 [L,R=301]
+  RewriteRule ^services/social-media-management/?$ /services/social-media-marketing/ [L,R=301]
+  RewriteRule ^services/content-development/?$ /services/video-production/ [L,R=301]
+  RewriteRule ^blog/category/digital-ads-management/?$ /blog/category/ads-campaign/ [L,R=301]
+  RewriteRule ^blog/category/social-media-management/?$ /blog/category/social-media-marketing/ [L,R=301]
+  RewriteRule ^blog/category/content-development/?$ /blog/category/video-production/ [L,R=301]
+  # Sample case-study pages replaced by the portfolio gallery
+  RewriteRule ^work/.+$ /work/ [L,R=301]
 
   # /index.html and /folder/index.html -> clean URL (only for real browser requests, not internal ones)
   RewriteCond %{THE_REQUEST} \s/+(.*/)?index\.html[\s?] [NC]

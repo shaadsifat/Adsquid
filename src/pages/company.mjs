@@ -1,9 +1,9 @@
 import { site, legalUpdated } from '../config.mjs';
-import { services, team, values, timeline, careers, freeAudit, clientsPlaceholder } from '../data.mjs';
+import { services, team, values, timeline, careers, freeAudit, clients } from '../data.mjs';
 import {
-  img16, icon, btn, waBtn, waLink, eyebrow, ctaBand, faqBlock, breadcrumbSchema, faqSchema, orgSchema, teamImg, clientLogo, esc, brand,
+  img16, icon, btn, waBtn, waLink, eyebrow, faqBlock, breadcrumbSchema, faqSchema, orgSchema, teamImg, clientLogo, esc, brand,
 } from '../lib.mjs';
-import { pageHero, heroPreload } from './parts.mjs';
+import { pageHero, heroPreload, heroIcon, teamFan } from './parts.mjs';
 
 export function aboutPage() {
   const crumbs = [{ name: 'About', path: '/about/' }];
@@ -12,15 +12,16 @@ ${pageHero({
   crumbs,
   h1: 'About Adsquid',
   display: 'We are Teamsquid.',
-  sentence: 'A Dhaka team of marketers, designers and developers.',
-  image: 'pages/hero-about',
+  sentence: 'Marketers, designers and developers from Dhaka, growing brands in five countries since 2015.',
+  cls: 'hero-oneline hero-team',
+  visual: teamFan(),
   buttons: btn('/free-audit/', 'Work with us', { cls: 'btn-magnetic' }) + btn('/careers/', 'Join the team', { variant: 'ghost' }),
 })}
 
 <section class="section" aria-labelledby="story-title">
   <div class="container">
-    <div class="sec-head">${eyebrow('Our story', '01')}<h2 class="h2" id="story-title" data-split>From one ad account<br> to seven services.</h2></div>
-    <ol class="timeline" data-placeholder>
+    <div class="sec-head">${eyebrow('Our story', '01')}<h2 class="h2" id="story-title" data-split>From one ad account to eight services.</h2></div>
+    <ol class="timeline">
       <span class="timeline-line" aria-hidden="true"><span></span></span>
       ${timeline.map((t) => `<li class="tl-item reveal"><span class="tl-year mono">${t.year}</span><h3>${t.title}</h3><p>${t.text}</p></li>`).join('')}
     </ol>
@@ -40,7 +41,7 @@ ${pageHero({
     <ul class="team-grid">
       ${team
         .map(
-          (m) => `<li class="member reveal"><figure>${teamImg(m)}<figcaption><strong>${esc(m.name)}</strong><span>${esc(m.role)}</span>${
+          (m, i) => `<li class="member reveal"><figure>${teamImg(m)}<span class="member-num mono">${String(i + 1).padStart(2, '0')}</span><figcaption><strong>${esc(m.name)}</strong><span>${esc(m.role)}</span>${
             m.linkedin ? `<a href="${m.linkedin}" target="_blank" rel="noopener" aria-label="${esc(m.name)} on LinkedIn">${brand('linkedin', { mono: true, size: 18 })}</a>` : ''
           }</figcaption></figure></li>`
         )
@@ -52,15 +53,14 @@ ${pageHero({
 <section class="section" aria-labelledby="wall-title">
   <div class="container">
     <div class="sec-head center">${eyebrow('Clients', '04')}<h2 class="h2" id="wall-title" data-split>Brands that trust us.</h2></div>
-    <div class="logo-wall">${clientsPlaceholder.map(clientLogo).join('')}</div>
+    <div class="logo-wall">${clients.map((c) => clientLogo(c)).join('')}</div>
   </div>
-</section>
-${ctaBand({ title: 'Let us grow together.', text: 'Start with a free audit. Meet the team on a short call.' })}`;
+</section>`;
   return {
     path: '/about/',
     title: 'About Adsquid | Meet Teamsquid',
-    desc: 'Meet the Dhaka team of marketers, designers and developers behind Adsquid.',
-    preload: [heroPreload('pages/hero-about')],
+    desc: 'Meet Teamsquid: the marketers, designers and developers behind Adsquid, growing brands in five countries since 2015.',
+    cta: { eyebrow: 'Ready to grow?', title: 'Let us grow together.', text: 'Start with a free audit. Meet the team on a short call.' },
     schema: [breadcrumbSchema(crumbs), orgSchema()],
     body,
   };
@@ -123,6 +123,7 @@ ${faqBlock(freeAudit.faq, { num: '03', title: 'Before you ask.' })}`;
     path: '/free-audit/',
     title: 'Free Digital Marketing Audit | Adsquid',
     desc: 'Get a free review of your ads, social pages and website, plus a 1-page plan to fix the leaks.',
+    cta: false,
     preload: [heroPreload('pages/hero-free-audit')],
     schema: [breadcrumbSchema(crumbs), faqSchema(freeAudit.faq)],
     body,
@@ -180,6 +181,7 @@ ${pageHero({
     path: '/contact/',
     title: 'Contact Adsquid | Digital Marketing Agency Dhaka',
     desc: 'Call, WhatsApp or message us. Office in Mirpur-6, Dhaka. We reply fast.',
+    cta: { title: 'Prefer a free audit first?', text: 'Send your page or website link. We reply with a 1-page plan.' },
     preload: [heroPreload('pages/hero-contact')],
     schema: [breadcrumbSchema(crumbs), orgSchema()],
     body,
@@ -217,6 +219,7 @@ ${pageHero({
     path: '/careers/',
     title: 'Careers at Adsquid | Join Teamsquid in Dhaka',
     desc: 'Work with a Dhaka team of marketers, designers and developers. See open roles at Adsquid or send your CV.',
+    cta: { eyebrow: 'Hiring or not', title: 'Good people are always welcome.', text: 'Want to work with us as a client instead? Start with a free audit.' },
     preload: [heroPreload('pages/hero-careers')],
     schema: [breadcrumbSchema(crumbs)],
     body,
@@ -226,7 +229,7 @@ ${pageHero({
 function legal({ path, name, title, desc, sections }) {
   const crumbs = [{ name, path }];
   const body = `
-${pageHero({ crumbs, h1: name, display: name + '.', sentence: `Last updated: ${legalUpdated}.`, cls: 'hero-type hero-small' })}
+${pageHero({ crumbs, h1: name, display: name + '.', sentence: `Last updated: ${legalUpdated}.`, cls: 'hero-type hero-small', visual: heroIcon('legal') })}
 <section class="section section-tight">
   <div class="container narrow prose">
     <p class="draft-note" data-placeholder>Draft text. Have it reviewed and approved by the agency before launch.</p>
@@ -265,7 +268,7 @@ export function termsPage() {
       ['About these terms', ['These terms apply to your use of this website. Work we do for clients is covered by a separate written agreement or proposal.']],
       ['Website content', ['All text, images, graphics and code on this site belong to Adsquid or are used with permission. Please do not copy or reuse them without written consent.']],
       ['Free audit', ['The free audit is a no-obligation review. Its recommendations are general advice based on the information available to us and do not guarantee specific results.']],
-      ['Results', ['Case study numbers describe past results for specific clients. Results depend on many factors, including budget, product, market and timing, and are not a promise of future performance.']],
+      ['Results', ['Portfolio pieces and figures on this site describe past work for specific clients. Results depend on many factors, including budget, product, market and timing, and are not a promise of future performance.']],
       ['Third-party links', ['This site links to other websites such as Facebook, LinkedIn and WhatsApp. We are not responsible for their content or privacy practices.']],
       ['Liability', ['We work to keep this site accurate and available, but it is provided as is. Adsquid is not liable for losses arising from use of this website.']],
       ['Governing law', ['These terms are governed by the laws of Bangladesh. Disputes fall under the courts of Dhaka.']],
@@ -290,6 +293,7 @@ export function notFoundPage() {
     title: 'Signal lost (404) | Adsquid',
     desc: 'This page does not exist or has moved. Go back home or browse our services.',
     noindex: true,
+    cta: false,
     bodyClass: 'page-404',
     body,
   };

@@ -1,20 +1,8 @@
 import { site } from '../config.mjs';
-import { services, groups, work, team, counters, whyUs, processSteps, clientsPlaceholder, freeAudit } from '../data.mjs';
-import { esc, icon, img16, objImg, teamImg, btn, eyebrow, serviceUrl, orgSchema, clientLogo, abs, brand, splitWords } from '../lib.mjs';
+import { services, works, team, counters, whyUs, processSteps, clients } from '../data.mjs';
+import { esc, icon, img16, teamImg, btn, eyebrow, serviceUrl, orgSchema, clientLogo, abs, brand, splitWords, hexIcon } from '../lib.mjs';
 import { postCard } from './blog.mjs';
-import { workCard } from './work.mjs';
-
-// Sockets measured on the 2576x1438 render of home-03-network (README section 8).
-// Order = clockwise = service order in data.mjs.
-const SOCKETS = [
-  { id: 'top', cx: 1287, cy: 251, r: 100, d: 'M1288 651 L1288 354' },
-  { id: 'r1', cx: 2051, cy: 463, r: 92, d: 'M1376 672 L1576 672 C1660 672 1690 464 1790 464 L1958 464' },
-  { id: 'r2', cx: 2254, cy: 718, r: 92, d: 'M1376 718 L2162 718' },
-  { id: 'r3', cx: 2050, cy: 975, r: 92, d: 'M1376 770 L1576 770 C1660 770 1690 975 1790 975 L1958 975' },
-  { id: 'l3', cx: 523, cy: 977, r: 92, d: 'M1200 770 L1000 770 C 916 770 886 977 786 977 L 616 977' },
-  { id: 'l2', cx: 321, cy: 719, r: 92, d: 'M1200 718 L 413 718' },
-  { id: 'l1', cx: 525, cy: 463, r: 92, d: 'M1200 672 L1000 672 C 916 672 886 464 786 464 L 616 464' },
-];
+import { workTile, lightbox } from './work.mjs';
 
 // Platform tops on home-04-process, in % of the image box.
 const PLATFORMS = [
@@ -27,30 +15,44 @@ const PLATFORMS = [
 
 const CHAPTERS = ['Hero', 'Problem', 'Services', 'Process', 'Proof', 'Clients', 'Why us', 'Team', 'Blog', 'Audit'];
 
-const side = (s) => (s.id === 'top' ? 'top' : s.id[0] === 'r' ? 'right' : 'left');
+const pad = (n) => String(n).padStart(2, '0');
 
-function networkVisual() {
-  return `<div class="net-stage">
-      <div class="net-box">
-        ${img16('home/home-03-network', { sizes: '(min-width: 1024px) 70vw, 100vw' })}
-        <svg class="net-svg" viewBox="0 0 2576 1438" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-          ${SOCKETS.map((s, i) => `<g class="net-arm" data-arm="${i}"><path class="net-glow" d="${s.d}" pathLength="1"/><path class="net-line" d="${s.d}" pathLength="1"/><path class="net-flow" d="${s.d}" pathLength="1"/></g>`).join('')}
-        </svg>
-        <span class="net-hub" aria-hidden="true"></span>
-        ${SOCKETS.map(
-          (s, i) => `<button class="net-node" type="button" data-node="${i}" style="left:${((s.cx / 2576) * 100).toFixed(2)}%;top:${((s.cy / 1438) * 100).toFixed(2)}%;--size:${(((s.r * 2) / 2576) * 100).toFixed(2)}%" aria-label="Show ${esc(services[i].name)}">
-          <img src="/assets/images/services/obj-${services[i].key}-320.webp" width="320" height="320" alt="" loading="lazy" decoding="async">
-          <span class="net-tag ${side(s)}">${esc(services[i].short)}</span>
-        </button>`
-        ).join('')}
+// The eight services as an infographic: four cards each side of a hexagon hub, wired to it (wires drawn by main.js).
+export function servicesInfographic({ headingTag = 'h3' } = {}) {
+  const half = Math.ceil(services.length / 2);
+  const card = (s, i) => `<li class="info-card ${i < half ? 'l' : 'r'}" data-info="${i}" style="--i:${i}">
+          <a href="${serviceUrl(s)}">
+            ${hexIcon(s.icon, 'info-hex')}
+            <span class="info-text">
+              <span class="info-num mono">${pad(i + 1)}</span>
+              <${headingTag} class="info-name">${s.name}</${headingTag}>
+              <span class="info-subs">${s.subs.map((x) => esc(x.title)).join(' <i>&middot;</i> ')}</span>
+            </span>
+          </a>
+        </li>`;
+  return `<div class="info" data-infographic>
+      <svg class="info-wires" aria-hidden="true"></svg>
+      <ul class="info-col info-left">
+        ${services.slice(0, half).map((s, i) => card(s, i)).join('')}
+      </ul>
+      <div class="info-hub" aria-hidden="true">
+        <span class="hub-ring"></span><span class="hub-ring r2"></span><span class="hub-orbit"><i></i></span>
+        <span class="hub-hex">
+          <span class="hub-face hub-home on"><img src="/assets/images/brand/logo/adsquid-mark.svg" width="64" height="64" alt="" loading="lazy"><b>${services.length} services</b><small>One team</small></span>
+          ${services.map((s, i) => `<span class="hub-face" data-face="${i}">${icon(s.icon)}<b>${s.name}</b><small>${s.pitch}</small></span>`).join('')}
+        </span>
       </div>
+      <ul class="info-col info-right">
+        ${services.slice(half).map((s, i) => card(s, i + half)).join('')}
+      </ul>
     </div>`;
 }
 
 export function homePage({ posts }) {
-  const featured = work.slice(0, 3);
+  const featured = ['social-media-post-design', 'custom-website-design', 'logo-design-branding'].map((slug) => works.find((w) => w.slug === slug));
   const latest = posts.slice(0, 3);
-  const half = Math.ceil(clientsPlaceholder.length / 2);
+  const half = Math.ceil(clients.length / 2);
+  const row = (list) => [...list, ...list].map((c, i) => clientLogo(c, { hidden: i >= list.length })).join('');
 
   const body = `
 <nav class="rail" aria-label="Chapters">
@@ -61,15 +63,6 @@ export function homePage({ posts }) {
 <section class="hero hero-home" id="ch-00" data-chapter="0">
   <div class="hero-bg" aria-hidden="true"></div>
   <div class="container hero-grid">
-    <div class="hero-content">
-      <h1 class="eyebrow hero-eyebrow">Digital marketing agency in Dhaka</h1>
-      <p class="display hero-display">${splitWords('Reach every<br> customer.')}</p>
-      <p class="hero-lead">Ads, content, SEO and tech under one roof. One <span class="nowrap">in-house</span> Dhaka team that plans, creates and grows your brand, with clear numbers every month.</p>
-      <div class="btns hero-btns">
-        ${btn('/free-audit/', 'Get a free audit', { cls: 'btn-magnetic' })}
-        ${btn('/work/', 'See our work', { variant: 'ghost', iconName: 'arrow-up-right' })}
-      </div>
-    </div>
     <div class="hero-art">
       <div class="art-stage">
         <span class="art-glow" aria-hidden="true"></span>
@@ -90,6 +83,15 @@ export function homePage({ posts }) {
         <span class="art-spark k1" aria-hidden="true"></span><span class="art-spark k2" aria-hidden="true"></span><span class="art-spark k3" aria-hidden="true"></span><span class="art-spark k4" aria-hidden="true"></span><span class="art-spark k5" aria-hidden="true"></span>
       </div>
     </div>
+    <div class="hero-content">
+      <h1 class="eyebrow hero-eyebrow">Digital marketing agency in Dhaka</h1>
+      <p class="display hero-display">${splitWords('Reach every<br> customer.')}</p>
+      <p class="hero-lead">Ads, content, SEO and tech under one roof. One <span class="nowrap">in-house</span> team from Dhaka that plans, creates and grows brands in five countries, with clear numbers every month.</p>
+      <div class="btns hero-btns">
+        ${btn('/free-audit/', 'Get a free audit', { cls: 'btn-magnetic' })}
+        ${btn('/work/', 'See our work', { variant: 'ghost', iconName: 'arrow-up-right' })}
+      </div>
+    </div>
   </div>
   <a class="scroll-cue" href="#ch-01" aria-label="Scroll to the next chapter"><span></span></a>
 </section>
@@ -102,7 +104,6 @@ export function homePage({ posts }) {
       <h2 class="h2 h2-xl" id="noise-title" data-split>Most brands shout.<br> Few get heard.</h2>
     </div>
     <div class="noise-stage">
-      <svg class="noise-line" viewBox="0 0 1200 200" preserveAspectRatio="none" aria-hidden="true"><path class="glow" d="M0 170 H380 L470 80 H1200"/><path d="M0 170 H380 L470 80 H1200"/></svg>
       <ul class="noise-cards">
         <li class="noise-card"><span class="mono">ERR 01</span><strong>Feeds are full.</strong><span>Your post is one of thousands today.</span></li>
         <li class="noise-card"><span class="mono">ERR 02</span><strong>Budgets leak.</strong><span>Boosts without tracking burn money.</span></li>
@@ -112,42 +113,17 @@ export function homePage({ posts }) {
   </div>
 </section>
 
-<div class="arms-spacer">
 <section class="ch ch-arms" id="ch-02" data-chapter="2" aria-labelledby="arms-title">
-  <div class="arms-pin">
-    <canvas class="trails" data-trails data-density="0.7" data-speed="0.6" data-opacity="0.55" aria-hidden="true"></canvas>
-    <div class="container arms-head">
-      <div class="arms-title">
-        ${eyebrow('Many arms', '02')}
-        <h2 class="h2" id="arms-title" data-split>Many arms. One goal.</h2>
-        <p class="sec-lead reveal">Seven services that work as one team. Tap an arm to jump to it.</p>
-      </div>
-      <div class="arms-meta mono" aria-live="polite"><b class="arms-cur">01</b><span>/ 07</span><span class="arms-bar"><i></i></span><span class="arms-name">${esc(services[0].short)}</span></div>
+  <canvas class="trails" data-trails data-density="0.7" data-speed="0.6" data-opacity="0.55" aria-hidden="true"></canvas>
+  <div class="container">
+    <div class="sec-head center">
+      ${eyebrow('Eight services', '02')}
+      <h2 class="h2" id="arms-title" data-split>Many arms. One goal.</h2>
+      <p class="sec-lead reveal">Eight services that work as one team, so nothing gets lost between agencies.</p>
     </div>
-    <div class="arms-visual">${networkVisual()}</div>
-    <div class="arms-track-wrap">
-      <ol class="arms-track">
-        ${services
-          .map(
-            (s, i) => `<li class="svc-card" data-card="${i}">
-          <a href="${serviceUrl(s)}">
-            <span class="svc-prog" aria-hidden="true"><i></i></span>
-            <span class="svc-thumb">${objImg(s.key, { sizes: '(min-width: 1024px) 96px, 120px', alt: '' })}</span>
-            <span class="svc-text">
-              <span class="svc-group mono">${String(i + 1).padStart(2, '0')} &middot; ${groups.find((g) => g.id === s.group).name}</span>
-              <span class="svc-name">${s.name}</span>
-              <span class="svc-pitch">${s.pitch}</span>
-            </span>
-            ${icon('arrow-up-right', 'svc-arrow')}
-          </a>
-        </li>`
-          )
-          .join('')}
-      </ol>
-    </div>
+    ${servicesInfographic()}
   </div>
 </section>
-</div>
 
 <section class="ch ch-process" id="ch-03" data-chapter="3" aria-labelledby="process-title">
   <div class="container">
@@ -176,25 +152,27 @@ export function homePage({ posts }) {
       <dl class="counters">
         ${counters
           .map(
-            (c) => `<div class="counter"${c.verify ? ' data-placeholder' : ''}><dt>${c.label}</dt><dd><span data-count="${c.value}"${c.plain ? ' data-plain' : ''}>${c.value}</span>${c.suffix}</dd></div>`
+            (c) => `<div class="counter"><dt>${c.label}</dt><dd><span data-count="${c.value}"${c.plain ? ' data-plain' : ''}>${c.value}</span>${c.suffix}</dd></div>`
           )
           .join('')}
       </dl>
     </div>
-    <div class="cards-3 proof-cards">
-      ${featured.map((w) => workCard(w, { tilt: true })).join('')}
+    <div class="work-grid proof-cards">
+      ${featured.map((w) => workTile(w)).join('')}
     </div>
+    <div class="proof-more reveal">${btn('/work/', 'See all our work', { variant: 'ghost', iconName: 'arrow-up-right' })}</div>
   </div>
+  ${lightbox()}
 </section>
 
 <section class="ch ch-clients" id="ch-05" data-chapter="5" aria-labelledby="clients-title">
   <div class="clients-bg">${img16('textures/grid-floor')}</div>
   <div class="container">
-    <div class="sec-head center">${eyebrow('Clients', '05')}<h2 class="h2" id="clients-title" data-split>Brands that trust us.</h2></div>
+    <div class="sec-head center">${eyebrow('Clients', '05')}<h2 class="h2" id="clients-title" data-split>Brands that trust us.</h2><p class="sec-lead reveal">50+ clients in five countries.</p></div>
   </div>
   <div class="marquee" aria-label="Client logos">
-    <div class="marquee-row"><div class="marquee-inner">${[...clientsPlaceholder.slice(0, half), ...clientsPlaceholder.slice(0, half)].map((c, i) => (i >= half ? clientLogo(c).replace('<span class="client-logo"', '<span class="client-logo" aria-hidden="true"') : clientLogo(c))).join('')}</div></div>
-    <div class="marquee-row reverse"><div class="marquee-inner">${[...clientsPlaceholder.slice(half), ...clientsPlaceholder.slice(half)].map((c, i) => (i >= half ? clientLogo(c).replace('<span class="client-logo"', '<span class="client-logo" aria-hidden="true"') : clientLogo(c))).join('')}</div></div>
+    <div class="marquee-row"><div class="marquee-inner">${row(clients.slice(0, half))}</div></div>
+    <div class="marquee-row reverse"><div class="marquee-inner">${row(clients.slice(half))}</div></div>
   </div>
 </section>
 
@@ -222,7 +200,7 @@ export function homePage({ posts }) {
           (m, i) => `<li class="tc-card" aria-roledescription="slide" aria-label="${i + 1} of ${team.length}">
         <figure>
           ${teamImg(m, { sizes: '(min-width: 1024px) 330px, 72vw' })}
-          <span class="tc-num mono">${String(i + 1).padStart(2, '0')}</span>
+          <span class="tc-num mono">${pad(i + 1)}</span>
           <figcaption><strong>${esc(m.name)}</strong><span>${esc(m.role)}</span></figcaption>
           ${m.linkedin ? `<a class="tc-in" href="${m.linkedin}" target="_blank" rel="noopener" aria-label="${esc(m.name)} on LinkedIn">${brand('linkedin', { mono: true, size: 18 })}</a>` : ''}
         </figure>
@@ -277,7 +255,8 @@ export function homePage({ posts }) {
     path: '/',
     title: 'Adsquid | Digital Marketing Agency in Dhaka, Bangladesh',
     ogTitle: 'Adsquid: Reach every customer.',
-    desc: 'Ads, social media, SEO, design, content, websites and software from one Dhaka team. Get a free audit today.',
+    desc: 'Ads, social media, brand, visual and video content, websites, SEO and software from one team. Get a free audit today.',
+    cta: false,
     bodyClass: 'page-home',
     preload: [
       '<link rel="preload" as="image" imagesrcset="/assets/images/brand/hero-mascot-480.webp 480w, /assets/images/brand/hero-mascot.webp 720w" imagesizes="(min-width: 960px) 46vw, 88vw" fetchpriority="high">',

@@ -6,11 +6,11 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { site } from './config.mjs';
-import { services, adPages, work } from './data.mjs';
+import { services, adPages } from './data.mjs';
 import { configureLayout, renderPage } from './layout.mjs';
 import { homePage } from './pages/home.mjs';
 import { servicesHub, servicePage, adPage } from './pages/services.mjs';
-import { workIndex, casePage } from './pages/work.mjs';
+import { workIndex } from './pages/work.mjs';
 import { blogIndex, categoryPage, postPage } from './pages/blog.mjs';
 import { aboutPage, auditPage, contactPage, careersPage, privacyPage, termsPage, notFoundPage } from './pages/company.mjs';
 
@@ -41,6 +41,7 @@ const imageMap = {
   ads: 'assets/images/ads',
   blog: 'assets/images/blog',
   brand: 'assets/images/brand',
+  clients: 'assets/images/clients',
   home: 'assets/images/home',
   mockups: 'assets/images/mockups',
   pages: 'assets/images/pages',
@@ -48,6 +49,7 @@ const imageMap = {
   textures: 'assets/images/textures',
   team: 'assets/images/team',
   video: 'assets/video',
+  work: 'assets/images/work',
 };
 for (const [from, to] of Object.entries(imageMap)) {
   if (existsSync(join(IMAGES, from))) cpSync(join(IMAGES, from), join(DIST, to), { recursive: true });
@@ -138,7 +140,6 @@ const pages = [
   ...services.map((s) => servicePage(s, ctx)),
   ...adPages.map((a) => adPage(a, ctx)),
   workIndex(),
-  ...work.map(casePage),
   blogIndex(ctx),
   ...services.map((s) => categoryPage(s, ctx)),
   ...posts.map((p) => postPage(p, ctx)),

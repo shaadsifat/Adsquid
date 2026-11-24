@@ -1,128 +1,66 @@
-import { work, workFilters } from '../data.mjs';
-import { img16, icon, btn, eyebrow, ctaBand, breadcrumbSchema, serviceBySlug, serviceUrl, esc, abs } from '../lib.mjs';
-import { pageHero, heroPreload } from './parts.mjs';
+import { works, workFilters } from '../data.mjs';
+import { icon, breadcrumbSchema, serviceBySlug, esc, abs } from '../lib.mjs';
+import { pageHero, heroIcon } from './parts.mjs';
 
-export function workCard(w, { tilt = false, headingTag = 'h3' } = {}) {
-  return `<article class="card work-card reveal"${tilt ? ' data-tilt' : ''} data-filters="${w.filters.join(' ')}" data-placeholder>
-  <a href="/work/${w.slug}/" class="card-link">
-    <span class="work-cover">${img16(w.cover, { sizes: '(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw', alt: `${w.client} project cover` })}<span class="sample-tag mono">SAMPLE</span></span>
-    <span class="work-meta mono">${esc(w.industry)}</span>
-    <${headingTag} class="work-client">${esc(w.client)}</${headingTag}>
-    <span class="work-result">${esc(w.result)}</span>
+const workSrc = (w, size = '') => `/assets/images/work/${w.slug}${size}.webp`;
+
+// One portfolio piece: opens full size in the lightbox (main.js); still a plain link to the image without JS.
+export function workTile(w, { headingTag = 'h3' } = {}) {
+  const s = serviceBySlug(w.service);
+  return `<figure class="work-tile reveal" id="${w.slug}" data-filter="${w.filter}">
+  <a class="work-open" href="${workSrc(w)}" data-lightbox data-title="${esc(w.title)}" data-cat="${esc(s.name)}" aria-label="View ${esc(w.title)} full size">
+    <span class="work-media"><img src="${workSrc(w, '-640')}" srcset="${workSrc(w, '-640')} 640w, ${workSrc(w)} 1280w" sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" width="1280" height="715" alt="${esc(w.title)}: ${esc(s.name.toLowerCase())} by Adsquid" loading="lazy" decoding="async"></span>
+    <span class="work-zoom" aria-hidden="true">${icon('maximize-2')}</span>
   </a>
-</article>`;
+  <figcaption><span class="work-cat mono">${esc(s.name)}</span><${headingTag} class="work-title">${esc(w.title)}</${headingTag}></figcaption>
+</figure>`;
+}
+
+// Full-size viewer for the tiles on a page (opened by main.js).
+export function lightbox() {
+  return `<dialog class="lightbox" aria-label="Portfolio viewer">
+  <div class="lb-top"><div class="lb-title"><span class="lb-cat"></span><b class="lb-name"></b></div><button class="lb-btn lb-close" type="button" aria-label="Close">${icon('x')}</button></div>
+  <div class="lb-stage"><img class="lb-img" src="data:," width="1280" height="715" alt=""></div>
+  <div class="lb-nav"><button class="lb-btn lb-prev" type="button" aria-label="Previous work">${icon('arrow-left')}</button><span class="lb-count"></span><button class="lb-btn lb-next" type="button" aria-label="Next work">${icon('arrow-right')}</button></div>
+</dialog>`;
 }
 
 export function workIndex() {
   const crumbs = [{ name: 'Work', path: '/work/' }];
+  const count = (id) => (id === 'all' ? works.length : works.filter((w) => w.filter === id).length);
   const body = `
 ${pageHero({
   crumbs,
-  h1: 'Digital marketing case studies',
-  display: 'Work that<br> moved numbers.',
-  sentence: 'Campaigns, websites and content we built for brands in Bangladesh, with the numbers behind them.',
+  h1: 'Our work: design, website and software portfolio',
+  display: 'Work we are proud of.',
+  sentence: 'Brand identities, social content, websites and software made by Teamsquid for clients around the world.',
   cls: 'hero-type',
-  extra: `<svg class="hero-signal" viewBox="0 0 1200 160" preserveAspectRatio="none" aria-hidden="true"><path class="glow" d="M0 150 H560 L600 110 H1200"/><path d="M0 150 H560 L600 110 H1200"/></svg>`,
+  visual: heroIcon('work'),
 })}
-<section class="section work-index" aria-label="Projects">
+<section class="section work-index" aria-label="Portfolio">
   <div class="container">
     <div class="filters" role="toolbar" aria-label="Filter by service">
-      ${workFilters.map((f, i) => `<button class="chip" type="button" data-filter="${f.id}" aria-pressed="${i === 0}">${f.name}</button>`).join('')}
+      ${workFilters.map((f, i) => `<button class="chip" type="button" data-filter="${f.id}" aria-pressed="${i === 0}">${f.name}<span class="chip-count">${count(f.id)}</span></button>`).join('')}
     </div>
-    <p class="note" data-placeholder>Sample projects shown while real case studies are prepared.</p>
-    <div class="cards-3 work-grid">${work.map((w) => workCard(w, { tilt: true, headingTag: 'h2' })).join('')}</div>
+    <div class="work-grid">${works.map((w) => workTile(w, { headingTag: 'h2' })).join('')}</div>
     <p class="empty-state" hidden>No projects in this category yet.</p>
   </div>
 </section>
-${ctaBand({ title: 'Your brand could be next.', text: 'Start with a free audit. We will show you where the growth is hiding.' })}`;
+${lightbox()}`;
   return {
     path: '/work/',
-    title: 'Our Work | Case Studies | Adsquid',
-    desc: 'Real campaigns, websites and content we built for brands in Bangladesh, with the numbers behind them.',
-    schema: [breadcrumbSchema(crumbs)],
-    body,
-  };
-}
-
-export function casePage(w) {
-  const path = `/work/${w.slug}/`;
-  const crumbs = [
-    { name: 'Work', path: '/work/' },
-    { name: w.client, path },
-  ];
-  const idx = work.indexOf(w);
-  const next = work[(idx + 1) % work.length];
-  const svcs = w.services.map(serviceBySlug);
-  const gallery = ['mockups/laptop-phone', 'mockups/three-phones', 'mockups/poster-frames'];
-
-  const body = `
-${pageHero({
-  crumbs,
-  h1: w.client,
-  display: esc(w.headline),
-  sentence: esc(w.challenge),
-  cls: 'hero-small',
-  extra: `<ul class="tags"><li>${esc(w.industry)}</li>${svcs.map((s) => `<li><a href="${serviceUrl(s)}">${s.short}</a></li>`).join('')}<li>${w.year}</li></ul>`,
-})}
-<div class="container case-cover">${img16(w.cover, { priority: true, sizes: '(min-width: 1280px) 1200px, 100vw', alt: `${w.client} project visual` })}</div>
-<div class="sample-banner" data-placeholder><div class="container">${icon('sparkles')} This is a SAMPLE case study. Replace it with a real project before launch.</div></div>
-
-<section class="section" aria-labelledby="ch-title">
-  <div class="container case-grid">
-    <div>
-      ${eyebrow('Challenge', '01')}
-      <h2 class="h3-lg" id="ch-title">${esc(w.challenge)}</h2>
-    </div>
-    <div>
-      ${eyebrow('What we did', '02')}
-      <ul class="check-list">${w.did.map((d) => `<li>${icon('check')}<span>${esc(d)}</span></li>`).join('')}</ul>
-    </div>
-  </div>
-</section>
-
-<section class="section" aria-labelledby="res-title">
-  <div class="container">
-    <div class="sec-head">${eyebrow('Results', '03')}<h2 class="h2" id="res-title" data-split>The numbers.</h2></div>
-    <dl class="result-nums">${w.numbers.map((n) => `<div class="card reveal"><dd class="big-num">${esc(n.value)}</dd><dt>${esc(n.label)}</dt></div>`).join('')}</dl>
-  </div>
-</section>
-
-<section class="section" aria-label="Gallery">
-  <div class="container">
-    ${eyebrow('Visuals', '04')}
-    <div class="gallery">${gallery.map((g) => `<figure class="reveal">${img16(g, { sizes: '(min-width: 1024px) 50vw, 100vw', alt: 'Project mockup placeholder', placeholder: true })}</figure>`).join('')}</div>
-  </div>
-</section>
-
-<section class="section section-tight">
-  <div class="container narrow">
-    <figure class="testimonial reveal" data-placeholder>
-      <blockquote><p>"${esc(w.quote.text)}"</p></blockquote>
-      <figcaption><strong>${esc(w.quote.name)}</strong><span>${esc(w.quote.role)}, ${esc(w.client)}</span></figcaption>
-    </figure>
-  </div>
-</section>
-
-<section class="section" aria-label="Next project">
-  <div class="container">
-    <a class="next-project card" href="/work/${next.slug}/">
-      <span class="next-media">${img16(next.cover, { sizes: '100vw', alt: '' })}</span>
-      <span class="next-text"><span class="eyebrow">Next project</span><span class="h2">${esc(next.client)}</span><span class="work-result">${esc(next.result)}</span></span>
-      ${icon('arrow-right', 'next-arrow')}
-    </a>
-  </div>
-</section>
-${ctaBand()}`;
-
-  return {
-    path,
-    title: `${w.client}: ${w.result} | Adsquid Work`,
-    desc: `${w.headline} ${w.challenge}`.slice(0, 155),
-    noindex: true, // SAMPLE: remove when real
-    ogImage: `/assets/images/${w.cover}-1280.webp`,
+    title: 'Our Work | Design, Website & Software Portfolio | Adsquid',
+    desc: 'Brand identities, social media designs, websites and software dashboards made by the Adsquid team.',
     schema: [
       breadcrumbSchema(crumbs),
-      { '@context': 'https://schema.org', '@type': 'CreativeWork', name: `${w.client}: ${w.headline}`, about: w.industry, creator: { '@id': abs('/#organization') }, url: abs(path), dateCreated: w.year },
+      {
+        '@context': 'https://schema.org',
+        '@type': 'ImageGallery',
+        name: 'Adsquid portfolio',
+        url: abs('/work/'),
+        creator: { '@id': abs('/#organization') },
+        image: works.map((w) => ({ '@type': 'ImageObject', name: w.title, contentUrl: abs(workSrc(w)), width: 1280, height: 715 })),
+      },
     ],
     body,
   };
