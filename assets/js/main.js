@@ -32,7 +32,7 @@
   if (hasGsap) gsap.registerPlugin(ScrollTrigger);
   if (!reduce && window.Lenis) {
     // Carousels scroll natively (cheap) instead of making Lenis inspect every ancestor on each wheel event.
-    lenis = new Lenis({ lerp: 0.1, smoothWheel: true, prevent: (node) => !!(node.classList && (node.classList.contains('car-track') || node.classList.contains('arms-track'))) });
+    lenis = new Lenis({ lerp: 0.1, smoothWheel: true, prevent: (node) => !!(node.classList && (node.classList.contains('car-track'))) });
     lenis.updateClassName = () => {}; // no lenis-* classes on <html> (nothing uses them; avoids root class churn)
     if (hasGsap) {
       lenis.on('scroll', ScrollTrigger.update);
@@ -277,10 +277,9 @@
     if (wrap && pos && body) {
       root.classList.add('has-cursor');
       const LABELS = [
-        ['.work-card, .next-project', 'View'],
+        ['.work-open', 'View'],
         ['.post-card', 'Read'],
-        ['.svc-tile, .svc-card, .platform', 'Open'],
-        ['.net-node', 'Jump'],
+        ['.svc-tile, .info-card, .platform', 'Open'],
         ['.car-track', 'Drag'],
       ];
       const DEG = 180 / Math.PI;
@@ -712,8 +711,8 @@
       const f = b.dataset.filter;
       $$('[data-filter]', filterBar).forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
       let shown = 0;
-      $$('.work-grid .work-card').forEach((c) => {
-        const on = f === 'all' || c.dataset.filters.split(' ').includes(f);
+      $$('.work-grid .work-tile').forEach((c) => {
+        const on = f === 'all' || c.dataset.filter === f;
         c.classList.toggle('hide', !on);
         if (on) { shown++; c.classList.add('in'); }
       });
@@ -722,6 +721,124 @@
       hasGsap && ScrollTrigger.refresh();
     });
   }
+
+  /* ---------- Portfolio lightbox: arrows, keys, swipe; plain image links without JS ---------- */
+  const lb = $('.lightbox');
+  const lbLinks = $$('[data-lightbox]');
+  if (lb && lb.showModal && lbLinks.length) {
+    const img = $('.lb-img', lb), name = $('.lb-name', lb), cat = $('.lb-cat', lb), count = $('.lb-count', lb);
+    let list = lbLinks, at = 0, opener = null;
+    const show = (k) => {
+      at = (k + list.length) % list.length;
+      const a = list[at];
+      img.src = a.getAttribute('href');
+      img.alt = a.dataset.title;
+      name.textContent = a.dataset.title;
+      cat.textContent = a.dataset.cat;
+      count.textContent = `${at + 1} / ${list.length}`;
+      img.style.animation = 'none'; void img.offsetWidth; img.style.animation = '';
+      const nx = list[(at + 1) % list.length];
+      if (nx) new Image().src = nx.getAttribute('href'); // preload the next one
+    };
+    lbLinks.forEach((a) => a.addEventListener('click', (e) => {
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.button) return;
+      e.preventDefault();
+      opener = a;
+      list = lbLinks.filter((x) => !x.closest('.hide'));
+      show(list.indexOf(a));
+      lb.showModal();
+      lenis && lenis.stop();
+    }));
+    $('.lb-prev', lb).addEventListener('click', () => show(at - 1));
+    $('.lb-next', lb).addEventListener('click', () => show(at + 1));
+    $('.lb-close', lb).addEventListener('click', () => lb.close());
+    lb.addEventListener('close', () => { lenis && lenis.start(); opener && opener.focus({ preventScroll: true }); });
+    lb.addEventListener('click', (e) => { if (e.target === lb || e.target.classList.contains('lb-stage')) lb.close(); });
+    lb.addEventListener('keydown', (e) => { if (e.key === 'ArrowLeft') show(at - 1); else if (e.key === 'ArrowRight') show(at + 1); });
+    let sx = null;
+    lb.addEventListener('pointerdown', (e) => { sx = e.clientX; });
+    lb.addEventListener('pointerup', (e) => {
+      if (sx !== null && e.pointerType !== 'mouse' && Math.abs(e.clientX - sx) > 50) show(at + (e.clientX < sx ? 1 : -1));
+      sx = null;
+    });
+  }
+
+  /* ---------- Eight-services infographic: wires from the hub to every card, a slow tour, hover focus ---------- */
+  $$('[data-infographic]').forEach((info) => {
+    const svg = $('.info-wires', info);
+    const hub = $('.info-hub', info);
+    const cards = $$('.info-card', info);
+    const faces = $$('.hub-face[data-face]', info);
+    const homeFace = $('.hub-home', info);
+    const NS = 'http://www.w3.org/2000/svg';
+    const mk = (tag, cls, attrs = {}) => {
+      const el = d.createElementNS(NS, tag);
+      el.setAttribute('class', cls);
+      for (const k in attrs) el.setAttribute(k, attrs[k]);
+      svg.appendChild(el);
+      return el;
+    };
+    const wires = cards.map(() => mk('path', 'wire'));
+    const pulses = cards.map(() => mk('path', 'wire-pulse', { pathLength: 1 }));
+    const ends = cards.map(() => mk('circle', 'wire-end', { r: 4.5 }));
+    // layout position inside the infographic (offsets ignore the entrance transforms)
+    const pos = (el) => { let x = 0, y = 0; while (el && el !== info) { x += el.offsetLeft; y += el.offsetTop; el = el.offsetParent; } return { x, y }; };
+    const draw = () => {
+      if (getComputedStyle(svg).display === 'none') return;
+      svg.setAttribute('viewBox', `0 0 ${info.clientWidth} ${info.clientHeight}`);
+      const h = pos(hub);
+      const cx = h.x + hub.offsetWidth / 2, cy = h.y + hub.offsetHeight / 2, R = hub.offsetWidth * 0.41;
+      cards.forEach((c, i) => {
+        const o = pos(c);
+        const left = c.classList.contains('l');
+        const ax = left ? o.x + c.offsetWidth : o.x;
+        const ay = o.y + c.offsetHeight / 2;
+        const ex = ax + (left ? 26 : -26);
+        const ang = Math.atan2(ay - cy, ex - cx);
+        const sx = cx + R * Math.cos(ang), sy = cy + R * Math.sin(ang);
+        const dd = `M${sx.toFixed(1)} ${sy.toFixed(1)} L${ex.toFixed(1)} ${ay.toFixed(1)} L${ax.toFixed(1)} ${ay.toFixed(1)}`;
+        wires[i].setAttribute('d', dd);
+        pulses[i].setAttribute('d', dd);
+        ends[i].setAttribute('cx', ax.toFixed(1));
+        ends[i].setAttribute('cy', ay.toFixed(1));
+      });
+    };
+    let cur = -2, timer = 0, hovering = false, inview = false;
+    const set = (i) => {
+      if (i === cur) return;
+      cur = i;
+      cards.forEach((c, j) => c.classList.toggle('on', j === i));
+      [wires, pulses, ends].forEach((g) => g.forEach((w, j) => w.classList.toggle('on', j === i)));
+      faces.forEach((f, j) => f.classList.toggle('on', j === i));
+      if (homeFace) homeFace.classList.toggle('on', i < 0);
+    };
+    const stop = () => { clearInterval(timer); timer = 0; };
+    const play = () => {
+      stop();
+      if (!reduce && inview && !hovering) timer = setInterval(() => set(cur + 1 >= cards.length ? -1 : cur + 1), 2400);
+    };
+    cards.forEach((c, i) => {
+      c.addEventListener('pointerenter', () => { hovering = true; stop(); set(i); });
+      c.addEventListener('focusin', () => { hovering = true; stop(); set(i); });
+    });
+    info.addEventListener('pointerleave', () => { hovering = false; set(-1); play(); });
+    info.addEventListener('focusout', (e) => { if (!info.contains(e.relatedTarget)) { hovering = false; set(-1); play(); } });
+    set(-1);
+    draw();
+    if ('ResizeObserver' in window) {
+      let raf = 0;
+      new ResizeObserver(() => { cancelAnimationFrame(raf); raf = requestAnimationFrame(draw); }).observe(info);
+    }
+    if (d.fonts) d.fonts.ready.then(draw);
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(([en]) => {
+        inview = en.isIntersecting;
+        info.classList.toggle('inview', inview);
+        if (inview) info.classList.add('in');
+        if (inview) play(); else stop();
+      }, { threshold: 0.2 }).observe(info);
+    } else info.classList.add('in', 'inview');
+  });
 
   /* ---------- Blog: active table-of-contents link ---------- */
   const toc = $('.toc');

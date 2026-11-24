@@ -1,4 +1,4 @@
-/* Homepage scroll story (chapters 00-09). Pinned sections: hero (desktop) and chapter 02 (desktop).
+/* Homepage scroll story (chapters 00-09). The services infographic (02) lives in main.js.
    Per-frame work is transform / opacity / stroke-dashoffset only, and every write is skipped
    when the value has not changed. */
 (() => {
@@ -30,67 +30,11 @@
     }, { rootMargin: '200px 0px' }).observe(video);
   }
 
-  /* ---------- 02 Many arms: shared state ---------- */
-  const armsSec = $('.ch-arms');
-  const arms = $$('.net-arm');
-  const nodes = $$('.net-node');
-  const cards = $$('.svc-card');
-  const n = arms.length;
-  const armK = new Array(n).fill(-1);
-  const meta = { cur: $('.arms-cur'), name: $('.arms-name'), bar: $('.arms-bar') };
-  const names = nodes.map((nd) => $('.net-tag', nd).textContent);
-  const progs = cards.map((c) => $('.svc-prog i', c));
-  const metaBarI = meta.bar && $('i', meta.bar);
-  let active = -1;
-
-  const setArm = (i, k) => {
-    k = Math.round(k * 400) / 400;
-    if (armK[i] === k) return;
-    armK[i] = k;
-    const off = String(1 - k);
-    $$('.net-glow, .net-line', arms[i]).forEach((p) => (p.style.strokeDashoffset = off));
-    const lit = k >= 1;
-    if (lit && !arms[i].classList.contains('lit')) setTimeout(() => arms[i].classList.add('pulsed'), 1000);
-    if (!lit) arms[i].classList.remove('pulsed');
-    arms[i].classList.toggle('lit', lit);
-    nodes[i].classList.toggle('lit', lit);
-    if (progs[i]) progs[i].style.transform = `scaleX(${k})`;
-  };
-  const setActive = (i) => {
-    if (i === active) return;
-    active = i;
-    arms.forEach((a, j) => a.classList.toggle('active', j === i));
-    nodes.forEach((nd, j) => nd.classList.toggle('active', j === i));
-    cards.forEach((c, j) => { c.classList.toggle('on', j === i); c.classList.toggle('past', j < i); });
-    if (meta.cur) meta.cur.textContent = String(i + 1).padStart(2, '0');
-    if (meta.name) meta.name.textContent = names[i];
-  };
-  if (armsSec && 'IntersectionObserver' in window) {
-    new IntersectionObserver(([en]) => armsSec.classList.toggle('inview', en.isIntersecting)).observe(armsSec);
-  }
-  const tilt = (el, area, max = 7) => {
-    const rx = gsap.quickTo(el, 'rotationX', { duration: 1.1, ease: 'power3' });
-    const ry = gsap.quickTo(el, 'rotationY', { duration: 1.1, ease: 'power3' });
-    area.addEventListener('pointermove', (e) => {
-      const r = area.getBoundingClientRect();
-      ry(((e.clientX - r.left) / r.width - 0.5) * max);
-      rx(-((e.clientY - r.top) / r.height - 0.5) * max * 0.7);
-    });
-    area.addEventListener('pointerleave', () => { rx(0); ry(0); });
-  };
-
   if (!motion) {
-    // Reduced motion: everything lit, sockets still work as shortcuts.
-    arms.forEach((a, i) => setArm(i, 1));
-    setActive(0);
+    // Reduced motion: everything shown in its final state.
     $$('.plat-chip, .p-step').forEach((el) => el.classList.add('on'));
     $$('.noise-card').forEach((c) => c.classList.add('snapped'));
-    $$('.noise-line, .cta-line').forEach((el) => el.style.setProperty('--draw', 0));
-    const track = $('.arms-track');
-    nodes.forEach((nd, i) => nd.addEventListener('click', () => {
-      setActive(i);
-      track && track.scrollTo({ left: cards[i].offsetLeft - cards[0].offsetLeft });
-    }));
+    $$('.cta-line').forEach((el) => el.style.setProperty('--draw', 0));
     return;
   }
 
@@ -162,61 +106,8 @@
         onUpdate: (s) => nCards.forEach((c, i) => c.classList.toggle('snapped', s.progress > 0.45 + i * 0.15)),
       },
     });
-    tl.fromTo($('.noise-line', noise), { '--draw': 1 }, { '--draw': 0, ease: 'none', duration: 1 }, 0);
     tl.to(nCards, { x: 0, y: 0, rotation: 0, opacity: 1, ease: 'power3.out', duration: 0.6, stagger: 0.15 }, 0.25);
     gsap.fromTo($('.ch-bg img', noise), { yPercent: -5, scale: 1.1 }, { yPercent: 5, scale: 1.02, ease: 'none', scrollTrigger: { trigger: noise, start: 'top bottom', end: 'bottom top', scrub: true } });
-  }
-
-  /* ---------- 02 Many arms ---------- */
-  if (armsSec && desktop) {
-    // Pinned: each line draws to its socket while its card slides into place.
-    armsSec.classList.add('pinned');
-    const track = $('.arms-track', armsSec);
-    const span = n + 0.4; // a little rest after the last arm
-    let step = 356;
-    const measure = () => { step = cards.length > 1 ? cards[1].offsetLeft - cards[0].offsetLeft : 356; };
-    let lastX = null, lastBar = null;
-    const render = (p) => {
-      const pos = p * span;
-      for (let i = 0; i < n; i++) setArm(i, clamp((pos - i) / 0.85, 0, 1));
-      const x = (clamp(pos - 0.9, 0, n - 1) * step).toFixed(1);
-      if (x !== lastX) { track.style.transform = `translate3d(${-x}px,0,0)`; lastX = x; }
-      setActive(clamp(Math.floor(pos), 0, n - 1));
-      const b = (Math.min(pos, n) / n).toFixed(3);
-      if (b !== lastBar) { metaBarI.style.transform = `scaleX(${b})`; lastBar = b; }
-    };
-    const st = ScrollTrigger.create({
-      trigger: armsSec, start: 'top top', end: () => `+=${Math.round(innerHeight * 3)}`, pin: true, pinSpacer: $('.arms-spacer'), scrub: 0.4, invalidateOnRefresh: true,
-      onRefresh: measure,
-      onUpdate: (self) => render(self.progress),
-    });
-    measure();
-    render(0);
-    // Click a socket: glide to the point where that arm is drawn and its card sits in place.
-    nodes.forEach((nd, i) => nd.addEventListener('click', () => {
-      const target = st.start + ((i + 0.9) / span) * (st.end - st.start);
-      cfg.scrollTo ? cfg.scrollTo(target, { duration: 1.2 + Math.abs(i - active) * 0.08 }) : scrollTo({ top: target, behavior: 'smooth' });
-    }));
-    if (finePointer) tilt($('.net-box', armsSec), $('.arms-visual', armsSec), 7);
-  } else if (armsSec) {
-    // Phones / tablets: lines draw in once, cards are a swipe carousel synced with the sockets.
-    const track = $('.arms-track', armsSec);
-    const go = (i) => track.scrollTo({ left: cards[i].offsetLeft - cards[0].offsetLeft, behavior: 'smooth' });
-    ScrollTrigger.create({
-      trigger: $('.net-box', armsSec), start: 'top 75%', once: true,
-      onEnter: () => arms.forEach((a, i) => gsap.to({ k: 0 }, { k: 1, duration: 0.7, delay: i * 0.16, ease: 'power2.out', onUpdate() { setArm(i, this.targets()[0].k); } })),
-    });
-    setActive(0);
-    nodes.forEach((nd, i) => nd.addEventListener('click', () => { setActive(i); go(i); }));
-    let raf = 0;
-    track.addEventListener('scroll', () => {
-      if (raf) return;
-      raf = requestAnimationFrame(() => {
-        raf = 0;
-        const stepW = cards.length > 1 ? cards[1].offsetLeft - cards[0].offsetLeft : track.clientWidth;
-        setActive(clamp(Math.round(track.scrollLeft / stepW), 0, n - 1));
-      });
-    }, { passive: true });
   }
 
   /* ---------- 03 Process: steps light up as the line climbs ---------- */
@@ -257,7 +148,7 @@
     gsap.from('.cta-form', { y: 70, opacity: 0, scale: 0.96, duration: 1.1, ease: 'power3.out', scrollTrigger: { trigger: cta, start: 'top 55%' } });
   }
 
-  // Triggers from main.js (footer, reveals) were created before the pins above: recalculate in page order.
+  // Recalculate every trigger in page order once this file's triggers exist.
   ScrollTrigger.sort();
   ScrollTrigger.refresh();
 })();
