@@ -30,6 +30,85 @@
     }, { rootMargin: '200px 0px' }).observe(video);
   }
 
+
+  /* ---------- 04 Proof: a film reel of six works on a 3D ring ---------- */
+  const reelEl = $('[data-reel]');
+  const reel = reelEl && (() => {
+    const ring = $('.reel-ring', reelEl);
+    const frames = $$('.reel-frame', reelEl);
+    const shades = frames.map((f) => $('.reel-shade', f));
+    const caps = $$('.reel-cap', reelEl);
+    const dots = $$('.reel-dots button', reelEl);
+    const n = frames.length;
+    const step = 360 / n;
+    let R = 0, pos = 0, cur = -1, lastRot = '';
+    const layout = () => {
+      R = (frames[0].offsetWidth / 2 / Math.tan(Math.PI / n)) * 1.06;
+      frames.forEach((f, k) => (f.style.transform = `rotateY(${(k * step).toFixed(2)}deg) translateZ(${R.toFixed(1)}px)`));
+      lastRot = '';
+    };
+    const setPos = (p) => {
+      pos = p;
+      const rot = `translateZ(${(-R).toFixed(1)}px) rotateY(${(-p * step).toFixed(2)}deg)`;
+      if (rot !== lastRot) {
+        lastRot = rot;
+        ring.style.transform = rot;
+        frames.forEach((f, k) => {
+          let a = (((k - p) * step) % 360 + 540) % 360 - 180;
+          const d = Math.min(1, Math.abs(a) / 90);
+          shades[k].style.opacity = (d * 0.62).toFixed(3);
+          f.classList.toggle('front', Math.abs(a) < step / 2);
+          const front = Math.abs(a) < step / 2;
+          f.querySelectorAll('.reel-open, .reel-go').forEach((el) => (el.tabIndex = front ? 0 : -1));
+        });
+      }
+      const i = ((Math.round(p) % n) + n) % n;
+      if (i !== cur) {
+        cur = i;
+        caps.forEach((c, k) => c.classList.toggle('on', k === i));
+        dots.forEach((b, k) => (k === i ? b.setAttribute('aria-current', 'true') : b.removeAttribute('aria-current')));
+      }
+    };
+    // Shortest way round to frame k from where the reel is now.
+    const nearest = (k) => { let dlt = (((k - cur) % n) + n) % n; if (dlt > n / 2) dlt -= n; return pos + dlt; };
+    layout();
+    setPos(0);
+    // re-measure whenever the frame size changes (main.css arrives after this script on slow connections)
+    if ('ResizeObserver' in window) new ResizeObserver(() => { layout(); setPos(pos); }).observe(frames[0]);
+    else addEventListener('resize', () => { layout(); setPos(pos); });
+    const api = { el: reelEl, setPos, nearest, dots, n, jump: (k) => setPos(nearest(k)), swiped: false, get pos() { return pos; } };
+    // A tap on a side frame (or right after a swipe) turns the reel instead of opening the viewer.
+    reelEl.addEventListener('click', (e) => {
+      const b = e.target.closest('.reel-open');
+      if (!b) return;
+      const f = b.closest('.reel-frame');
+      if (api.swiped || !f.classList.contains('front')) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!api.swiped) api.jump(+f.dataset.k);
+        api.swiped = false;
+      }
+    }, true);
+    return api;
+  })();
+  // Phones, tablets and reduced motion: the reel steps on its own (or on tap), with a CSS transition.
+  if (reel && !(motion && desktop)) {
+    reel.el.classList.add('auto');
+    const go = (p) => reel.setPos(p);
+    reel.jump = (k) => go(reel.nearest(k));
+    reel.dots.forEach((b, k) => b.addEventListener('click', () => reel.jump(k)));
+    let sx = null;
+    reel.el.addEventListener('pointerdown', (e) => { sx = e.clientX; });
+    reel.el.addEventListener('pointerup', (e) => { if (sx !== null && Math.abs(e.clientX - sx) > 40) { reel.swiped = true; go(reel.pos + (e.clientX < sx ? 1 : -1)); } sx = null; });
+    if (!reduce && 'IntersectionObserver' in window) {
+      let timer = 0;
+      new IntersectionObserver(([en]) => {
+        clearInterval(timer);
+        if (en.isIntersecting) timer = setInterval(() => go(reel.pos + 1), 3200);
+      }, { threshold: 0.35 }).observe(reel.el);
+    }
+  }
+
   if (!motion) {
     // Reduced motion: everything shown in its final state.
     $$('.plat-chip, .p-step').forEach((el) => el.classList.add('on'));
@@ -130,10 +209,23 @@
     if (pm) gsap.fromTo(pm, { scale: 1.08, yPercent: 3 }, { scale: 1, yPercent: -3, ease: 'none', scrollTrigger: { trigger: proc, start: 'top bottom', end: 'bottom top', scrub: true } });
   }
 
-  /* ---------- 04 Proof: bars rise out of the floor ---------- */
-  const proofImg = $('.proof-bg img');
-  if (proofImg) {
-    gsap.fromTo(proofImg, { yPercent: 30, opacity: 0.2 }, { yPercent: 0, opacity: 1, ease: 'none', scrollTrigger: { trigger: '.ch-proof', start: 'top 90%', end: 'top 15%', scrub: true } });
+  /* ---------- 04 Proof (desktop): the section pins and each scroll step rolls the film one frame ---------- */
+  if (reel && desktop) {
+    const sec = $('.ch-proof'); // sticky layout comes from CSS (.motion .ch-proof)
+    const span = reel.n - 1;
+    // a staircase: each frame rests in front for a moment before the next one rolls in
+    // eased steps: a short rest on each frame, then a long, soft roll to the next (smootherstep)
+    const stair = (t) => { const i = Math.floor(t); const e = clamp((t - i - 0.14) / 0.72, 0, 1); return Math.min(span, i + e * e * e * (e * (e * 6 - 15) + 10)); };
+    const st = ScrollTrigger.create({
+      // the section is position: sticky inside a tall .proof-spacer (CSS), so no pinning or reparenting is needed
+      trigger: $('.proof-spacer'), start: 'top top', end: 'bottom bottom', scrub: 1.1, invalidateOnRefresh: true,
+      onUpdate: (self) => reel.setPos(stair(self.progress * span)),
+    });
+    reel.jump = (k) => {
+      const y = st.start + (k / span) * (st.end - st.start);
+      cfg.scrollTo ? cfg.scrollTo(y, { duration: 1 }) : scrollTo({ top: y, behavior: 'smooth' });
+    };
+    reel.dots.forEach((b, k) => b.addEventListener('click', () => reel.jump(k)));
   }
 
   /* ---------- 05 Clients: grid floor glides ---------- */
