@@ -64,10 +64,10 @@ export function pageHero({ crumbs, h1, display, sentence, image, imageAlt = '', 
   ${
     visual
       ? `<div class="container page-hero-grid">
+    <div class="page-hero-visual">${visual}</div>
     <div class="page-hero-content">
     ${content}
     </div>
-    <div class="page-hero-visual">${visual}</div>
   </div>`
       : `<div class="container page-hero-content">
     ${content}

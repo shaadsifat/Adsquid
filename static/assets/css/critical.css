@@ -107,11 +107,11 @@ button { cursor: pointer; background: none; border: 0; padding: 0; }
 /* @home-only-start */
 /* Home hero (chapter 00): text + animated octopus mascot (right on desktop, on top on phones) */
 .hero { position: relative; isolation: isolate; overflow: hidden; }
-.hero-home { width: 100%; padding: calc(var(--header-h) + 4px) 0 48px; }
+.hero-home { width: 100%; padding: calc(var(--header-h) + 24px) 0 48px; }
 .hero-bg { position: absolute; inset: 0; z-index: -1; pointer-events: none; background: radial-gradient(75% 42% at 50% 24%, rgba(136, 0, 212, .34), rgba(136, 0, 212, 0) 72%), radial-gradient(40% 30% at 90% 75%, rgba(34, 227, 211, .06), rgba(34, 227, 211, 0) 70%); }
 .hero-bg::after { content: ""; position: absolute; inset: 0; opacity: .55; background-image: linear-gradient(rgba(42, 35, 64, .5) 1px, transparent 1px), linear-gradient(90deg, rgba(42, 35, 64, .5) 1px, transparent 1px); background-size: 64px 64px; -webkit-mask-image: radial-gradient(60% 40% at 50% 26%, #000, transparent 75%); mask-image: radial-gradient(60% 40% at 50% 26%, #000, transparent 75%); }
-.hero-grid { display: grid; gap: 6px; align-items: center; }
-.hero-art { position: relative; width: min(90vw, 470px); margin: 0 auto; }
+.hero-grid { display: grid; gap: 30px; align-items: center; }
+.hero-art { position: relative; width: min(84vw, 440px); margin: 0 auto; }
 .art-stage { position: relative; aspect-ratio: 720 / 560; transform-style: preserve-3d; will-change: transform; }
 .art-glow { position: absolute; left: 50%; top: 50%; width: 80%; aspect-ratio: 1; border-radius: 50%; transform: translate(-50%, -50%); background: radial-gradient(circle, rgba(168, 85, 247, .5), rgba(136, 0, 212, .18) 45%, rgba(136, 0, 212, 0) 70%); animation: art-glow 6s ease-in-out infinite; }
 .art-ring { position: absolute; left: 50%; top: 50%; width: 86%; aspect-ratio: 1; margin: -43% 0 0 -43%; border-radius: 50%; border: 1px dashed rgba(214, 180, 255, .3); animation: art-spin 60s linear infinite; }
@@ -212,9 +212,10 @@ button { cursor: pointer; background: none; border: 0; padding: 0; }
 /* Text-only heroes with art on the right (art styled in main.css; its box is sized here) */
 .page-hero-grid { position: relative; display: grid; gap: 4px; }
 .page-hero-grid > .page-hero-content { padding-bottom: 0; }
-.page-hero-visual { position: relative; width: min(74vw, 300px); aspect-ratio: 1; min-height: 0; justify-self: center; margin: 18px 0 8px; visibility: hidden; }
+.page-hero-visual { position: relative; width: min(80vw, 330px); aspect-ratio: 1; min-height: 0; justify-self: center; margin: 6px 0 34px; visibility: hidden; }
 .page-hero-visual > * { position: absolute; inset: 0; }
 .hero-team .page-hero-visual { width: 100%; max-width: 540px; aspect-ratio: 1.5; }
+.page-hero.has-visual { padding-top: calc(var(--header-h) + 28px); }
 .page-hero.has-visual.hero-type { padding-bottom: 40px; }
 .page-hero.has-visual .hero-display { font-size: clamp(2.2rem, .9rem + 3.4vw, 4rem); text-wrap: balance; }
 .hero-oneline .hero-display { white-space: nowrap; font-size: min(8.2vw, 4.25rem); }
