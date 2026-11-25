@@ -1321,3 +1321,8 @@ html:has(.lightbox[open]) .cursor { visibility: hidden; }
 .has-cursor .lightbox a, .has-cursor .lightbox button { cursor: pointer !important; }
 /* Headings stay within two lines */
 .h2 { text-wrap: balance; }
+
+/* Reel: drag with mouse or finger */
+.reel-stage { touch-action: pan-y; cursor: grab; -webkit-user-select: none; user-select: none; }
+.reel.dragging .reel-stage, .reel.dragging .reel-open { cursor: grabbing; }
+.reel-frame img { -webkit-user-drag: none; pointer-events: none; }

@@ -76,7 +76,48 @@
     // re-measure whenever the frame size changes (main.css arrives after this script on slow connections)
     if ('ResizeObserver' in window) new ResizeObserver(() => { layout(); setPos(pos); }).observe(frames[0]);
     else addEventListener('resize', () => { layout(); setPos(pos); });
-    const api = { el: reelEl, setPos, nearest, dots, n, jump: (k) => setPos(nearest(k)), swiped: false, get pos() { return pos; } };
+    // Every move ends on a whole frame: goTo() tweens the ring there (instantly with reduced motion).
+    const state = { p: 0 };
+    const goTo = (t, dur = 0.95) => {
+      if (!window.gsap || reduce) { setPos(t); return; }
+      state.p = pos;
+      gsap.to(state, { p: t, duration: dur, ease: 'power3.inOut', overwrite: true, onUpdate: () => setPos(state.p) });
+    };
+    const api = { el: reelEl, setPos, nearest, dots, n, goTo, jump: (k) => goTo(nearest(k)), swiped: false, dragging: false, onDragStart: null, onDragEnd: null, get pos() { return pos; } };
+    // Drag the reel left / right with the mouse or a finger; on release it settles on the nearest frame.
+    const stage = $('.reel-stage', reelEl);
+    let sx = null, sp = 0, pid = null;
+    const perFrame = () => Math.max(120, frames[0].offsetWidth * 0.55);
+    stage.addEventListener('pointerdown', (e) => {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      sx = e.clientX; sp = pos; pid = e.pointerId;
+    });
+    stage.addEventListener('pointermove', (e) => {
+      if (sx === null || e.pointerId !== pid) return;
+      const dx = e.clientX - sx;
+      if (!api.dragging && Math.abs(dx) > 6) {
+        api.dragging = true;
+        if (window.gsap) gsap.killTweensOf(state);
+        try { stage.setPointerCapture(pid); } catch (err) { /* pointer already gone */ }
+        reelEl.classList.add('dragging');
+        if (api.onDragStart) api.onDragStart();
+      }
+      if (api.dragging) setPos(sp - dx / perFrame());
+    });
+    const endDrag = () => {
+      if (sx === null) return;
+      sx = null;
+      if (!api.dragging) return;
+      api.dragging = false;
+      api.swiped = true; // the click that follows a drag must not open the viewer
+      setTimeout(() => (api.swiped = false), 0);
+      reelEl.classList.remove('dragging');
+      goTo(Math.round(pos), 0.6);
+      if (api.onDragEnd) api.onDragEnd();
+    };
+    stage.addEventListener('pointerup', endDrag);
+    stage.addEventListener('pointercancel', endDrag);
+    stage.addEventListener('dragstart', (e) => e.preventDefault());
     // A tap on a side frame (or right after a swipe) turns the reel instead of opening the viewer.
     reelEl.addEventListener('click', (e) => {
       const b = e.target.closest('.reel-open');
@@ -91,21 +132,16 @@
     }, true);
     return api;
   })();
-  // Phones, tablets and reduced motion: the reel steps on its own (or on tap), with a CSS transition.
+  // Phones, tablets and reduced motion: the reel steps on its own every few seconds; dots, taps and drags move it too.
   if (reel && !(motion && desktop)) {
-    reel.el.classList.add('auto');
-    const go = (p) => reel.setPos(p);
-    reel.jump = (k) => go(reel.nearest(k));
+    if (!window.gsap) reel.el.classList.add('auto'); // CSS transition fallback
     reel.dots.forEach((b, k) => b.addEventListener('click', () => reel.jump(k)));
-    let sx = null;
-    reel.el.addEventListener('pointerdown', (e) => { sx = e.clientX; });
-    reel.el.addEventListener('pointerup', (e) => { if (sx !== null && Math.abs(e.clientX - sx) > 40) { reel.swiped = true; go(reel.pos + (e.clientX < sx ? 1 : -1)); } sx = null; });
     if (!reduce && 'IntersectionObserver' in window) {
-      let timer = 0;
-      new IntersectionObserver(([en]) => {
-        clearInterval(timer);
-        if (en.isIntersecting) timer = setInterval(() => go(reel.pos + 1), 3200);
-      }, { threshold: 0.35 }).observe(reel.el);
+      let timer = 0, inview = false;
+      const play = () => { clearInterval(timer); if (inview && !reel.dragging) timer = setInterval(() => reel.goTo(Math.round(reel.pos) + 1), 3400); };
+      reel.onDragStart = () => clearInterval(timer);
+      reel.onDragEnd = play;
+      new IntersectionObserver(([en]) => { inview = en.isIntersecting; play(); }, { threshold: 0.35 }).observe(reel.el);
     }
   }
 
@@ -209,17 +245,19 @@
     if (pm) gsap.fromTo(pm, { scale: 1.08, yPercent: 3 }, { scale: 1, yPercent: -3, ease: 'none', scrollTrigger: { trigger: proc, start: 'top bottom', end: 'bottom top', scrub: true } });
   }
 
-  /* ---------- 04 Proof (desktop): the section pins and each scroll step rolls the film one frame ---------- */
+  /* ---------- 04 Proof (desktop): the section sticks while scrolling; each scroll step turns the film one whole frame ---------- */
   if (reel && desktop) {
-    const sec = $('.ch-proof'); // sticky layout comes from CSS (.motion .ch-proof)
     const span = reel.n - 1;
-    // a staircase: each frame rests in front for a moment before the next one rolls in
-    // eased steps: a short rest on each frame, then a long, soft roll to the next (smootherstep)
-    const stair = (t) => { const i = Math.floor(t); const e = clamp((t - i - 0.14) / 0.72, 0, 1); return Math.min(span, i + e * e * e * (e * (e * 6 - 15) + 10)); };
+    let lastIdx = 0;
     const st = ScrollTrigger.create({
-      // the section is position: sticky inside a tall .proof-spacer (CSS), so no pinning or reparenting is needed
-      trigger: $('.proof-spacer'), start: 'top top', end: 'bottom bottom', scrub: 1.1, invalidateOnRefresh: true,
-      onUpdate: (self) => reel.setPos(stair(self.progress * span)),
+      // the section is position: sticky inside a tall .proof-spacer (CSS), so no pinning is needed
+      trigger: $('.proof-spacer'), start: 'top top', end: 'bottom bottom', invalidateOnRefresh: true,
+      onUpdate: (self) => {
+        const idx = Math.round(self.progress * span);
+        if (idx === lastIdx || reel.dragging) return;
+        lastIdx = idx;
+        reel.goTo(reel.nearest(idx));
+      },
     });
     reel.jump = (k) => {
       const y = st.start + (k / span) * (st.end - st.start);

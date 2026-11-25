@@ -90,7 +90,8 @@
       mega.classList.toggle('open', open);
       if (open) header.classList.remove('is-hidden');
     };
-    megaBtn.addEventListener('click', () => setMega(megaBtn.getAttribute('aria-expanded') !== 'true'));
+    // Click opens the menu (a second click keeps it open); it closes on mouse leave, Esc, focus leaving or a click outside.
+    megaBtn.addEventListener('click', () => setMega(true));
     if (finePointer) {
       const li = megaBtn.parentElement;
       li.addEventListener('mouseenter', () => { clearTimeout(hoverTimer); hoverTimer = setTimeout(() => setMega(true), 80); });
@@ -280,7 +281,7 @@
         ['.work-open', 'View'],
         ['.post-card', 'Read'],
         ['.svc-tile, .info-card, .platform', 'Open'],
-        ['.car-track', 'Drag'],
+        ['.car-track, .reel-stage', 'Drag'],
       ];
       const DEG = 180 / Math.PI;
       let mx = -100, my = -100, x = -100, y = -100, vx = 0, vy = 0, rot = 0, press = 0, down = false;

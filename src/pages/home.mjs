@@ -169,7 +169,7 @@ export function homePage({ posts }) {
               (w, i) => `<div class="reel-frame" style="--k:${i}" data-k="${i}">
             <button class="reel-open" type="button" data-lightbox data-src="/assets/images/work/${w.slug}.webp" data-title="${esc(w.title)}" data-cat="${esc(serviceBySlug(w.service).name)}" data-href="${workUrl(w)}" aria-label="View ${esc(w.title)} full screen">
               <span class="reel-holes" aria-hidden="true"></span>
-              <img src="/assets/images/work/${w.slug}-640.webp" srcset="/assets/images/work/${w.slug}-640.webp 640w, /assets/images/work/${w.slug}.webp 1280w" sizes="(min-width: 1024px) 720px, 82vw" width="1280" height="715" alt="${esc(w.title)}" loading="lazy" decoding="async">
+              <img src="/assets/images/work/${w.slug}-640.webp" srcset="/assets/images/work/${w.slug}-640.webp 640w, /assets/images/work/${w.slug}.webp 1280w" sizes="(min-width: 1024px) 720px, 82vw" width="1280" height="715" alt="${esc(w.title)}" loading="lazy" decoding="async" draggable="false">
               <span class="reel-holes bottom" aria-hidden="true"></span>
               <span class="reel-zoom" aria-hidden="true">${icon('maximize-2')}</span>
             </button>
