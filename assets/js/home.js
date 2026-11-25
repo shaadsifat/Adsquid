@@ -83,7 +83,7 @@
       state.p = pos;
       gsap.to(state, { p: t, duration: dur, ease: 'power3.inOut', overwrite: true, onUpdate: () => setPos(state.p) });
     };
-    const api = { el: reelEl, setPos, nearest, dots, n, goTo, jump: (k) => goTo(nearest(k)), swiped: false, dragging: false, onDragStart: null, onDragEnd: null, get pos() { return pos; } };
+    const api = { el: reelEl, setPos, nearest, dots, n, goTo, jump: (k) => goTo(nearest(k)), swiped: false, dragging: false, syncing: false, onDragStart: null, onDragEnd: null, get pos() { return pos; } };
     // Drag the reel left / right with the mouse or a finger; on release it settles on the nearest frame.
     const stage = $('.reel-stage', reelEl);
     let sx = null, sp = 0, pid = null;
@@ -245,24 +245,39 @@
     if (pm) gsap.fromTo(pm, { scale: 1.08, yPercent: 3 }, { scale: 1, yPercent: -3, ease: 'none', scrollTrigger: { trigger: proc, start: 'top bottom', end: 'bottom top', scrub: true } });
   }
 
-  /* ---------- 04 Proof (desktop): the section sticks while scrolling; each scroll step turns the film one whole frame ---------- */
+  /* ---------- 04 Proof (desktop): the section sticks; the film turns smoothly with the scroll, and when scrolling
+     stops between two works the page glides to the nearest one, so the reel never rests half-way ---------- */
   if (reel && desktop) {
     const span = reel.n - 1;
-    let lastIdx = 0;
+    const spacer = $('.proof-spacer');
     const st = ScrollTrigger.create({
-      // the section is position: sticky inside a tall .proof-spacer (CSS), so no pinning is needed
-      trigger: $('.proof-spacer'), start: 'top top', end: 'bottom bottom', invalidateOnRefresh: true,
-      onUpdate: (self) => {
-        const idx = Math.round(self.progress * span);
-        if (idx === lastIdx || reel.dragging) return;
-        lastIdx = idx;
-        reel.goTo(reel.nearest(idx));
-      },
+      trigger: spacer, start: 'top top', end: 'bottom bottom', invalidateOnRefresh: true,
+      onUpdate: (self) => { if (!reel.dragging && !reel.syncing) reel.setPos(self.progress * span); },
     });
-    reel.jump = (k) => {
-      const y = st.start + (k / span) * (st.end - st.start);
-      cfg.scrollTo ? cfg.scrollTo(y, { duration: 1 }) : scrollTo({ top: y, behavior: 'smooth' });
+    const stepY = (k) => st.start + (k / span) * (st.end - st.start);
+    const glide = (y, dur, done) => {
+      let finished = false;
+      const end = () => { if (finished) return; finished = true; if (done) done(); };
+      if (cfg.lenis) cfg.lenis.scrollTo(y, { duration: dur, easing: (t) => 1 - Math.pow(1 - t, 3), onComplete: end });
+      else scrollTo({ top: y, behavior: 'smooth' });
+      setTimeout(end, dur * 1000 + 400); // also ends if the visitor scrolls during the glide
     };
+    // scrolling stopped between two frames: finish the turn to the nearest one
+    ScrollTrigger.addEventListener('scrollEnd', () => {
+      if (!st.isActive || reel.dragging || reel.syncing) return;
+      const exact = st.progress * span;
+      const k = Math.round(exact);
+      if (Math.abs(exact - k) < 0.015) return;
+      glide(stepY(k), 0.45 + Math.abs(exact - k) * 0.6);
+    });
+    // a drag turned the reel: move the page to the matching step without turning the reel again
+    reel.onDragEnd = () => {
+      if (!st.isActive) return;
+      const k = ((Math.round(reel.pos) % reel.n) + reel.n) % reel.n;
+      reel.syncing = true;
+      glide(stepY(k), 0.7, () => { reel.syncing = false; reel.setPos(k); });
+    };
+    reel.jump = (k) => glide(stepY(k), 1);
     reel.dots.forEach((b, k) => b.addEventListener('click', () => reel.jump(k)));
   }
 
@@ -278,7 +293,7 @@
     gsap.from('.cta-form', { y: 70, opacity: 0, scale: 0.96, duration: 1.1, ease: 'power3.out', scrollTrigger: { trigger: cta, start: 'top 55%' } });
   }
 
-  // Recalculate every trigger in page order once this file's triggers exist.
+  // Put triggers in page order; ScrollTrigger measures them all in its own refresh on "load".
   ScrollTrigger.sort();
-  ScrollTrigger.refresh();
+  if (document.readyState === 'complete') ScrollTrigger.refresh();
 })();
