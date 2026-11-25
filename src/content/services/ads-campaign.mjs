@@ -108,7 +108,7 @@ export default {
       ],
       featuresTitle: 'TikTok ads, from script to sale.',
       who: [
-        'Made for visual products and young buyers.',
+        'For visual products, young buyers.',
         'TikTok works best when your product is easy to show on camera and your buyers are roughly 18 to 35. Fashion, beauty, food, gadgets and education all perform well.',
         ['Fashion, beauty and lifestyle brands', 'Food, restaurant and cloud kitchen brands', 'Apps, courses and education businesses', 'Brands that already post short videos and want more reach'],
       ],
@@ -177,7 +177,7 @@ export default {
       ],
       featuresTitle: 'LinkedIn campaigns built for B2B sales.',
       who: [
-        'For B2B companies where one deal matters.',
+        'For B2B, where one deal matters.',
         'LinkedIn makes sense when you sell to businesses and a single client is worth a lot. If your buyer has a job title, we can usually reach them here.',
         ['Software, SaaS and IT service companies', 'Consulting, logistics and manufacturing firms', 'Universities and professional training providers', 'Recruiters and companies hiring senior talent'],
       ],

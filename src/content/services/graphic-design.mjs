@@ -167,7 +167,7 @@ export default {
         ['printer', 'Print-ready files', 'CMYK, bleed and specs checked with your printer.'],
       ],
       who: [
-        'For businesses that meet customers in person.',
+        'For brands that sell face to face.',
         'Printed materials build trust at events, in stores and in sales meetings. They are essential for retail, hospitality, education and B2B companies.',
         ['Restaurants, cafes and retail shops', 'B2B companies with sales teams and trade fairs', 'Schools, coaching centres and universities', 'Real estate developers and event organisers'],
       ],

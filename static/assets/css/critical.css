@@ -1,11 +1,11 @@
 /* Critical CSS: inlined into every page <head> by the build.
    Covers fonts, tokens, base, header, mega menu shell and heroes (everything above the fold). */
 
-@font-face { font-family: "Raleway"; font-style: normal; font-weight: 800; font-display: swap; src: url(/assets/fonts/raleway-800.woff2) format("woff2"); }
-@font-face { font-family: "Open Sans"; font-style: normal; font-weight: 300 800; font-stretch: 100%; font-display: swap; src: url(/assets/fonts/open-sans-var.woff2) format("woff2"); }
-/* Metric-matched fallbacks so the font swap does not move text (CLS) */
-@font-face { font-family: "Raleway Fallback"; font-weight: 800; src: local("Arial Bold"), local("Arial-BoldMT"); ascent-override: 93.3%; descent-override: 23.2%; line-gap-override: 0%; size-adjust: 100.7%; }
-@font-face { font-family: "Open Sans Fallback"; src: local("Arial"), local("ArialMT"); ascent-override: 103%; descent-override: 28.2%; line-gap-override: 0%; size-adjust: 103.8%; }
+/* Montserrat (Google Fonts, loaded without blocking: see layout.mjs). Until it arrives, Arial is
+   reshaped to Montserrat's measured width and line box so nothing moves when the font swaps in (CLS). */
+@font-face { font-family: "Montserrat Fallback"; font-weight: 100 549; src: local("Arial"), local("ArialMT"); size-adjust: 111.3%; ascent-override: 87%; descent-override: 22.55%; line-gap-override: 0%; }
+@font-face { font-family: "Montserrat Fallback"; font-weight: 550 749; src: local("Arial Bold"), local("Arial-BoldMT"); size-adjust: 108.4%; ascent-override: 89.3%; descent-override: 23.15%; line-gap-override: 0%; }
+@font-face { font-family: "Montserrat Fallback"; font-weight: 750 900; src: local("Arial Bold"), local("Arial-BoldMT"); size-adjust: 111.5%; ascent-override: 86.8%; descent-override: 22.5%; line-gap-override: 0%; }
 
 :root {
   --violet: #8800D4;
@@ -17,9 +17,9 @@
   --cyan: #22E3D3;
   --white: #FFFFFF;
   --mist: #B9B3C9;
-  --f-head: "Raleway", "Raleway Fallback", system-ui, sans-serif;
-  --f-body: "Open Sans", "Open Sans Fallback", system-ui, sans-serif;
-  --f-mono: var(--f-body); /* small uppercase labels use Open Sans too */
+  --f-head: "Montserrat", "Montserrat Fallback", system-ui, sans-serif;
+  --f-body: "Montserrat", "Montserrat Fallback", system-ui, sans-serif;
+  --f-mono: var(--f-body); /* one family everywhere: Montserrat (headings 700, body 400, labels 600) */
   --header-h: 72px;
   --gutter: clamp(16px, 4vw, 40px);
   --radius: 20px;
@@ -49,11 +49,11 @@ button { cursor: pointer; background: none; border: 0; padding: 0; }
 .container.narrow { max-width: 880px; }
 
 .i { width: 1.15em; height: 1.15em; flex: none; }
-.mono { font-family: var(--f-mono); font-weight: 500; }
-.eyebrow { display: inline-block; font-family: var(--f-mono); font-weight: 500; font-size: .8125rem; line-height: 1.4; letter-spacing: .12em; text-transform: uppercase; color: var(--lilac); }
+.mono { font-family: var(--f-mono); font-weight: 600; }
+.eyebrow { display: inline-block; font-family: var(--f-mono); font-weight: 600; font-size: .8125rem; line-height: 1.4; letter-spacing: .12em; text-transform: uppercase; color: var(--lilac); }
 .eyebrow-num { color: var(--white); }
-.display { font-family: var(--f-head); font-weight: 800; font-size: clamp(2.6rem, 1.1rem + 5.6vw, 6.25rem); line-height: .98; letter-spacing: -.02em; color: var(--white); text-wrap: balance; }
-.h2 { font-family: var(--f-head); font-weight: 800; font-size: clamp(1.8rem, 1rem + 3.3vw, 3.75rem); line-height: 1.05; letter-spacing: -.02em; color: var(--white); text-wrap: balance; }
+.display { font-family: var(--f-head); font-weight: 700; font-size: clamp(2.6rem, 1.1rem + 5.6vw, 6.25rem); line-height: .98; letter-spacing: -.02em; color: var(--white); text-wrap: balance; }
+.h2 { font-family: var(--f-head); font-weight: 700; font-size: clamp(1.8rem, 1rem + 3.3vw, 3.75rem); line-height: 1.05; letter-spacing: -.02em; color: var(--white); text-wrap: balance; }
 .hero-lead { font-size: clamp(1.0625rem, .95rem + .5vw, 1.375rem); color: #DCD7E7; max-width: 21em; text-wrap: balance; }
 .hero-home .hero-lead { max-width: 21em; font-size: clamp(.9375rem, .86rem + .3vw, 1.125rem); line-height: 1.6; }
 .btns { display: flex; flex-wrap: wrap; gap: 12px; }
@@ -221,8 +221,8 @@ button { cursor: pointer; background: none; border: 0; padding: 0; }
 .hero-team .page-hero-visual { width: 100%; max-width: 540px; aspect-ratio: 1.5; }
 .page-hero.has-visual { padding-top: calc(var(--header-h) + 28px); }
 .page-hero.has-visual.hero-type { padding-bottom: 40px; }
-.page-hero.has-visual .hero-display { font-size: clamp(2.2rem, .9rem + 3.4vw, 4rem); text-wrap: balance; }
-.hero-oneline .hero-display { white-space: nowrap; font-size: min(8.2vw, 4.25rem); }
+.page-hero.has-visual .hero-display { font-size: clamp(2rem, .9rem + 2.9vw, 3.5rem); text-wrap: balance; }
+.page-hero.hero-oneline .hero-display { white-space: nowrap; text-wrap: nowrap; font-size: min(8vw, 3.4rem); }
 @media (min-width: 900px) {
   .page-hero.has-visual, .page-hero.has-visual.hero-type { padding: calc(var(--header-h) + 48px) 0 56px; }
   .page-hero-grid { grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); align-items: start; gap: 48px; }
@@ -231,7 +231,7 @@ button { cursor: pointer; background: none; border: 0; padding: 0; }
   .page-hero-visual { width: 100%; max-width: 460px; margin: 0; justify-self: end; }
   .hero-team .page-hero-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
   .hero-team .page-hero-visual { max-width: 600px; }
-  .hero-oneline .hero-display { font-size: min(4.2vw, 4rem); }
+  .page-hero.hero-oneline .hero-display { font-size: min(3.7vw, 3.4rem); }
 }
 .crumbs { margin-bottom: 22px; font-family: var(--f-mono); font-size: .75rem; letter-spacing: .06em; color: var(--mist); }
 .crumbs ol { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -307,7 +307,7 @@ main > section:not(.hero):not(.page-hero):not(.nf), main > .sample-banner, .post
 .post-hero .narrow { display: grid; gap: 18px; justify-items: start; }
 .post-hero .crumbs { margin-bottom: 0; }
 .chip-cat { min-height: 32px; font-family: var(--f-mono); font-size: .75rem; letter-spacing: .1em; text-transform: uppercase; color: var(--lilac); }
-.post-h1 { font-family: var(--f-head); font-weight: 800; font-size: clamp(1.5rem, .9rem + 2.4vw, 3rem); line-height: 1.08; letter-spacing: -.02em; color: #fff; text-wrap: balance; }
+.post-h1 { font-family: var(--f-head); font-weight: 700; font-size: clamp(1.375rem, .8rem + 2.4vw, 2.75rem); line-height: 1.08; letter-spacing: -.02em; color: #fff; text-wrap: balance; }
 .byline { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 14px; }
 .byline .avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; }
 .byline div { display: grid; line-height: 1.3; }

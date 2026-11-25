@@ -375,7 +375,7 @@ export const workFilters = [
   { id: 'software', name: 'Software' },
 ];
 
-// Team, in the order of the numbered portraits (01-07). Photos: images/team/<photo>.webp
+// Team, in the order of the numbered portraits (01-08). Photos: images/team/<photo>.webp
 export const team = [
   { name: 'Nirjhar Khan', role: 'Creative Director', photo: 'nirjhar-khan', linkedin: 'https://www.linkedin.com/in/nirjharkhan' },
   { name: 'Sakib Malik', role: 'Creative Advisor', photo: 'sakib-malik', linkedin: 'https://www.linkedin.com/in/sakibmalik/' },
@@ -384,6 +384,7 @@ export const team = [
   { name: 'Fuad Al Hassan', role: 'Creative Designer', photo: 'fuad-al-hassan', linkedin: 'https://www.linkedin.com/in/fuad-al-hassan-6091a1219/' },
   { name: 'Md Shaad Uddin Sifat', role: 'Tech Specialist', photo: 'shaad-sifat', linkedin: 'https://www.linkedin.com/in/shaad-sifat/' },
   { name: 'Mezbahul Alam Rafi', role: 'Marketing Specialist', photo: 'mezbahul-rafi', linkedin: 'https://www.linkedin.com/in/mezbahul-alam-rafi/' },
+  { name: 'Mubin Siddique', role: 'Market Analyst', photo: 'mubin-siddique', linkedin: 'https://www.linkedin.com/in/mubin-siddique-00002/' },
 ];
 
 export const counters = [

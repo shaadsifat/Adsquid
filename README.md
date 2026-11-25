@@ -54,7 +54,7 @@ old-URL redirects and the 404 page.
 
 ## How the homepage motion works
 
-- **00 Hero:** the octopus mascot (`images/brand/hero-mascot*.webp`, cleaned from `hero-img.png`) sits right of the text on desktop and above it on phones. It pops in, floats, glints, has floating status chips, tilts toward the cursor in 3D (chips move more for depth) and hops when clicked. Its CSS is inlined on the homepage only. Fonts: Raleway (headings) and Open Sans (everything else), self-hosted.
+- **00 Hero:** the octopus mascot (`images/brand/hero-mascot*.webp`, cleaned from `hero-img.png`) sits right of the text on desktop and above it on phones. It pops in, floats, glints, has floating status chips, tilts toward the cursor in 3D (chips move more for depth) and hops when clicked. Its CSS is inlined on the homepage only. Font: Montserrat everywhere (headings 700, body 400, labels 600), from Google Fonts with a metric-matched Arial fallback so nothing moves when it loads.
 - **01:** the three grey cards snap into a row.
 - **02:** the eight-service infographic: four cards each side of a hexagon hub, wired to it with dotted lines (drawn by `main.js` from the real card positions). It tours the services slowly; hover or focus picks one. Also used on /services/.
 - **03 to 09:** step chips light up, counters roll, bars rise (clip reveal), logo marquee, light-trail canvases (V4, built in code), CTA video (V3, loaded only near view, desktop only).

@@ -49,7 +49,7 @@ export default {
     'erp-software': {
       art: ['nodes', { core: 'layers', items: [['boxes', 'Inventory'], ['shopping-cart', 'Purchase'], ['receipt', 'Sales'], ['settings', 'Production'], ['calculator', 'Finance']] }],
       h1: 'ERP software development in Bangladesh',
-      display: 'Your whole business, one system.',
+      display: 'Your business, one system.',
       sentence: 'Custom ERP that connects inventory, purchase, sales, production and accounts in one place.',
       title: 'ERP Software Development in Bangladesh | Custom ERP | Adsquid',
       desc: 'Custom ERP software development in Bangladesh: inventory, purchase, sales, production, HR and accounts connected in one system built around your workflow.',
@@ -68,7 +68,7 @@ export default {
         ['layout-dashboard', 'Management dashboards', 'A live view of the whole business.'],
       ],
       who: [
-        'For businesses that have outgrown spreadsheets.',
+        'For teams outgrowing spreadsheets.',
         'ERP makes sense when several departments depend on the same data and mistakes between them are costing you money.',
         ['Manufacturers and garment factories', 'Distributors, importers and wholesalers', 'Multi-branch retail and trading companies', 'Growing businesses with separate tools for each team'],
       ],

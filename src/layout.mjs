@@ -200,8 +200,10 @@ ${page.noindex || forceNoindex ? '<meta name="robots" content="noindex, follow">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
 <meta name="theme-color" content="#07050D">
-<link rel="preload" href="/assets/fonts/raleway-800.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/assets/fonts/open-sans-var.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400..800&amp;display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400..800&amp;display=swap"></noscript>
 ${preloads}
 <style>${criticalCss}${page.path === '/' ? criticalHomeCss : ''}</style>
 <link rel="preload" href="${assetVersion('/assets/css/main.css')}" as="style">

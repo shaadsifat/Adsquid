@@ -43,8 +43,10 @@ export function teamFan() {
   return `<div class="fan" aria-label="Teamsquid">
       ${team
         .map((m, i) => {
-          const o = i === 0 ? 0 : (i % 2 ? -1 : 1) * Math.ceil(i / 2);
-          return `<figure class="fan-card${o < 0 ? ' fl' : o > 0 ? ' fr' : ' fc'}" style="--o:${o};--a:${Math.abs(o)};--z:${10 - Math.abs(Math.round(o))}">${teamImg(m, { sizes: '180px', eager: true })}<b class="fan-num">${String(i + 1).padStart(2, '0')}</b><figcaption>${esc(m.name)}<span>${esc(m.role)}</span></figcaption></figure>`;
+          const k = i === 0 ? 0 : (i % 2 ? -1 : 1) * Math.ceil(i / 2);
+          // with an even team size, shift by half a step so the fan stays centred
+          const o = k + (team.length % 2 === 0 ? 0.5 : 0);
+          return `<figure class="fan-card${k < 0 ? ' fl' : k > 0 ? ' fr' : ' fc'}" style="--o:${o};--a:${Math.abs(o)};--z:${10 - Math.abs(k)}">${teamImg(m, { sizes: '180px', eager: true })}<b class="fan-num">${String(i + 1).padStart(2, '0')}</b><figcaption>${esc(m.name)}<span>${esc(m.role)}</span></figcaption></figure>`;
         })
         .join('')}
     </div>`;
