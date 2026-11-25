@@ -14,6 +14,13 @@ const TYPES = {
 };
 
 createServer(async (req, res) => {
+  if (req.method === 'POST' && req.url.split('?')[0].endsWith('/api/send.php')) {
+    // Local stand-in for static/api/send.php (PHP only runs on the real hosting). Logs the fields, sends nothing.
+    let raw = '';
+    for await (const chunk of req) raw += chunk;
+    console.log('[form] local test submission (not emailed):', raw.length, 'bytes');
+    return res.writeHead(200, { 'Content-Type': 'application/json' }).end(JSON.stringify({ ok: true, message: 'Thank you! We will reply within one working day. (Local preview: nothing was emailed.)' }));
+  }
   let p = normalize(decodeURIComponent(new URL(req.url, 'http://x').pathname)).replace(/\\/g, '/');
   if (p.includes('..')) return res.writeHead(400).end();
   let file = join(DIST, p);

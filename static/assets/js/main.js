@@ -195,7 +195,7 @@
         el.setAttribute('aria-label', label);
         reveal(el);
       });
-      hasGsap && ScrollTrigger.refresh();
+      if (hasGsap && d.readyState === 'complete') ScrollTrigger.refresh();
     });
   }
 
@@ -451,9 +451,8 @@
       draw(dt);
       if (visible) raf = requestAnimationFrame(loop);
     };
-    resize();
-    let rt;
-    new ResizeObserver(() => { clearTimeout(rt); rt = setTimeout(resize, 100); }).observe(canvas);
+    let rt, sized = false;
+    new ResizeObserver(() => { if (!sized) { sized = true; resize(); return; } clearTimeout(rt); rt = setTimeout(resize, 100); }).observe(canvas);
     if (!reduce) {
       new IntersectionObserver(([en]) => {
         visible = en.isIntersecting;
@@ -855,25 +854,33 @@
   }
 
   /* ---------- Map: load the iframe only when asked ---------- */
-  $$('[data-map]').forEach((box) => {
-    const btn = $('.map-load', box);
-    btn && btn.addEventListener('click', () => {
-      const f = d.createElement('iframe');
-      f.src = box.dataset.map;
-      f.title = 'Adsquid office location on Google Maps';
-      f.loading = 'lazy';
-      f.referrerPolicy = 'no-referrer-when-downgrade';
-      f.allowFullscreen = true;
-      box.append(f);
-      btn.remove();
-    });
-  });
+  /* ---------- Offices: live local time and open / closed status for each city ---------- */
+  const tzEls = $$('[data-tz]');
+  if (tzEls.length && window.Intl) {
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const tick = () => {
+      const now = new Date();
+      tzEls.forEach((el) => { el.textContent = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit', timeZone: el.dataset.tz }).format(now).toLowerCase(); });
+      $$('[data-tz-open]').forEach((el) => {
+        const parts = new Intl.DateTimeFormat('en-US', { weekday: 'short', hour: 'numeric', hourCycle: 'h23', timeZone: el.dataset.tzOpen }).formatToParts(now);
+        const wd = days.indexOf(parts.find((x) => x.type === 'weekday').value);
+        const h = +parts.find((x) => x.type === 'hour').value;
+        const [o, c] = el.dataset.hours.split('-').map(Number);
+        const open = el.dataset.days.split(',').map(Number).includes(wd) && h >= o && h < c;
+        el.textContent = open ? 'Open now' : 'Closed now';
+        el.classList.toggle('is-open', open);
+      });
+    };
+    tick();
+    setInterval(tick, 30000);
+  }
 
-  /* ---------- Forms: Formspree/Web3Forms endpoint, or WhatsApp fallback ---------- */
+  /* ---------- Forms: posted to /api/send.php (PHP on the hosting), WhatsApp hand-over on preview copies ---------- */
   const track = (name) => {
     window.dataLayer && window.dataLayer.push({ event: 'generate_lead', form_name: name });
     window.fbq && window.fbq('track', 'Lead', { content_name: name });
   };
+  const opened = performance.now();
   $$('form[data-form]').forEach((form) => {
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -891,27 +898,32 @@
       if (!ok) return setStatus('Please fill in the highlighted fields.', 'err');
 
       const data = new FormData(form);
-      data.append('form', name);
-      data.append('page', location.pathname);
+      data.set('form', name);
+      data.set('page', location.pathname);
+      data.set('_e', ((performance.now() - opened) / 1000).toFixed(1));
       const btn = $('button[type="submit"]', form);
-      if (cfg.form) {
+      const endpoint = cfg.form && !/\.github\.io$/.test(location.hostname) ? (cfg.form.startsWith('/') ? (cfg.base || '') + cfg.form : cfg.form) : '';
+      if (endpoint) {
         btn && (btn.disabled = true);
         setStatus('Sending...', '');
+        let msg = '';
         try {
-          const res = await fetch(cfg.form, { method: 'POST', body: data, headers: { Accept: 'application/json' } });
-          if (!res.ok) throw new Error(res.status);
+          const res = await fetch(endpoint, { method: 'POST', body: data, headers: { Accept: 'application/json' } });
+          const out = await res.json().catch(() => ({}));
+          if (!res.ok || out.ok === false) { msg = out.message || ''; throw new Error(res.status); }
           form.classList.add('sent');
-          setStatus('Thank you! We will reply within one working day.', 'ok');
+          setStatus(out.message || 'Thank you! We will reply within one working day.', 'ok');
           track(name);
         } catch (err) {
           btn && (btn.disabled = false);
-          setStatus(`Something went wrong. Please <a href="https://wa.me/${cfg.wa}" target="_blank" rel="noopener">message us on WhatsApp</a>.`, 'err');
+          const wa = `<a href="https://wa.me/${cfg.wa}" target="_blank" rel="noopener">message us on WhatsApp</a>`;
+          setStatus(msg && !/WhatsApp/.test(msg) ? `${msg}` : `Something went wrong. Please ${wa}.`, 'err');
         }
         return;
       }
       // No endpoint configured yet: hand the details over to WhatsApp.
       const lines = [];
-      data.forEach((v, k) => { if (v && !['form', 'page'].includes(k)) lines.push(`${k[0].toUpperCase() + k.slice(1)}: ${v}`); });
+      data.forEach((v, k) => { if (v && !['form', 'page', '_form', '_e', 'fax'].includes(k)) lines.push(`${k[0].toUpperCase() + k.slice(1)}: ${v}`); });
       const title = { 'free-audit': 'Free audit request', 'home-audit': 'Free audit request', contact: 'New message' }[name] || 'Website enquiry';
       const text = `${title} (adsquidbd.com)\n\n${lines.join('\n')}`;
       window.open(`https://wa.me/${cfg.wa}?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
@@ -926,7 +938,6 @@
 
   /* ---------- Analytics: loaded after the page "load" event ---------- */
   addEventListener('load', () => {
-    hasGsap && ScrollTrigger.refresh();
     const go = () => {
       const add = (src) => { const s = d.createElement('script'); s.async = true; s.src = src; d.head.append(s); };
       if (cfg.gtm) {

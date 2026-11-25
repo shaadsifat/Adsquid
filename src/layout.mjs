@@ -104,6 +104,18 @@ function header(path) {
 </div>`;
 }
 
+// Search results show about 60-65 characters of a title. Longer titles lose the blog suffix first,
+// then the middle part of "Topic | Extras | Adsquid" (the extras are in the H1 and description anyway).
+export function fitTitle(t) {
+  const len = (x) => x.replace(/&amp;/g, '&').length;
+  if (len(t) <= 65) return t;
+  let s = t.replace(/ \| Adsquid Blog$/, ' | Adsquid');
+  if (len(s) <= 65) return s;
+  const parts = s.split(' | ');
+  if (parts.length >= 3) s = [parts[0], parts[parts.length - 1]].join(' | ');
+  return s;
+}
+
 function footer() {
   const socials = [
     site.social.facebook && ['facebook', site.social.facebook],
@@ -135,6 +147,7 @@ function footer() {
           <li><a href="/about/">About</a></li>
           <li><a href="/work/">Work</a></li>
           <li><a href="/blog/">Blog</a></li>
+          <li><a href="/offices/">Offices</a></li>
           <li><a href="/careers/">Careers</a></li>
           <li><a href="/free-audit/">Free Audit</a></li>
         </ul>
@@ -144,7 +157,7 @@ function footer() {
         <ul class="footer-contact">
           <li><a href="tel:${site.phoneHref}">${icon('phone')}<span>${site.phone}</span></a></li>
           <li><a href="mailto:${site.email}">${icon('mail')}<span>${site.email}</span></a></li>
-          <li>${icon('map-pin')}<span>${site.address.street}, ${site.address.locality} ${site.address.postalCode}</span></li>
+          <li class="footer-office">${icon('map-pin')}<span><span class="footer-office-top"><small class="footer-sub">Head office</small><a class="footer-pill" href="/offices/">All offices${icon('arrow-up-right')}</a></span><a href="${site.mapLink}" target="_blank" rel="noopener">${site.address.street}, ${site.address.locality}-${site.address.postalCode}, Bangladesh</a></span></li>
           <li>${icon('clock')}<span>${site.hours}</span></li>
         </ul>
       </div>
@@ -181,13 +194,13 @@ export function renderPage(page) {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>${esc(page.title)}</title>
+<title>${esc(fitTitle(page.title))}</title>
 <meta name="description" content="${esc(page.desc)}">
 <link rel="canonical" href="${canonical}">
 ${page.noindex || forceNoindex ? '<meta name="robots" content="noindex, follow">' : '<meta name="robots" content="index, follow, max-image-preview:large">'}
 <meta property="og:type" content="${page.ogType || 'website'}">
 <meta property="og:site_name" content="Adsquid">
-<meta property="og:title" content="${esc(page.ogTitle || page.title)}">
+<meta property="og:title" content="${esc(page.ogTitle || fitTitle(page.title))}">
 <meta property="og:description" content="${esc(page.desc)}">
 <meta property="og:url" content="${canonical}">
 <meta property="og:image" content="${og}">
@@ -205,7 +218,7 @@ ${page.noindex || forceNoindex ? '<meta name="robots" content="noindex, follow">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400..800&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400..800&amp;display=swap"></noscript>
 ${preloads}
-<style>${criticalCss}${page.path === '/' ? criticalHomeCss : ''}</style>
+<style>${criticalCss}${page.path === '/' ? criticalHomeCss : ''}${page.css || ''}</style>
 <link rel="preload" href="${assetVersion('/assets/css/main.css')}" as="style">
 <link rel="stylesheet" href="${assetVersion('/assets/css/main.css')}" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="${assetVersion('/assets/css/main.css')}"></noscript>

@@ -41,6 +41,7 @@ button { cursor: pointer; background: none; border: 0; padding: 0; }
 :focus-visible { outline: 2px solid var(--glow); outline-offset: 3px; border-radius: 6px; }
 [hidden] { display: none !important; }
 .nowrap { white-space: nowrap; }
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 .skip { position: fixed; left: 16px; top: -60px; z-index: 100; padding: 10px 16px; background: var(--violet); color: #fff; border-radius: 999px; transition: top .2s; }
 .skip:focus { top: 12px; }
@@ -147,7 +148,7 @@ button { cursor: pointer; background: none; border: 0; padding: 0; }
 .art-spark.k3 { right: 3%; top: 38%; animation-delay: 1.7s; }
 .art-spark.k4 { left: 1%; top: 50%; width: 8px; height: 8px; animation-delay: 2.4s; }
 .art-spark.k5 { left: 47%; top: 1%; width: 6px; height: 6px; animation-delay: 1.2s; background: var(--lilac); }
-@keyframes art-pop { 0% { opacity: 0; transform: translateY(46px) scale(.72) rotate(-7deg); } 55% { opacity: 1; } 100% { opacity: 1; transform: none; } }
+@keyframes art-pop { 0% { opacity: .35; transform: translateY(46px) scale(.72) rotate(-7deg); } 55% { opacity: 1; } 100% { opacity: 1; transform: none; } }
 @keyframes art-float { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-16px) rotate(-1.4deg); } }
 @keyframes art-shadow { 0%, 100% { transform: scaleX(1); opacity: .9; } 50% { transform: scaleX(.76); opacity: .5; } }
 @keyframes art-glow { 0%, 100% { transform: translate(-50%, -50%) scale(.94); opacity: .8; } 50% { transform: translate(-50%, -50%) scale(1.07); opacity: 1; } }
@@ -188,6 +189,8 @@ button { cursor: pointer; background: none; border: 0; padding: 0; }
 .hero-content > :nth-child(4) { animation-delay: .24s; }
 .hero-content > :nth-child(5) { animation-delay: .32s; }
 @keyframes rise { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: none; } }
+.hero-content > .hero-lead, .page-hero-content > .hero-lead { animation-name: rise-soft; }
+@keyframes rise-soft { from { opacity: .35; transform: translateY(14px); } to { opacity: 1; transform: none; } }
 
 /* Inner page hero */
 .page-hero { position: relative; isolation: isolate; overflow: hidden; padding-top: var(--header-h); }
@@ -260,7 +263,7 @@ button { cursor: pointer; background: none; border: 0; padding: 0; }
 
 /* Below-the-hero content stays invisible (but keeps its space) until main.css arrives, so nobody sees it
    change shape. main.css reveals it; the animation is a CSS-only failsafe if main.css never loads. */
-main > section:not(.hero):not(.page-hero):not(.nf), main > .sample-banner, .post-layout, .site-footer { visibility: hidden; animation: css-failsafe 0s 3.5s forwards; }
+main > section:not(.hero):not(.page-hero):not(.nf), .post-layout, .site-footer { visibility: hidden; animation: css-failsafe 0s 3.5s forwards; }
 @keyframes css-failsafe { to { visibility: visible; } }
 /* Elements styled only by main.css would render unstyled for a moment and push the hero: keep them here */
 .cursor { display: none; }
@@ -289,9 +292,9 @@ main > section:not(.hero):not(.page-hero):not(.nf), main > .sample-banner, .post
 
 
 /* Hero-area components (styled here so nothing moves when main.css arrives) */
-.signal-line, .hero-signal, .noise-line, .cta-line { overflow: visible; clip-path: inset(-30px calc(var(--draw, 1) * 100%) -30px -30px); }
-.signal-line path, .hero-signal path, .noise-line path, .cta-line path { fill: none; stroke: var(--lilac); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
-.signal-line path.glow, .hero-signal path.glow, .noise-line path.glow, .cta-line path.glow { stroke: var(--violet); stroke-width: 9; opacity: .45; }
+.signal-line, .hero-signal, .cta-line { overflow: visible; clip-path: inset(-30px calc(var(--draw, 1) * 100%) -30px -30px); }
+.signal-line path, .hero-signal path, .cta-line path { fill: none; stroke: var(--lilac); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.signal-line path.glow, .hero-signal path.glow, .cta-line path.glow { stroke: var(--violet); stroke-width: 9; opacity: .45; }
 .chip { display: inline-flex; align-items: center; min-height: 38px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line); font-size: .9063rem; color: #E4E0EC; background: rgba(18, 14, 28, .6); transition: border-color .2s, background-color .2s, color .2s; }
 .trails { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 .badges { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 26px; }
@@ -320,7 +323,6 @@ main > section:not(.hero):not(.page-hero):not(.nf), main > .sample-banner, .post
 .nf { min-height: 100vh; padding: calc(var(--header-h) + 48px) 0 40px; display: flex; flex-direction: column; align-items: center; text-align: center; }
 .nf-content { display: grid; gap: 14px; justify-items: center; order: -1; position: relative; z-index: 1; }
 .nf-code { color: var(--lilac); letter-spacing: .3em; }
-.nf-media { width: min(1100px, 100%); margin-top: -2vw; -webkit-mask-image: radial-gradient(60% 60% at 50% 50%, #000 55%, transparent 100%); mask-image: radial-gradient(60% 60% at 50% 50%, #000 55%, transparent 100%); }
 .nf .btns { justify-content: center; margin-top: 10px; }
 
 @media (prefers-reduced-motion: reduce) {

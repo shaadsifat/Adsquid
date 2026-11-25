@@ -88,7 +88,7 @@ export function homePage({ posts }) {
     <div class="hero-content">
       <h1 class="eyebrow hero-eyebrow">Digital marketing agency in Dhaka</h1>
       <p class="display hero-display">${splitWords('Reach every<br> customer.')}</p>
-      <p class="hero-lead">Ads, content, SEO and tech under one roof. One <span class="nowrap">in-house</span> team from Dhaka that plans, creates and grows brands in five countries, with clear numbers every month.</p>
+      <p class="hero-lead">Ads, content, SEO and tech under one roof. One <span class="nowrap">in-house</span> team from Dhaka that plans, creates and grows brands worldwide, with clear numbers every month.</p>
       <div class="btns hero-btns">
         ${btn('/free-audit/', 'Get a free audit', { cls: 'btn-magnetic' })}
         ${btn('/work/', 'See our work', { variant: 'ghost', iconName: 'arrow-up-right' })}
@@ -198,7 +198,7 @@ export function homePage({ posts }) {
 <section class="ch ch-clients" id="ch-05" data-chapter="5" aria-labelledby="clients-title">
   <div class="clients-bg">${img16('textures/grid-floor')}</div>
   <div class="container">
-    <div class="sec-head center">${eyebrow('Clients', '05')}<h2 class="h2" id="clients-title" data-split>Brands that trust us.</h2><p class="sec-lead reveal">50+ clients in five countries.</p></div>
+    <div class="sec-head center">${eyebrow('Clients', '05')}<h2 class="h2" id="clients-title" data-split>Brands that trust us.</h2><p class="sec-lead reveal">50+ clients all over the world.</p></div>
   </div>
   <div class="marquee" aria-label="Client logos">
     <div class="marquee-row"><div class="marquee-inner">${row(clients.slice(0, half))}</div></div>
@@ -277,7 +277,8 @@ export function homePage({ posts }) {
       ${eyebrow('Free audit', '09')}
       <h2 class="h2" id="cta-title">Find your growth leaks.</h2>
       <p>Free audit of your ads, page and website.</p>
-      <form class="form" data-form="home-audit" novalidate>
+      <form class="form" data-form="home-audit" action="${site.formEndpoint || '/api/send.php'}" method="post" novalidate>
+        <div class="hp" aria-hidden="true"><label>Leave this field empty <input name="fax" tabindex="-1" autocomplete="off"></label></div><input type="hidden" name="_form" value="home-audit">
         <div class="field"><label for="h-name">Name</label><input id="h-name" name="name" autocomplete="name" required></div>
         <div class="field"><label for="h-wa">WhatsApp number</label><input id="h-wa" name="whatsapp" type="tel" inputmode="tel" autocomplete="tel" placeholder="01XXX-XXXXXX" required></div>
         <div class="field"><label for="h-link">Website or page link</label><input id="h-link" name="link" type="text" inputmode="url" placeholder="facebook.com/yourpage" required></div>

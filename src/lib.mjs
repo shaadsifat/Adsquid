@@ -1,7 +1,7 @@
 // Small HTML helpers shared by every page template.
 import { readFileSync } from 'node:fs';
 import { site } from './config.mjs';
-import { services } from './data.mjs';
+import { services, team } from './data.mjs';
 
 const ICONS = JSON.parse(readFileSync(new URL('./icons.json', import.meta.url), 'utf8'));
 const BRANDS = JSON.parse(readFileSync(new URL('./brands.json', import.meta.url), 'utf8'));
@@ -175,9 +175,31 @@ export function orgSchema() {
     openingHoursSpecification: [
       { '@type': 'OpeningHoursSpecification', dayOfWeek: site.hoursSpec.days, opens: site.hoursSpec.opens, closes: site.hoursSpec.closes },
     ],
-    areaServed: { '@type': 'Country', name: 'Bangladesh' },
+    areaServed: 'Worldwide',
+    contactPoint: [
+      { '@type': 'ContactPoint', contactType: 'customer service', telephone: site.phoneHref, email: site.email, areaServed: 'Worldwide', availableLanguage: ['English', 'Bengali'] },
+    ],
+    location: (site.offices || []).map((o) => ({
+      '@type': 'Place',
+      name: `Adsquid ${o.head ? 'Head Office' : o.label || 'Office'}, ${o.city}`,
+      address: { '@type': 'PostalAddress', ...o.schema },
+    })),
+    knowsAbout: services.map((s) => s.name),
+    employee: team.map((t) => ({
+      '@type': 'Person',
+      name: t.name,
+      jobTitle: t.role,
+      image: abs(`/assets/images/team/${t.photo}.webp`),
+      ...(t.linkedin ? { sameAs: [t.linkedin] } : {}),
+      worksFor: { '@id': abs('/#organization') },
+    })),
     sameAs,
   };
+}
+
+// About and Contact pages say what they are, and point to the organisation
+export function pageTypeSchema(type, path, name) {
+  return { '@context': 'https://schema.org', '@type': type, '@id': abs(path), url: abs(path), name, about: { '@id': abs('/#organization') }, mainEntity: { '@id': abs('/#organization') } };
 }
 
 export function serviceSchema({ name, desc, path, serviceType }) {
@@ -189,7 +211,7 @@ export function serviceSchema({ name, desc, path, serviceType }) {
     description: desc,
     url: abs(path),
     provider: { '@id': abs('/#organization'), '@type': 'Organization', name: site.name, url: abs('/') },
-    areaServed: { '@type': 'Country', name: 'Bangladesh' },
+    areaServed: 'Worldwide',
   };
 }
 

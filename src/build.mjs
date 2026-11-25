@@ -12,7 +12,7 @@ import { homePage } from './pages/home.mjs';
 import { servicesHub, servicePage, subPage } from './pages/services.mjs';
 import { workIndex, workPage } from './pages/work.mjs';
 import { blogIndex, postPage } from './pages/blog.mjs';
-import { aboutPage, auditPage, contactPage, careersPage, privacyPage, termsPage, notFoundPage } from './pages/company.mjs';
+import { aboutPage, auditPage, contactPage, careersPage, privacyPage, termsPage, notFoundPage, officesPage, thankYouPage } from './pages/company.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 // Options: --out=<folder> (default dist), --base=/Adsquid (serve from a sub-folder, e.g. GitHub Pages),
@@ -146,10 +146,12 @@ const pages = [
   aboutPage(),
   auditPage(),
   contactPage(),
+  officesPage(),
   careersPage(),
   privacyPage(),
   termsPage(),
   notFoundPage(),
+  thankYouPage(),
 ];
 
 const problems = [];
@@ -175,9 +177,22 @@ ${indexable.map((p) => `  <url><loc>${site.url}${p.path}</loc><lastmod>${p.lastm
 </urlset>
 `
 );
-writeFileSync(join(DIST, 'robots.txt'), `User-agent: *\nAllow: /\n\nSitemap: ${site.url}/sitemap.xml\n`);
+writeFileSync(join(DIST, 'robots.txt'), `User-agent: *\nAllow: /\nDisallow: /api/\n\nSitemap: ${site.url}/sitemap.xml\n`);
 
-// 7. Report.
+// 7. Upload only what the site uses: remove images no page, stylesheet or script references
+//    (brand master files in /images stay in the repo, they just are not deployed).
+{
+  const textFiles = [];
+  const walkText = (d) => readdirSync(d).forEach((f) => { const p = join(d, f); if (statSync(p).isDirectory()) walkText(p); else if (/\.(html|css|js|xml|webmanifest|json)$/.test(f)) textFiles.push(p); });
+  walkText(DIST);
+  const refs = textFiles.map((f) => readFileSync(f, 'utf8')).join('\n');
+  let pruned = 0;
+  const prune = (d) => readdirSync(d).forEach((f) => { const p = join(d, f); if (statSync(p).isDirectory()) { prune(p); if (!readdirSync(p).length) rmSync(p, { recursive: true }); } else if (!refs.includes(f)) { rmSync(p); pruned++; } });
+  prune(join(DIST, 'assets/images'));
+  if (pruned) console.log(`Left out ${pruned} unused image files.`);
+}
+
+// 8. Report.
 const dirSize = (d) => readdirSync(d).reduce((t, f) => { const p = join(d, f); const s = statSync(p); return t + (s.isDirectory() ? dirSize(p) : s.size); }, 0);
 console.log(`Built ${pages.length} pages (${indexable.length} in sitemap), ${posts.length} posts. dist = ${(dirSize(DIST) / 1048576).toFixed(1)} MB`);
 console.log(`critical.css inline: ${(Buffer.byteLength(critical) / 1024).toFixed(1)} KB (+${(Buffer.byteLength(criticalHome) / 1024).toFixed(1)} KB on home), main.css: ${(statSync(join(DIST, 'assets/css/main.css')).size / 1024).toFixed(1)} KB`);

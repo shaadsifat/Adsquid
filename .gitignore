@@ -13,3 +13,6 @@ ADSQUID-IMAGES-README.txt
 Adsquid Website Plan & Google Flow Prompts.docx
 # raw handoff folder (converted copies live in images/)
 New folder/
+
+# form mail login (holds a password; create it on the server or locally, never commit it)
+static/api/mail-config.php

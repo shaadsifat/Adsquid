@@ -99,8 +99,8 @@ ${pageHero({
   visual: heroArt(['signature', { core: 'workflow', nodes: services.map((s) => s.icon), cards: [['layers', 'Eight services'], ['users', 'One in-house team']] }]),
   buttons: btn('/free-audit/', 'Get a free audit', { cls: 'btn-magnetic' }) + btn('/work/', 'See our work', { variant: 'ghost', iconName: 'arrow-up-right' }),
 })}
-<section class="section section-tight" aria-label="Our eight services">
-  <div class="container">${servicesInfographic()}</div>
+<section class="section section-tight" aria-labelledby="svc-all-title">
+  <div class="container"><h2 class="sr-only" id="svc-all-title">Our eight services</h2>${servicesInfographic()}</div>
 </section>
 ${groups
   .map(

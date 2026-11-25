@@ -391,14 +391,13 @@ export const counters = [
   { value: 50, suffix: '+', label: 'Clients worldwide' },
   { value: 2015, suffix: '', label: 'Growing brands since', plain: true },
   { value: 8, suffix: '', label: 'Services, one team' },
-  { value: 5, suffix: '', label: 'Countries' },
 ];
 
 export const whyUs = [
   { icon: 'users', title: 'In-house team', text: 'No outsourcing. Marketers, designers, video editors and developers work in one office, so ideas move from plan to live in days.' },
   { icon: 'file-text', title: 'Clear monthly reports', text: 'Plain numbers every month: what we spent, what it brought back and what we will test next. No jargon, no vanity metrics.' },
   { icon: 'headphones', title: 'One point of contact', text: 'One account manager who knows your business and answers on WhatsApp. No ticket queues, no passing you around.' },
-  { icon: 'globe', title: 'Local roots, global reach', text: 'Born in Bangladesh and serving brands in five countries. We know bKash and courier as well as global ad platforms.' },
+  { icon: 'globe', title: 'Local roots, global reach', text: 'Born in Bangladesh and serving brands all over the world. We know bKash and courier as well as global ad platforms.' },
 ];
 
 // Home "Why Adsquid": what a client gets.
@@ -423,7 +422,7 @@ export const timeline = [
   { year: '2018', title: 'Creative team', text: 'Visual and dynamic content, made in-house.' },
   { year: '2020', title: 'Tech team', text: 'Website and software development join the lineup.' },
   { year: '2024', title: '50+ clients', text: 'Brands all over the world.' },
-  { year: '2026', title: '5 country operations', text: 'Eight services, one team, five countries.' },
+  { year: '2026', title: 'Worldwide operations', text: 'Eight services, one team, offices in Dhaka and Florida, clients worldwide.' },
 ];
 
 export const careers = {
