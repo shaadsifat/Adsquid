@@ -172,7 +172,7 @@ ${pageHero({
         <li>${icon('phone')}<div><span class="mono">Hotline</span><a href="tel:${site.phoneHref}">${site.phone}</a></div></li>
         <li>${icon('mail')}<div><span class="mono">Email</span><a href="mailto:${site.email}">${site.email}</a></div></li>
         <li>${icon('map-pin')}<div><span class="mono">Head office</span><address>${site.address.street}, ${site.address.locality}-${site.address.postalCode}, Bangladesh</address><a class="more-link" href="/offices/">All our offices ${icon('arrow-right')}</a></div></li>
-        <li>${icon('clock')}<div><span class="mono">Office hours</span><span data-hours-live>${site.hours}</span></div></li>
+        <li>${icon('clock')}<div><span class="mono">Office hours</span><span>${site.hours}</span></div></li>
       </ul>
     </div>
   </div>
@@ -205,7 +205,7 @@ function officeCard(o, i) {
       <address class="office-addr">${icon('map-pin')}<span>${o.lines.map(esc).join('<br>')}</span></address>
       <dl class="office-meta">
         <div><dt>${icon('clock')}Local time</dt><dd><span class="office-time" data-tz="${o.tz}">--:--</span><small class="office-tz">${esc(o.tzName)}</small>${o.openDays ? ` <em class="office-open" data-tz-open="${o.tz}" data-days="${o.openDays.join(',')}" data-hours="${o.opens}-${o.closes}"></em>` : ''}</dd></div>
-        ${o.hours ? `<div><dt>${icon('calendar')}Office hours</dt><dd data-hours-live>${esc(o.hours)}</dd></div>` : `<div><dt>${icon('globe')}Time zone</dt><dd>${esc(o.tzName)}</dd></div>`}
+        ${o.hours ? `<div><dt>${icon('calendar')}Office hours</dt><dd>${esc(o.hours)}</dd></div>` : `<div><dt>${icon('globe')}Time zone</dt><dd>${esc(o.tzName)}</dd></div>`}
       </dl>
       <div class="btns">${btn(o.mapLink, 'Get directions', { iconName: 'navigation' })}${o.head ? btn(`tel:${site.phoneHref}`, 'Call us', { variant: 'ghost', iconName: 'phone' }) : btn(`mailto:${site.email}`, 'Email us', { variant: 'ghost', iconName: 'mail' })}</div>
     </div>
@@ -255,7 +255,7 @@ ${pageHero({
 <section class="section section-tight" aria-label="Reach us">
   <div class="container reach">
     <a class="reach-card card reveal" href="${waLink()}" target="_blank" rel="noopener"><span class="reach-ic wa">${brand('whatsapp', { mono: true, size: 24 })}</span><span><b>WhatsApp</b><small>Fastest reply, usually within the hour</small></span>${icon('arrow-up-right')}</a>
-    <a class="reach-card card reveal" href="tel:${site.phoneHref}"><span class="reach-ic">${icon('phone')}</span><span><b>${site.phone}</b><small>Hotline, <span data-hours-live>${esc(site.hours)}</span> (Dhaka time)</small></span>${icon('arrow-up-right')}</a>
+    <a class="reach-card card reveal" href="tel:${site.phoneHref}"><span class="reach-ic">${icon('phone')}</span><span><b>${site.phone}</b><small>Hotline, ${esc(site.hours)} (Dhaka time)</small></span>${icon('arrow-up-right')}</a>
     <a class="reach-card card reveal" href="mailto:${site.email}"><span class="reach-ic">${icon('mail')}</span><span><b>${site.email}</b><small>For proposals, briefs and partnerships</small></span>${icon('arrow-up-right')}</a>
   </div>
 </section>`;

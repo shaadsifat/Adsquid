@@ -162,7 +162,7 @@ function footer() {
           <li><a href="tel:${site.phoneHref}">${icon('phone')}<span>${site.phone}</span></a></li>
           <li><a href="mailto:${site.email}">${icon('mail')}<span>${site.email}</span></a></li>
           <li class="footer-office">${icon('map-pin')}<span><span class="footer-office-top"><small class="footer-sub">Head office</small><a class="footer-pill" href="/offices/">All offices${icon('arrow-up-right')}</a></span><a href="${site.mapLink}" target="_blank" rel="noopener">${site.address.street}, ${site.address.locality}-${site.address.postalCode}, Bangladesh</a></span></li>
-          <li>${icon('clock')}<span data-hours-live>${site.hours}</span></li>
+          <li>${icon('clock')}<span>${site.hours}</span></li>
         </ul>
       </div>
     </div>
@@ -192,7 +192,7 @@ export function renderPage(page) {
   const scripts = ['/assets/vendor/gsap.min.js', '/assets/vendor/ScrollTrigger.min.js', '/assets/vendor/lenis.min.js', '/assets/js/main.js', ...(page.scripts || [])]
     .map((s) => `<script src="${assetVersion(s)}" defer></script>`)
     .join('\n');
-  const cfg = { base, form: site.formEndpoint, hours: '/api/hours.php', wa: site.whatsapp, gtm: site.analytics.gtm, ga4: site.analytics.ga4, pixel: site.analytics.metaPixel };
+  const cfg = { base, form: site.formEndpoint, wa: site.whatsapp, gtm: site.analytics.gtm, ga4: site.analytics.ga4, pixel: site.analytics.metaPixel };
 
   return `<!doctype html>
 <html lang="en-BD" id="top">

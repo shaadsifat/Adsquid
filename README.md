@@ -85,9 +85,7 @@ adsquidbd.com/            <- the site folder
   api/
     .htaccess             <- keeps the mail settings private
     send.php              <- the form handler
-    hours.php             <- live head office hours from Google Maps (optional, step 8)
     mail-config.example.php
-    hours-config.example.php
   assets/  about/  blog/  contact/  offices/  services/  work/ ...
 ```
 
@@ -154,30 +152,8 @@ shows why an email failed, so no lead is ever lost. This folder is outside all y
    Then **Sitemaps** > enter `sitemap.xml` > Submit, and **URL Inspection** > `https://adsquidbd.com/` > Request indexing.
 2. **Bing Webmaster Tools** (bing.com/webmasters): sign in > **Import from Google Search Console**.
 3. **Google Business Profile:** use exactly the same name, address and phone as the website
-   (Section-15, Mirpur, Dhaka-1216, +880 1888 055 999) and add the link https://adsquidbd.com.
-
-### Step 8 (optional): Office hours that follow Google Maps
-
-When this is set up, the head office hours on the website follow your Google Maps listing: change the hours in
-Google Maps (Google Business Profile) and, within about 6 hours, the website shows the new hours on the Offices page,
-the Contact page, the hotline card and the footer, and the "Open now / Closed now" badge uses them too.
-Until it is set up, the website shows the hours written in the site.
-
-1. Go to [console.cloud.google.com](https://console.cloud.google.com) and sign in with the Google account that manages the business.
-   Create a project (for example "Adsquid website"). Google asks for a billing account for Maps services; the website
-   only asks Google about 4 times a day (the answer is kept for 6 hours), which is well inside Google's free monthly allowance.
-2. **APIs & Services > Library** > search **Places API (New)** > **Enable**.
-3. **APIs & Services > Credentials** > **Create credentials > API key**. Then click the key to restrict it:
-   - API restrictions: **Restrict key** > tick only **Places API (New)**;
-   - Application restrictions: **IP addresses** > add your hosting server's IP (cPanel right sidebar, "Shared IP Address").
-   Save and copy the key.
-4. File Manager > the site folder > `api`: open `hours-config.example.php` with **Edit**, copy all the text, Close.
-   Click **+ File**, name it `hours-config.php`, **Edit** it, paste, replace `PASTE-YOUR-API-KEY-HERE` with your key, **Save Changes**.
-5. Open https://adsquidbd.com/api/hours.php. You should see `"ok":true` and your hours (for example `"text":"Sat-Thu, 10am-7pm"`).
-   If it shows `"ok":false`, look at `api/error_log`: usually the key is not restricted to the right IP, or Places API (New) is not enabled.
-
-The key stays on the server (it is never sent to visitors' browsers), `hours-config.php` is never in the zip or on GitHub,
-and the website blocks anyone from opening it. Set a budget alert in Google Cloud > Billing if you want extra peace of mind.
+   (Section-15, Mirpur, Dhaka-1216, +880 1888 055 999) and the same opening hours (Saturday to Thursday, 10am to 8pm),
+   and add the link https://adsquidbd.com. If you change the hours later, change them in `src/config.mjs` too (see Common jobs).
 
 ---
 
@@ -188,9 +164,9 @@ and the website blocks anyone from opening it. Set a budget alert in Google Clou
    The new files replace the old ones.
 3. Delete the zip from the server.
 
-Your `api/mail-config.php` and `api/hours-config.php` are not in the zip, so they stay as they are. If you ever empty
-the site folder completely, create them again (steps 5.4 and 8). Pages that were removed from the website stay on the server until you delete them; for
-a full clean refresh, delete everything in the site folder except `api/mail-config.php`, `api/hours-config.php` and `.well-known`, then extract the new zip.
+Your `api/mail-config.php` is not in the zip, so it stays as it is. If you ever empty
+the site folder completely, create it again (step 5.4). Pages that were removed from the website stay on the server until you delete them; for
+a full clean refresh, delete everything in the site folder except `api/mail-config.php` and `.well-known`, then extract the new zip.
 
 **After changing the share image** (the picture shown when the link is shared on Facebook, LinkedIn or WhatsApp), Facebook
 keeps the old one for a while: paste https://adsquidbd.com into the [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/)
@@ -265,7 +241,7 @@ Static-only hosts (Netlify, Cloudflare Pages, Vercel) cannot run PHP: there, put
 - **Services:** each service in `src/data.mjs` has `subs`. They feed the mega menu, the infographic, the service pages and the footer.
 - **Add an office:** add an entry to `offices` in `src/config.mjs` (copy the Canada one). `nation` is the country name on the labels, `pin` its place on the /offices/ globe (in % of the picture), `region` lights up its continent on the world map (`asia`, `north-america`, `oceania`; more can be added in `src/pages/worldmap.mjs`) and `mapPos` places its pin on the map. Labels on the map and the globe find a free spot by themselves, so they never cover a flight path.
 - **Share image (Open Graph):** `images/brand/og-default.jpg`, 1200x630. Blog posts and portfolio pages use their own picture.
-- **Head office hours (fallback):** `hours`, `hoursSpec` and the Dhaka office's `hours`, `openDays`, `opens`, `closes` in `src/config.mjs`. With step 8 set up, the live hours from Google Maps replace them on the page.
+- **Head office hours:** `hours` and `hoursSpec` (used by Google's business data on every page) and the Dhaka office's `hours`, `openDays`, `opens`, `closes` (the "Open now" badge) in `src/config.mjs`. Change all of them together, build, upload.
 - **Legal pages:** edit `src/content/legal.mjs` and the date in `legalUpdated` (`src/config.mjs`).
 - **Analytics:** fill `analytics.gtm` / `ga4` / `metaPixel` in `src/config.mjs`. They load after the page has loaded; form sends push `generate_lead` / `Lead`. Add a cookie consent banner first: the Privacy Policy promises to ask EU and UK visitors before these cookies are set.
 

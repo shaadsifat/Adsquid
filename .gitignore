@@ -16,4 +16,3 @@ New folder/
 
 # form mail login (holds a password; create it on the server or locally, never commit it)
 static/api/mail-config.php
-static/api/hours-config.php

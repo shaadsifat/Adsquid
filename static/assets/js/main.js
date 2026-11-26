@@ -866,45 +866,14 @@
         const wd = days.indexOf(parts.find((x) => x.type === 'weekday').value);
         const h = +parts.find((x) => x.type === 'hour').value;
         const m = +parts.find((x) => x.type === 'minute').value;
-        let open;
-        if (el.dataset.periods) {
-          // live hours from Google Maps: [openDay, openMinute, closeDay, closeMinute] in minutes of the week
-          const week = 7 * 1440, t = wd * 1440 + h * 60 + m;
-          open = JSON.parse(el.dataset.periods).some(([od, om, cd, cm]) => {
-            if (cd === null) return true;
-            const s = od * 1440 + om;
-            let e = cd * 1440 + cm;
-            if (e <= s) e += week;
-            return (t >= s && t < e) || (t + week >= s && t + week < e);
-          });
-        } else {
-          const [o, c] = el.dataset.hours.split('-').map(Number);
-          open = el.dataset.days.split(',').map(Number).includes(wd) && h >= o && h < c;
-        }
+        const [o, c] = el.dataset.hours.split('-').map(Number);
+        const open = el.dataset.days.split(',').map(Number).includes(wd) && h * 60 + m >= o * 60 && h * 60 + m < c * 60;
         el.textContent = open ? 'Open now' : 'Closed now';
         el.classList.toggle('is-open', open);
       });
     };
     tick();
     setInterval(tick, 30000);
-    d.addEventListener('adsq:hours', tick);
-  }
-
-  /* ---------- Head office hours follow the Google Maps listing (api/hours.php) ---------- */
-  const liveHours = $$('[data-hours-live]');
-  if (liveHours.length && cfg.hours && !/\.github\.io$/.test(location.hostname)) {
-    const getHours = () => fetch((cfg.base || '') + cfg.hours, { headers: { Accept: 'application/json' } })
-      .then((r) => (r.ok ? r.json() : null))
-      .then((h) => {
-        if (!h || !h.ok) return;
-        if (h.text) liveHours.forEach((el) => { el.textContent = h.text; });
-        if (Array.isArray(h.periods) && h.periods.length) {
-          $$('[data-tz-open]').forEach((el) => { el.dataset.periods = JSON.stringify(h.periods); });
-          d.dispatchEvent(new Event('adsq:hours'));
-        }
-      })
-      .catch(() => {});
-    'requestIdleCallback' in window ? requestIdleCallback(getHours, { timeout: 2500 }) : setTimeout(getHours, 1200);
   }
 
   /* ---------- Forms: posted to /api/send.php (PHP on the hosting), WhatsApp hand-over on preview copies ---------- */

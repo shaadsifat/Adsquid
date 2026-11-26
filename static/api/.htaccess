@@ -1,5 +1,5 @@
-# Only send.php and hours.php may be opened from the web; the settings files stay private.
-<FilesMatch "^(mail|hours)-config(\.example)?\.php$">
+# Only send.php may be opened from the web; the mail settings files stay private.
+<FilesMatch "^mail-config(\.example)?\.php$">
   <IfModule mod_authz_core.c>
     Require all denied
   </IfModule>
