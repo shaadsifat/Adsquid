@@ -22,7 +22,7 @@ $config = [
     'fromName'     => 'Adsquid Website',
     'allowedHosts' => ['adsquidbd.com', 'www.adsquidbd.com'],
     'smtp'         => null,                       // set in mail-config.php
-    'leadsDir'     => dirname(__DIR__, 2) . '/adsquid-leads', // backup copy, outside public_html; false = off
+    'leadsDir'     => null,                       // backup copy folder; null = your hosting home folder (see below); false = off
     'rateLimit'    => 6,                          // messages per visitor (IP) per 10 minutes
     'thankYou'     => '/thank-you/',
 ];
@@ -291,10 +291,29 @@ if ($recipients) {
     $error = 'no valid "to" address in the config';
 }
 
-// 9. Keep a private backup copy (outside the public website folder) so a lead is never lost
-if (!empty($config['leadsDir'])) {
-    $dir = (string) $config['leadsDir'];
+// 9. Keep a private backup copy so a lead is never lost.
+//    Default: /home/<cpanel-user>/adsquid-leads, which no website on the account can serve, even when this
+//    domain's folder sits inside another domain's public_html (addon domains). Last resort: a folder inside
+//    api/ that is locked with its own .htaccess.
+$leadsDir = $config['leadsDir'];
+if ($leadsDir === null) {
+    $home = '';
+    if (function_exists('posix_getpwuid') && function_exists('posix_geteuid')) {
+        $pw = @posix_getpwuid(posix_geteuid());
+        $home = is_array($pw) && !empty($pw['dir']) ? (string) $pw['dir'] : '';
+    }
+    if ($home === '' && preg_match('~^(/home\d*/[^/]+)/~', __DIR__, $m)) {
+        $home = $m[1];
+    }
+    $leadsDir = ($home !== '' && @is_dir($home) && @is_writable($home)) ? $home . '/adsquid-leads' : __DIR__ . '/private-leads';
+}
+if (!empty($leadsDir)) {
+    $dir = (string) $leadsDir;
+    $inWebFolder = strpos($dir, __DIR__) === 0;
     if (is_dir($dir) || @mkdir($dir, 0700, true)) {
+        if ($inWebFolder && !is_file($dir . '/.htaccess')) {
+            @file_put_contents($dir . '/.htaccess', "<IfModule mod_authz_core.c>\n  Require all denied\n</IfModule>\n<IfModule !mod_authz_core.c>\n  Order allow,deny\n  Deny from all\n</IfModule>\n");
+        }
         $file = $dir . '/leads-' . date('Y-m') . '.csv';
         $isNew = !is_file($file);
         if ($fh = @fopen($file, 'ab')) {
