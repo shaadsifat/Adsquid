@@ -18,8 +18,8 @@ export const site = {
     country: 'BD',
   },
   geo: { lat: 23.8103594, lng: 90.3623558 },
-  hours: 'Sat-Thu, 10am-8pm',
-  hoursSpec: { days: ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday'], opens: '10:00', closes: '20:00' },
+  hours: 'Mon-Fri, 9am-5pm',
+  hoursSpec: { days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'], opens: '09:00', closes: '17:00' },
   founded: '2015', // CONFIRM
   mapEmbed: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3650.3821601089103!2d90.38075289999999!3d23.805005899999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x823f6c1515e2f32f%3A0xb99d37bbb55b7a8c!2sAdsquid!5e0!3m2!1sen!2sbd!4v1795630355529!5m2!1sen!2sbd',
   mapLink: 'https://maps.app.goo.gl/1NK4moJoSQ3sFSZi9',
@@ -36,10 +36,10 @@ export const site = {
       lines: ['Section-15, Mirpur', 'Dhaka-1216, Bangladesh'],
       tz: 'Asia/Dhaka',
       tzName: 'GMT+6',
-      hours: 'Sat-Thu, 10am-8pm',
-      openDays: [6, 0, 1, 2, 3, 4], // Saturday to Thursday (0 = Sunday)
-      opens: 10,
-      closes: 20,
+      hours: 'Mon-Fri, 9am-5pm',
+      openDays: [1, 2, 3, 4, 5], // Monday to Friday (0 = Sunday)
+      opens: 9,
+      closes: 17,
       mapLink: 'https://maps.app.goo.gl/1NK4moJoSQ3sFSZi9',
       mapEmbed: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3650.3821601089103!2d90.38075289999999!3d23.805005899999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x823f6c1515e2f32f%3A0xb99d37bbb55b7a8c!2sAdsquid!5e0!3m2!1sen!2sbd!4v1795630355529!5m2!1sen!2sbd',
       pin: [70, 30], // position on the Offices page globe (% of the picture)

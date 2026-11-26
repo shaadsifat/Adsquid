@@ -152,7 +152,7 @@ shows why an email failed, so no lead is ever lost. This folder is outside all y
    Then **Sitemaps** > enter `sitemap.xml` > Submit, and **URL Inspection** > `https://adsquidbd.com/` > Request indexing.
 2. **Bing Webmaster Tools** (bing.com/webmasters): sign in > **Import from Google Search Console**.
 3. **Google Business Profile:** use exactly the same name, address and phone as the website
-   (Section-15, Mirpur, Dhaka-1216, +880 1888 055 999) and the same opening hours (Saturday to Thursday, 10am to 8pm),
+   (Section-15, Mirpur, Dhaka-1216, +880 1888 055 999) and the same opening hours (Monday to Friday, 9am to 5pm; Saturday and Sunday closed),
    and add the link https://adsquidbd.com. If you change the hours later, change them in `src/config.mjs` too (see Common jobs).
 
 ---
