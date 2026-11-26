@@ -45,7 +45,6 @@ export const site = {
       pin: [70, 30], // position on the Offices page globe (% of the picture)
       region: 'asia',
       mapPos: { lat: 23.81, lng: 90.36 },
-      mapLabel: 'above',
       schema: { streetAddress: 'Section-15, Mirpur', addressLocality: 'Dhaka', postalCode: '1216', addressRegion: 'Dhaka Division', addressCountry: 'BD' },
       geo: { lat: 23.8103594, lng: 90.3623558 }, // the Adsquid pin on Google Maps
     },

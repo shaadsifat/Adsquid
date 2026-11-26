@@ -4,7 +4,7 @@ import {
   icon, brand, brandTitle, objImg, btn, waBtn, eyebrow, sectionHead, faqBlock, signalLine,
   breadcrumbSchema, faqSchema, serviceSchema, serviceUrl, subUrl, heroOf, subMark, esc,
 } from '../lib.mjs';
-import { pageHero, lightbox } from './parts.mjs';
+import { pageHero } from './parts.mjs';
 import { heroArt } from './art.mjs';
 import { postCard } from './blog.mjs';
 import { workTile } from './work.mjs';
@@ -70,7 +70,6 @@ function workSection(list, title, num) {
     <div class="sec-head split"><div>${eyebrow('Our work', num)}<h2 class="h2" id="proof-title" data-split>${title}</h2></div>${btn('/work/', 'All work', { variant: 'ghost' })}</div>
     <div class="work-grid">${list.slice(0, 3).map((w) => workTile(w)).join('')}</div>
   </div>
-  ${lightbox()}
 </section>`
     : '';
 }

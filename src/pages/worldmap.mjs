@@ -41,23 +41,77 @@ const REGIONS = {
   asia: { name: 'Asia', d: [EURASIA, CASPIAN, BLACKSEA, JAPAN, SRILANKA, LUZON, MINDANAO, SUMATRA, JAVA, BORNEO, SULAWESI].map(path).join(''), from: 42, to: 180 },
   oceania: { name: 'Oceania', d: [AUSTRALIA, TASMANIA, NZ_N, NZ_S, NEWGUINEA].map(path).join(''), from: 110, to: 180 },
 };
-const LAND = [NA, HUDSON, GREENLAND, CUBA, HISPANIOLA, SA, AFRICA, MADAGASCAR, EURASIA, CASPIAN, BLACKSEA, GB, IRELAND, ICELAND, JAPAN, SRILANKA, LUZON, MINDANAO, SUMATRA, JAVA, BORNEO, SULAWESI, NEWGUINEA, AUSTRALIA, TASMANIA, NZ_N, NZ_S].map(path).join('');
+// The same outlines also feed the 3D globe on /offices/ (src/pages/globe.mjs). Overlaps (Caspian, Black Sea,
+// Hudson Bay) are holes: a point is land when it falls inside an odd number of outlines.
+export const LAND_POLYS = [NA, HUDSON, GREENLAND, CUBA, HISPANIOLA, SA, AFRICA, MADAGASCAR, EURASIA, CASPIAN, BLACKSEA, GB, IRELAND, ICELAND, JAPAN, SRILANKA, LUZON, MINDANAO, SUMATRA, JAVA, BORNEO, SULAWESI, NEWGUINEA, AUSTRALIA, TASMANIA, NZ_N, NZ_S];
+const LAND = LAND_POLYS.map(path).join('');
 
 // view: latitudes 76N to 56S
 const VB = { x: 0, y: Y(76), w: 1000, h: Y(-56) - Y(76) };
 const pct = (lon, lat) => [((X(lon) - VB.x) / VB.w) * 100, ((Y(lat) - VB.y) / VB.h) * 100];
 
+// Label placement: each label tries eight spots around its pin and takes the first one that touches no flight
+// path, no other pin, no other label and stays inside the map. Done for the desktop labels (code + country) and
+// for the small phone labels (code only), at the map sizes where they are the largest relative to the map.
+const POSITIONS = ['b', 'r', 'bl', 'br', 'l', 'a', 'al', 'ar'];
+function rectAt(x, y, w, h, g, pos) {
+  const d = g * 0.6;
+  switch (pos) {
+    case 'b': return [x - w / 2, y + g, x + w / 2, y + g + h];
+    case 'a': return [x - w / 2, y - g - h, x + w / 2, y - g];
+    case 'r': return [x + g, y - h / 2, x + g + w, y + h / 2];
+    case 'l': return [x - g - w, y - h / 2, x - g, y + h / 2];
+    case 'bl': return [x - d - w, y + d, x - d, y + d + h];
+    case 'br': return [x + d, y + d, x + d + w, y + d + h];
+    case 'al': return [x - d - w, y - d - h, x - d, y - d];
+    default: return [x + d, y - d - h, x + d + w, y - d]; // ar
+  }
+}
+function placeLabels(pins, arcPts, sizeOf, scales, gapPx) {
+  const out = new Map();
+  const placed = [];
+  const order = [...pins].sort((a, b) => (b.o.head ? 1 : 0) - (a.o.head ? 1 : 0));
+  for (const p of order) {
+    const ok = (pos, s) => {
+      const [w, h] = sizeOf(p.o).map((v) => v * s);
+      const r = rectAt(p.x, p.y, w, h, gapPx * s, pos);
+      const pad = 3 * s;
+      if (r[0] < VB.x - 4 || r[2] > VB.x + VB.w + 4 || r[1] < VB.y - 4 || r[3] > VB.y + VB.h + 4) return false;
+      for (const [x, y] of arcPts) if (x > r[0] - pad && x < r[2] + pad && y > r[1] - pad && y < r[3] + pad) return false;
+      for (const q of pins) if (q !== p && q.x > r[0] - 8 * s && q.x < r[2] + 8 * s && q.y > r[1] - 8 * s && q.y < r[3] + 8 * s) return false;
+      for (const [o, rs] of placed) if (o !== p) { const t = rs[s]; if (t && r[0] < t[2] + pad && r[2] > t[0] - pad && r[1] < t[3] + pad && r[3] > t[1] - pad) return false; }
+      return true;
+    };
+    const pos = POSITIONS.find((ps) => scales.every((s) => ok(ps, s))) || POSITIONS.find((ps) => ok(ps, scales[0])) || 'b';
+    const rects = {};
+    for (const s of scales) { const [w, h] = sizeOf(p.o).map((v) => v * s); rects[s] = rectAt(p.x, p.y, w, h, gapPx * s, pos); }
+    placed.push([p, rects]);
+    out.set(p, pos);
+  }
+  return out;
+}
+
 export function worldMap(offices) {
   const lit = [...new Set(offices.map((o) => o.region))];
   const pins = offices.map((o) => ({ o, x: X(o.geo.lng), y: Y(o.geo.lat) }));
   const head = pins.find((p) => p.o.head) || pins[0];
-  // flight paths to the head office: higher for longer trips, never above the top of the map
+  // flight paths from the head office out to each office: higher for longer trips, never above the top of the map
+  const arcPts = [];
   const arcs = pins.filter((p) => p !== head).map((p) => {
     const dist = Math.hypot(p.x - head.x, p.y - head.y);
     const mx = (p.x + head.x) / 2;
     const my = Math.max(VB.y + 18, Math.min(p.y, head.y) - dist * 0.32);
-    return `M${p.x.toFixed(1)} ${p.y.toFixed(1)} Q${mx.toFixed(1)} ${my.toFixed(1)} ${head.x.toFixed(1)} ${head.y.toFixed(1)}`;
+    for (let i = 1; i < 60; i++) {
+      const t = i / 60, u = 1 - t;
+      arcPts.push([u * u * head.x + 2 * u * t * mx + t * t * p.x, u * u * head.y + 2 * u * t * my + t * t * p.y]);
+    }
+    return `M${head.x.toFixed(1)} ${head.y.toFixed(1)} Q${mx.toFixed(1)} ${my.toFixed(1)} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`;
   });
+  // label sizes in CSS pixels (see .wm-label in main.css); map units per pixel at the tightest widths
+  const deskSize = (o) => [37 + (o.nation || o.country).length * 6.9 + (o.head ? 27 : 0), 24];
+  const phoneSize = () => [30, 18];
+  const desk = placeLabels(pins, arcPts, deskSize, [1.1, 1.6], 10);
+  const phone = placeLabels(pins, arcPts, phoneSize, [3.2], 7);
   return `<div class="wmap" role="img" aria-label="World map: ${esc(offices.map((o) => `${o.head ? 'head office' : 'office'} in ${o.city}, ${o.country}`).join('; '))}">
   <svg class="wmap-svg" viewBox="${VB.x} ${VB.y.toFixed(1)} ${VB.w} ${VB.h.toFixed(1)}" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
     <defs>
@@ -65,15 +119,15 @@ export function worldMap(offices) {
       <pattern id="wmLit" width="7" height="7" patternUnits="userSpaceOnUse"><circle cx="3.5" cy="3.5" r="1.9" fill="#B57BFF"/></pattern>
       <clipPath id="wmLand" clip-rule="evenodd"><path clip-rule="evenodd" d="${LAND}"/></clipPath>
       ${lit.map((r) => `<clipPath id="wm-${r}" clip-rule="evenodd"><path clip-rule="evenodd" d="${REGIONS[r].d}"/></clipPath>`).join('')}
-      ${pins.map((p, i) => `<radialGradient id="wmGlow${i}"><stop offset="0" stop-color="#A855F7" stop-opacity=".55"/><stop offset="1" stop-color="#A855F7" stop-opacity="0"/></radialGradient>`).join('')}
+      <radialGradient id="wmGlow"><stop offset="0" stop-color="#A855F7" stop-opacity=".4"/><stop offset="1" stop-color="#A855F7" stop-opacity="0"/></radialGradient>
     </defs>
     <rect x="0" y="0" width="1000" height="500" fill="url(#wmDot)" clip-path="url(#wmLand)"/>
     ${lit.map((r) => `<g clip-path="url(#wm-${r})"><rect class="wm-lit" x="${X(REGIONS[r].from).toFixed(1)}" y="0" width="${(X(REGIONS[r].to) - X(REGIONS[r].from)).toFixed(1)}" height="500" fill="url(#wmLit)"/></g>`).join('')}
-    ${pins.map((p, i) => `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="90" fill="url(#wmGlow${i})"/>`).join('')}
-    ${arcs.map((d) => `<path class="wm-arc-glow" d="${d}"/><path class="wm-arc" d="${d}" pathLength="1"/><circle class="wm-plane" r="4.5"><animateMotion dur="4s" repeatCount="indefinite" path="${d}"/></circle>`).join('')}
-    ${pins.map((p) => `<g class="wm-pin${p.o.head ? ' head' : ''}"><circle class="wm-ring" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="6"/><circle class="wm-core" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="6"/></g>`).join('')}
+    ${pins.map((p) => `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${p.o.head ? 62 : 46}" fill="url(#wmGlow)"/>`).join('')}
+    ${arcs.map((d, i) => `<path class="wm-arc" d="${d}" pathLength="1" style="transition-delay:${(0.2 + i * 0.18).toFixed(2)}s"/><path class="wm-comet" d="${d}" pathLength="1" style="animation-delay:${(i * 0.9).toFixed(1)}s"/>`).join('')}
+    ${pins.map((p, i) => `<g class="wm-pin${p.o.head ? ' head' : ''}"><circle class="wm-ring" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${p.o.head ? 7 : 5}" style="animation-delay:-${(i * 0.7).toFixed(1)}s"/><circle class="wm-core" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${p.o.head ? 7 : 5}"/></g>`).join('')}
   </svg>
-  ${pins.map((p) => { const [l, t] = pct(p.o.geo.lng, p.o.geo.lat); return `<span class="wm-label ${p.o.mapLabel || 'below'}${p.o.head ? ' head' : ''}" style="left:${l.toFixed(2)}%;top:${t.toFixed(2)}%" title="${esc(p.o.nation || p.o.country)}: ${p.o.head ? `Head office, ${esc(p.o.city)}` : esc(p.o.city)}"><b><em>${esc(p.o.code)}</em>${esc(p.o.nation || p.o.country)}</b><small>${p.o.head ? `Head office, ${esc(p.o.city)}` : esc(p.o.city)}</small><i aria-hidden="true">${esc(p.o.code)}</i></span>`; }).join('')}
+  ${pins.map((p) => { const [l, t] = pct(p.o.geo.lng, p.o.geo.lat); return `<span class="wm-label d-${desk.get(p)} m-${phone.get(p)}${p.o.head ? ' head' : ''}" style="left:${l.toFixed(2)}%;top:${t.toFixed(2)}%" title="${esc(p.o.nation || p.o.country)}: ${p.o.head ? `Head office, ${esc(p.o.city)}` : esc(p.o.city)}"><b><em>${esc(p.o.code)}</em>${esc(p.o.nation || p.o.country)}</b><small>${p.o.head ? `Head office, ${esc(p.o.city)}` : esc(p.o.city)}</small><i aria-hidden="true">${esc(p.o.code)}</i></span>`; }).join('')}
 </div>`;
 }
 

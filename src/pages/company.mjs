@@ -7,6 +7,7 @@ import { pageHero, teamFan } from './parts.mjs';
 import { privacy, terms } from '../content/legal.mjs';
 import { heroArt } from './art.mjs';
 import { worldMap, regionName } from './worldmap.mjs';
+import { globeArt } from './globe.mjs';
 const teamPhoto = (m) => `img:/assets/images/team/${m.photo}-320.webp`;
 
 export function aboutPage() {
@@ -222,7 +223,7 @@ ${pageHero({
   display: 'Come say hello.',
   sentence: `Our head office is in Mirpur, Dhaka, with offices in the USA, Canada, Australia and Malaysia. Visit us, call or send a WhatsApp message.`,
   cls: 'hero-type',
-  visual: heroArt(['globe', { pins: offices.map((o) => [o.pin[0], o.pin[1], o.nation, o.head ? `Head office, ${o.city}` : o.city, o.code]) }]),
+  visual: globeArt(offices),
   buttons: btn('#offices', 'See our offices', { cls: 'btn-magnetic', iconName: 'map-pin' }) + waBtn('WhatsApp us'),
 })}
 <section class="section" id="offices" aria-labelledby="offices-title">
@@ -260,6 +261,7 @@ ${pageHero({
 </section>`;
   return {
     path: '/offices/',
+    scripts: ['/assets/js/globe.js'],
     title: 'Adsquid Offices: Dhaka HQ, USA, Canada, Australia, Malaysia',
     desc: 'Adsquid head office: Section-15, Mirpur, Dhaka-1216. Offices in Kissimmee (USA), Saskatoon (Canada), Cranbourne North (Australia) and Nilai (Malaysia).',
     cta: { eyebrow: 'Visit or message', title: 'Let us talk about your growth.', text: 'Book a visit, a call or start with a free audit.' },

@@ -16,13 +16,10 @@ const subOf = (w) => {
 export function workTile(w, { headingTag = 'h3' } = {}) {
   const s = serviceBySlug(w.service);
   return `<figure class="work-tile reveal" id="${w.slug}" data-filter="${w.filter}">
-  <div class="work-open">
-    <button class="work-view" type="button" data-lightbox data-src="${workSrc(w)}" data-title="${esc(w.title)}" data-cat="${esc(s.name)}" data-href="${workUrl(w)}" aria-label="View ${esc(w.title)} full screen">
-      <span class="work-media"><img src="${workSrc(w, '-640')}" srcset="${workSrc(w, '-640')} 640w, ${workSrc(w)} 1280w" sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" width="1280" height="715" alt="${esc(w.title)}: ${esc(s.name.toLowerCase())} by Adsquid" loading="lazy" decoding="async"></span>
-      <span class="work-zoom" aria-hidden="true">${icon('maximize-2')}</span>
-    </button>
-    <a class="work-go" href="${workUrl(w)}" aria-label="Open the ${esc(w.title)} project">${icon('arrow-up-right')}</a>
-  </div>
+  <a class="work-open" href="${workUrl(w)}" aria-label="Open the ${esc(w.title)} project">
+    <span class="work-media"><img src="${workSrc(w, '-640')}" srcset="${workSrc(w, '-640')} 640w, ${workSrc(w)} 1280w" sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" width="1280" height="715" alt="${esc(w.title)}: ${esc(s.name.toLowerCase())} by Adsquid" loading="lazy" decoding="async"></span>
+    <span class="work-go" aria-hidden="true">${icon('arrow-up-right')}</span>
+  </a>
   <figcaption><span class="work-cat mono">${esc(s.name)}</span><${headingTag} class="work-title"><a href="${workUrl(w)}">${esc(w.title)}</a></${headingTag}></figcaption>
 </figure>`;
 }
@@ -34,7 +31,7 @@ export function workIndex() {
 ${pageHero({
   crumbs,
   h1: 'Our work: design, website and software portfolio',
-  display: 'Work we are proud of.',
+  display: 'Work we are<br class="br-m"> proud of.', // fixed break on phones, so the font swap cannot re-wrap it
   sentence: 'Brand identities, social content, websites and software made by Teamsquid for clients around the world.',
   cls: 'hero-type',
   visual: heroArt(['gallery', { images: ['custom-website-design', 'social-media-post-design', 'logo-design-branding'].map((slug) => `/assets/images/work/${slug}-640.webp`), chip: ['layout-grid', `${works.length} projects`], tags: [['gem', 'Brand'], ['image', 'Visual'], ['monitor-smartphone', 'Website'], ['cpu', 'Software']] }]),
@@ -47,8 +44,7 @@ ${pageHero({
     <div class="work-grid">${works.map((w) => workTile(w, { headingTag: 'h2' })).join('')}</div>
     <p class="empty-state" hidden>No projects in this category yet.</p>
   </div>
-</section>
-${lightbox()}`;
+</section>`;
   return {
     path: '/work/',
     title: 'Our Work | Design, Website & Software Portfolio | Adsquid',

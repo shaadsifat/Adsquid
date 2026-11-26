@@ -223,8 +223,9 @@ export function signalLine(cls = '') {
 // Wrap each word of a display line in masks for a CSS word-by-word reveal. Text stays real HTML (SEO-safe).
 export function splitWords(html) {
   let i = 0;
+  // keep line breaks (also <br class="..."> for breaks that only apply on some screens) as they are
   return html
-    .split(/(<br\s*\/?>)/)
+    .split(/(<br\b[^>]*>)/)
     .map((part) =>
       /^<br/.test(part)
         ? part

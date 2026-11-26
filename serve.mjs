@@ -39,6 +39,12 @@ createServer(async (req, res) => {
       res.writeHead(206, { 'Content-Type': type, 'Content-Range': `bytes ${start}-${end}/${body.length}`, 'Accept-Ranges': 'bytes', 'Content-Length': end - start + 1 });
       return res.end(body.subarray(start, end + 1));
     }
+    if (type.startsWith('text/html')) {
+      // Local preview only: the share image (og:image) points at this computer instead of adsquidbd.com,
+      // so share-preview tools show the current picture before the site is uploaded. /dist is not changed.
+      const html = body.toString('utf8').replace(/(<meta property="og:image" content=")https:\/\/adsquidbd\.com\//g, `$1http://${req.headers.host || `localhost:${PORT}`}/`);
+      return res.writeHead(200, { 'Content-Type': type, 'Cache-Control': 'no-cache' }).end(html);
+    }
     res.writeHead(200, { 'Content-Type': type, 'Cache-Control': 'no-cache' }).end(body);
   } catch {
     const nf = await readFile(join(DIST, '404.html')).catch(() => 'Not found');
