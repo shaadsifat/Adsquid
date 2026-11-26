@@ -11,13 +11,17 @@ let criticalHomeCss = '';
 let wm = { w: 1200, h: 240 };
 let base = '';
 let forceNoindex = false;
-export function configureLayout({ version, critical, criticalHome = '', wordmark, basePath = '', noindex = false }) {
+let ogVersion = '';
+let ogOrigin = '';
+export function configureLayout({ version, critical, criticalHome = '', wordmark, basePath = '', noindex = false, ogVer = '', origin = '' }) {
   assetVersion = version;
   criticalCss = critical;
   criticalHomeCss = criticalHome;
   if (wordmark) wm = wordmark;
   base = basePath;
   forceNoindex = noindex;
+  ogVersion = ogVer;
+  ogOrigin = origin;
 }
 
 const navLinks = [
@@ -181,7 +185,8 @@ function footer() {
  */
 export function renderPage(page) {
   const canonical = abs(page.path === '/404.html' ? '/404.html' : page.path);
-  const og = abs(page.ogImage || '/assets/images/brand/og-default.jpg');
+  const ogPath = page.ogImage || `/assets/images/brand/og-default.jpg${ogVersion ? `?v=${ogVersion}` : ''}`;
+  const og = ogOrigin ? ogOrigin + base + ogPath : abs(ogPath);
   const schemas = (page.schema || []).map((s) => `<script type="application/ld+json">${JSON.stringify(s)}</script>`).join('\n');
   const preloads = (page.preload || []).join('\n');
   const scripts = ['/assets/vendor/gsap.min.js', '/assets/vendor/ScrollTrigger.min.js', '/assets/vendor/lenis.min.js', '/assets/js/main.js', ...(page.scripts || [])]

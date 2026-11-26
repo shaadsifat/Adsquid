@@ -104,7 +104,11 @@ writeFileSync(join(DIST, '.nojekyll'), ''); // GitHub Pages: serve files as-is
 // Critical CSS is inlined per page (criticalHome is added on the homepage only).
 const critical = readFileSync(join(DIST, 'assets/css/critical.css'), 'utf8');
 rmSync(join(DIST, 'assets/css/critical.css'));
-configureLayout({ version, critical, criticalHome, wordmark, basePath: BASE, noindex: NOINDEX });
+// Share image version (changes when the picture changes, so Facebook/WhatsApp fetch the new one).
+// Preview copies point og:image at their own host, so shared preview links show the picture too.
+const ogVer = createHash('md5').update(readFileSync(join(IMAGES, 'brand/og-default.jpg'))).digest('hex').slice(0, 8);
+const ORIGIN = arg('origin') || (BASE ? 'https://shaadsifat.github.io' : '');
+configureLayout({ version, critical, criticalHome, wordmark, basePath: BASE, noindex: NOINDEX, ogVer, origin: ORIGIN });
 
 // 4. Blog posts: src/content/posts/*.html with a JSON front matter comment.
 const POSTS_DIR = join(ROOT, 'src/content/posts');
