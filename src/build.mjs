@@ -1,7 +1,8 @@
 // Adsquid static site builder. No dependencies: `node src/build.mjs`.
-// Output goes to /dist. Upload the contents of /dist to public_html (or Netlify / Cloudflare Pages).
+// Output goes to /dist, plus adsquid-website.zip (the contents of /dist) ready to upload in cPanel.
 import { readFileSync, writeFileSync, mkdirSync, rmSync, cpSync, readdirSync, existsSync, statSync } from 'node:fs';
 import { createHash } from 'node:crypto';
+import { execFileSync } from 'node:child_process';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -198,4 +199,21 @@ console.log(`Built ${pages.length} pages (${indexable.length} in sitemap), ${pos
 console.log(`critical.css inline: ${(Buffer.byteLength(critical) / 1024).toFixed(1)} KB (+${(Buffer.byteLength(criticalHome) / 1024).toFixed(1)} KB on home), main.css: ${(statSync(join(DIST, 'assets/css/main.css')).size / 1024).toFixed(1)} KB`);
 if (problems.length) {
   console.warn('\nChecks:\n  ' + problems.join('\n  '));
+}
+
+// 9. Ready-to-upload zip of the real site (not for preview copies): adsquid-website.zip in the project folder.
+//    Upload it in cPanel > File Manager and Extract (README > Hosting). Windows 10/11 have tar.exe built in.
+if (!BASE && !NOINDEX && !arg('out')) {
+  const zip = join(ROOT, 'adsquid-website.zip');
+  try {
+    rmSync(zip, { force: true });
+    if (process.platform === 'win32') {
+      execFileSync(join(process.env.SystemRoot || 'C:\\Windows', 'System32', 'tar.exe'), ['-a', '-cf', zip, '-C', DIST, '.'], { stdio: 'ignore' });
+    } else {
+      execFileSync('zip', ['-qr', zip, '.'], { cwd: DIST, stdio: 'ignore' });
+    }
+    console.log(`Upload file: adsquid-website.zip (${(statSync(zip).size / 1048576).toFixed(1)} MB)`);
+  } catch (e) {
+    console.warn(`Could not create adsquid-website.zip (${e.message}). Zip the contents of /dist by hand.`);
+  }
 }

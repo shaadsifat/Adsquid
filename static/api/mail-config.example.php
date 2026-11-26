@@ -2,7 +2,7 @@
 /*
  * Form email settings.
  *
- * 1. Copy this file to "mail-config.php" in the same folder (public_html/api/mail-config.php).
+ * 1. Make a copy of this file named "mail-config.php" in the same folder (api/ in the website's folder).
  * 2. Fill in the SMTP login of an email account you created in cPanel > Email Accounts.
  * 3. Save. That's it: the website forms now send through your own mail server.
  *
