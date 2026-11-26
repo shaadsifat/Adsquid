@@ -171,7 +171,7 @@ ${pageHero({
         <li>${icon('phone')}<div><span class="mono">Hotline</span><a href="tel:${site.phoneHref}">${site.phone}</a></div></li>
         <li>${icon('mail')}<div><span class="mono">Email</span><a href="mailto:${site.email}">${site.email}</a></div></li>
         <li>${icon('map-pin')}<div><span class="mono">Head office</span><address>${site.address.street}, ${site.address.locality}-${site.address.postalCode}, Bangladesh</address><a class="more-link" href="/offices/">All our offices ${icon('arrow-right')}</a></div></li>
-        <li>${icon('clock')}<div><span class="mono">Office hours</span><span>${site.hours}</span></div></li>
+        <li>${icon('clock')}<div><span class="mono">Office hours</span><span data-hours-live>${site.hours}</span></div></li>
       </ul>
     </div>
   </div>
@@ -186,7 +186,7 @@ ${pageHero({
   return {
     path: '/contact/',
     title: 'Contact Adsquid | Digital Marketing Agency Dhaka',
-    desc: 'Call, WhatsApp or message us. Head office in Mirpur, Dhaka, plus a US office in Kissimmee, Florida. We reply fast.',
+    desc: 'Call, WhatsApp or message us. Head office in Mirpur, Dhaka, plus offices in the USA, Canada, Australia and Malaysia. We reply fast.',
     cta: { title: 'Prefer a free audit first?', text: 'Send your page or website link. We reply with a 1-page plan.' },
     schema: [breadcrumbSchema(crumbs), orgSchema(), pageTypeSchema('ContactPage', '/contact/', 'Contact Adsquid')],
     body,
@@ -204,7 +204,7 @@ function officeCard(o, i) {
       <address class="office-addr">${icon('map-pin')}<span>${o.lines.map(esc).join('<br>')}</span></address>
       <dl class="office-meta">
         <div><dt>${icon('clock')}Local time</dt><dd><span class="office-time" data-tz="${o.tz}">--:--</span><small class="office-tz">${esc(o.tzName)}</small>${o.openDays ? ` <em class="office-open" data-tz-open="${o.tz}" data-days="${o.openDays.join(',')}" data-hours="${o.opens}-${o.closes}"></em>` : ''}</dd></div>
-        ${o.hours ? `<div><dt>${icon('calendar')}Office hours</dt><dd>${esc(o.hours)}</dd></div>` : `<div><dt>${icon('globe')}Time zone</dt><dd>${esc(o.tzName)}</dd></div>`}
+        ${o.hours ? `<div><dt>${icon('calendar')}Office hours</dt><dd data-hours-live>${esc(o.hours)}</dd></div>` : `<div><dt>${icon('globe')}Time zone</dt><dd>${esc(o.tzName)}</dd></div>`}
       </dl>
       <div class="btns">${btn(o.mapLink, 'Get directions', { iconName: 'navigation' })}${o.head ? btn(`tel:${site.phoneHref}`, 'Call us', { variant: 'ghost', iconName: 'phone' }) : btn(`mailto:${site.email}`, 'Email us', { variant: 'ghost', iconName: 'mail' })}</div>
     </div>
@@ -218,16 +218,16 @@ export function officesPage() {
   const body = `
 ${pageHero({
   crumbs,
-  h1: 'Adsquid offices in Dhaka and the USA',
+  h1: 'Adsquid offices in five countries',
   display: 'Come say hello.',
-  sentence: `Our head office is in Mirpur, Dhaka, with a second office in Kissimmee, Florida. Visit us, call or send a WhatsApp message.`,
+  sentence: `Our head office is in Mirpur, Dhaka, with offices in the USA, Canada, Australia and Malaysia. Visit us, call or send a WhatsApp message.`,
   cls: 'hero-type',
-  visual: heroArt(['globe', { pins: offices.map((o) => [o.pin[0], o.pin[1], o.city.split(',')[0], o.head ? 'Head office' : o.country]) }]),
+  visual: heroArt(['globe', { pins: offices.map((o) => [o.pin[0], o.pin[1], o.nation, o.head ? `Head office, ${o.city}` : o.city, o.code]) }]),
   buttons: btn('#offices', 'See our offices', { cls: 'btn-magnetic', iconName: 'map-pin' }) + waBtn('WhatsApp us'),
 })}
 <section class="section" id="offices" aria-labelledby="offices-title">
   <div class="container">
-    <div class="sec-head">${eyebrow('Our offices', String(n).padStart(2, '0'))}<h2 class="h2" id="offices-title" data-split>${n === 2 ? 'Two offices.' : `${n} offices.`} One team.</h2><p class="sec-lead reveal">Strategy, design and development happen at our head office in Dhaka. Our US office keeps us close to clients in North America.</p></div>
+    <div class="sec-head">${eyebrow('Our offices', String(n).padStart(2, '0'))}<h2 class="h2" id="offices-title" data-split>${['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight'][n] || n} offices. One team.</h2><p class="sec-lead reveal">Strategy, design and development happen at our head office in Dhaka. Our offices in the USA, Canada, Australia and Malaysia keep us close to clients in their own time zones.</p></div>
     <div class="offices">
       ${offices.map(officeCard).join('\n      ')}
       <article class="office-next reveal">
@@ -240,7 +240,7 @@ ${pageHero({
 </section>
 <section class="section coverage" aria-labelledby="coverage-title">
   <div class="container">
-    <div class="sec-head center">${eyebrow('Coverage', '03')}<h2 class="h2" id="coverage-title" data-split>From Dhaka to the world.</h2><p class="sec-lead reveal">Two offices on two continents, serving clients all over the world. Dhaka and Florida are 10 to 11 hours apart, so work keeps moving while one side sleeps.</p></div>
+    <div class="sec-head center">${eyebrow('Coverage', '03')}<h2 class="h2" id="coverage-title" data-split>From Dhaka to the world.</h2><p class="sec-lead reveal">${['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight'][n] || n} offices on ${['', 'one', 'two', 'three', 'four', 'five', 'six'][new Set(offices.map((o) => o.region)).size]} continents, from Saskatoon to Cranbourne North, serving clients all over the world.</p></div>
     <div class="wmap-wrap reveal">${worldMap(offices.map((o) => ({ ...o, geo: o.mapPos || o.geo })))}</div>
     <ul class="cov-stats">
       <li class="reveal"><b>${String(n).padStart(2, '0')}</b><span>Offices</span></li>
@@ -248,20 +248,20 @@ ${pageHero({
       <li class="reveal"><b>Global</b><span>Service area</span></li>
       <li class="reveal"><b>50+</b><span>Clients worldwide</span></li>
     </ul>
-    <ul class="cov-regions">${offices.map((o) => `<li class="reveal${o.head ? ' head' : ''}"><span class="cov-dot"></span><span><b>${esc(regionName(o.region))}</b><small>${o.head ? 'Head office' : esc(o.label || 'Office')}: ${esc(o.city)}</small></span></li>`).join('')}<li class="reveal"><span class="cov-dot dim"></span><span><b>Everywhere else</b><small>Served remotely by both offices</small></span></li></ul>
+    <ul class="cov-regions">${[...new Set(offices.map((o) => o.region))].map((r) => { const here = offices.filter((o) => o.region === r); return `<li class="reveal${here.some((o) => o.head) ? ' head' : ''}"><span class="cov-dot"></span><span><b>${esc(regionName(r))}</b><small>${here.map((o) => esc(o.city) + (o.head ? ' (head office)' : '')).join(' &middot; ')}</small></span></li>`; }).join('')}<li class="reveal"><span class="cov-dot dim"></span><span><b>Everywhere else</b><small>Served remotely by our offices</small></span></li></ul>
   </div>
 </section>
 <section class="section section-tight" aria-label="Reach us">
   <div class="container reach">
     <a class="reach-card card reveal" href="${waLink()}" target="_blank" rel="noopener"><span class="reach-ic wa">${brand('whatsapp', { mono: true, size: 24 })}</span><span><b>WhatsApp</b><small>Fastest reply, usually within the hour</small></span>${icon('arrow-up-right')}</a>
-    <a class="reach-card card reveal" href="tel:${site.phoneHref}"><span class="reach-ic">${icon('phone')}</span><span><b>${site.phone}</b><small>Hotline, ${esc(site.hours)} (Dhaka time)</small></span>${icon('arrow-up-right')}</a>
+    <a class="reach-card card reveal" href="tel:${site.phoneHref}"><span class="reach-ic">${icon('phone')}</span><span><b>${site.phone}</b><small>Hotline, <span data-hours-live>${esc(site.hours)}</span> (Dhaka time)</small></span>${icon('arrow-up-right')}</a>
     <a class="reach-card card reveal" href="mailto:${site.email}"><span class="reach-ic">${icon('mail')}</span><span><b>${site.email}</b><small>For proposals, briefs and partnerships</small></span>${icon('arrow-up-right')}</a>
   </div>
 </section>`;
   return {
     path: '/offices/',
-    title: 'Our Offices: Dhaka Head Office & USA | Adsquid',
-    desc: 'Visit Adsquid: head office in Section-15, Mirpur, Dhaka-1216, Bangladesh, and a US office in Kissimmee, Florida. Directions, maps and local times.',
+    title: 'Adsquid Offices: Dhaka HQ, USA, Canada, Australia, Malaysia',
+    desc: 'Adsquid head office: Section-15, Mirpur, Dhaka-1216. Offices in Kissimmee (USA), Saskatoon (Canada), Cranbourne North (Australia) and Nilai (Malaysia).',
     cta: { eyebrow: 'Visit or message', title: 'Let us talk about your growth.', text: 'Book a visit, a call or start with a free audit.' },
     schema: [
       breadcrumbSchema(crumbs),

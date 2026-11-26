@@ -39,6 +39,7 @@ const NZ_S = [[172.8, -40.5], [174.3, -41.7], [173.2, -43], [171.2, -44.5], [170
 const REGIONS = {
   'north-america': { name: 'North America', d: [NA, HUDSON, GREENLAND, CUBA, HISPANIOLA].map(path).join(''), from: -180, to: -20 },
   asia: { name: 'Asia', d: [EURASIA, CASPIAN, BLACKSEA, JAPAN, SRILANKA, LUZON, MINDANAO, SUMATRA, JAVA, BORNEO, SULAWESI].map(path).join(''), from: 42, to: 180 },
+  oceania: { name: 'Oceania', d: [AUSTRALIA, TASMANIA, NZ_N, NZ_S, NEWGUINEA].map(path).join(''), from: 110, to: 180 },
 };
 const LAND = [NA, HUDSON, GREENLAND, CUBA, HISPANIOLA, SA, AFRICA, MADAGASCAR, EURASIA, CASPIAN, BLACKSEA, GB, IRELAND, ICELAND, JAPAN, SRILANKA, LUZON, MINDANAO, SUMATRA, JAVA, BORNEO, SULAWESI, NEWGUINEA, AUSTRALIA, TASMANIA, NZ_N, NZ_S].map(path).join('');
 
@@ -50,7 +51,13 @@ export function worldMap(offices) {
   const lit = [...new Set(offices.map((o) => o.region))];
   const pins = offices.map((o) => ({ o, x: X(o.geo.lng), y: Y(o.geo.lat) }));
   const head = pins.find((p) => p.o.head) || pins[0];
-  const arcs = pins.filter((p) => p !== head).map((p) => { const mx = (p.x + head.x) / 2; const my = Math.min(p.y, head.y) - 150; return `M${p.x.toFixed(1)} ${p.y.toFixed(1)} Q${mx.toFixed(1)} ${my.toFixed(1)} ${head.x.toFixed(1)} ${head.y.toFixed(1)}`; });
+  // flight paths to the head office: higher for longer trips, never above the top of the map
+  const arcs = pins.filter((p) => p !== head).map((p) => {
+    const dist = Math.hypot(p.x - head.x, p.y - head.y);
+    const mx = (p.x + head.x) / 2;
+    const my = Math.max(VB.y + 18, Math.min(p.y, head.y) - dist * 0.32);
+    return `M${p.x.toFixed(1)} ${p.y.toFixed(1)} Q${mx.toFixed(1)} ${my.toFixed(1)} ${head.x.toFixed(1)} ${head.y.toFixed(1)}`;
+  });
   return `<div class="wmap" role="img" aria-label="World map: ${esc(offices.map((o) => `${o.head ? 'head office' : 'office'} in ${o.city}, ${o.country}`).join('; '))}">
   <svg class="wmap-svg" viewBox="${VB.x} ${VB.y.toFixed(1)} ${VB.w} ${VB.h.toFixed(1)}" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
     <defs>
@@ -66,7 +73,7 @@ export function worldMap(offices) {
     ${arcs.map((d) => `<path class="wm-arc-glow" d="${d}"/><path class="wm-arc" d="${d}" pathLength="1"/><circle class="wm-plane" r="4.5"><animateMotion dur="4s" repeatCount="indefinite" path="${d}"/></circle>`).join('')}
     ${pins.map((p) => `<g class="wm-pin${p.o.head ? ' head' : ''}"><circle class="wm-ring" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="6"/><circle class="wm-core" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="6"/></g>`).join('')}
   </svg>
-  ${pins.map((p) => { const [l, t] = pct(p.o.geo.lng, p.o.geo.lat); return `<span class="wm-label${p.o.head ? ' head' : ''}" style="left:${l.toFixed(2)}%;top:${t.toFixed(2)}%"><b>${esc(p.o.city)}</b><small>${p.o.head ? 'Head office' : esc(p.o.label || 'Office')}</small></span>`; }).join('')}
+  ${pins.map((p) => { const [l, t] = pct(p.o.geo.lng, p.o.geo.lat); return `<span class="wm-label ${p.o.mapLabel || 'below'}${p.o.head ? ' head' : ''}" style="left:${l.toFixed(2)}%;top:${t.toFixed(2)}%" title="${esc(p.o.nation || p.o.country)}: ${p.o.head ? `Head office, ${esc(p.o.city)}` : esc(p.o.city)}"><b><em>${esc(p.o.code)}</em>${esc(p.o.nation || p.o.country)}</b><small>${p.o.head ? `Head office, ${esc(p.o.city)}` : esc(p.o.city)}</small><i aria-hidden="true">${esc(p.o.code)}</i></span>`; }).join('')}
 </div>`;
 }
 

@@ -422,7 +422,7 @@ export const timeline = [
   { year: '2018', title: 'Creative team', text: 'Visual and dynamic content, made in-house.' },
   { year: '2020', title: 'Tech team', text: 'Website and software development join the lineup.' },
   { year: '2024', title: '50+ clients', text: 'Brands all over the world.' },
-  { year: '2026', title: 'Worldwide operations', text: 'Eight services, one team, offices in Dhaka and Florida, clients worldwide.' },
+  { year: '2026', title: 'Worldwide operations', text: 'Eight services, one team, offices on three continents, clients worldwide.' },
 ];
 
 export const careers = {

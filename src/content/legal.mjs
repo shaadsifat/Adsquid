@@ -6,8 +6,9 @@ import { site } from '../config.mjs';
 
 const mail = `<a href="mailto:${site.email}">${site.email}</a>`;
 const head = site.offices.find((o) => o.head);
-const usa = site.offices.find((o) => !o.head);
+const others = site.offices.filter((o) => !o.head);
 const addr = (o) => o.lines.join(', ');
+const officeList = others.map((o) => `${o.label}: ${addr(o)}`).join('<br>');
 
 export const privacy = {
   summary: [
@@ -18,7 +19,7 @@ export const privacy = {
   ],
   sections: [
     ['Who we are', [
-      `This website, adsquidbd.com, is run by Adsquid, a digital marketing agency. Our head office is at ${addr(head)}, and we also have an office at ${addr(usa)}.`,
+      `This website, adsquidbd.com, is run by Adsquid, a digital marketing agency. Our head office is at ${addr(head)}, and we also have offices in ${others.map((o) => o.country.split(', ').pop()).join(', ').replace(/, ([^,]*)$/, ' and $1')}.`,
       `Adsquid is responsible for the personal information described in this policy (in data protection terms, we are the "controller"). For any privacy question, email ${mail} or call <a href="tel:${site.phoneHref}">${site.phone}</a>.`,
       'This policy covers our website, our forms, and conversations with us by WhatsApp, phone, email or social media. When we handle data inside a client\'s own accounts while doing their work (for example their ad accounts or customer lists), we do so on that client\'s behalf and under their instructions, as explained in section 12.',
     ]],
@@ -68,7 +69,7 @@ export const privacy = {
     ['Who we share it with', [
       'We share personal information only when we need to, and only with:',
       ['ul', [
-        '<strong>Our own team</strong> in Dhaka and in the USA, who see only what they need for their work.',
+        '<strong>Our own team</strong> at our head office in Dhaka and at our other offices, who see only what they need for their work.',
         '<strong>Service providers that help us run the business:</strong> our website hosting and email provider (which stores form messages and emails), Google (Analytics, Maps, Fonts and Workspace tools), Meta (WhatsApp and the Meta Pixel), and the project, file storage and accounting tools we use. They may only use the data to provide their service to us.',
         '<strong>Advertising and social media platforms,</strong> when you are a client and we run campaigns or manage pages on your behalf, as agreed with you.',
         '<strong>Professional advisers</strong> such as accountants, auditors and lawyers, under a duty of confidentiality.',
@@ -78,7 +79,7 @@ export const privacy = {
       'We do not sell your personal information for money. If we switch on advertising tools such as the Meta Pixel, some US state laws may treat this as "sharing" for targeted advertising. You can opt out of that at any time by emailing us (see section 9).',
     ]],
     ['International transfers', [
-      'We work from Bangladesh and the United States, and some of our service providers store data in other countries. When your information moves between countries, we take reasonable steps to keep it protected, for example by using well-known providers with strong security and, where the GDPR applies, standard contractual clauses or similar safeguards.',
+      'We work from offices in Bangladesh, the United States, Canada, Australia and Malaysia, and some of our service providers store data in other countries. When your information moves between countries, we take reasonable steps to keep it protected, for example by using well-known providers with strong security and, where the GDPR applies, standard contractual clauses or similar safeguards.',
     ]],
     ['How long we keep it', [
       ['ul', [
@@ -124,7 +125,7 @@ export const privacy = {
       'We may update this policy when our services, tools or the law change. The date at the top shows when it was last updated. If we make an important change, we will say so clearly on this page.',
     ]],
     ['Contact us', [
-      `Email: ${mail}<br>Phone and WhatsApp: <a href="tel:${site.phoneHref}">${site.phone}</a><br>Head office: ${addr(head)}<br>USA office: ${addr(usa)}`,
+      `Email: ${mail}<br>Phone and WhatsApp: <a href="tel:${site.phoneHref}">${site.phone}</a><br>Head office: ${addr(head)}<br>${officeList}`,
     ]],
   ],
 };
@@ -244,13 +245,13 @@ export const terms = {
     ]],
     ['Law and disputes', [
       'If a problem comes up, please tell us first. Most issues are solved with a conversation, and we will try in good faith to resolve it within 30 days.',
-      'These terms are governed by the laws of Bangladesh, and the courts of Dhaka have jurisdiction, unless your signed agreement with us (for example with our USA office) names a different law or place.',
+      'These terms are governed by the laws of Bangladesh, and the courts of Dhaka have jurisdiction, unless your signed agreement with us (for example with one of our offices outside Bangladesh) names a different law or place.',
     ]],
     ['General', [
       'We may update these terms from time to time. The date at the top shows the latest version, and the version in force when you accepted a proposal applies to that project. If any part of these terms cannot be enforced, the rest still applies. If we do not enforce a right straight away, we can still enforce it later. You may not transfer your agreement with us to someone else without our written consent.',
     ]],
     ['Contact us', [
-      `Email: ${mail}<br>Phone and WhatsApp: <a href="tel:${site.phoneHref}">${site.phone}</a><br>Head office: ${addr(head)}<br>USA office: ${addr(usa)}`,
+      `Email: ${mail}<br>Phone and WhatsApp: <a href="tel:${site.phoneHref}">${site.phone}</a><br>Head office: ${addr(head)}<br>${officeList}`,
     ]],
   ],
 };

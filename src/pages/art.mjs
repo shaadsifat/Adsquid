@@ -190,20 +190,28 @@ const ARCH = {
     const lat = [-110, -60, 0, 60, 110].map((dy) => { const rx = Math.sqrt(150 * 150 - dy * dy); return `<ellipse class="gb-lat" cx="200" cy="${200 + dy}" rx="${rx.toFixed(1)}" ry="${(rx * 0.17).toFixed(1)}"/>`; }).join('');
     const mer = [0, 1, 2, 3, 4, 5].map((i) => `<ellipse class="gb-mer" cx="200" cy="200" rx="150" ry="150"><animate attributeName="rx" values="150;106;0;106;150" dur="18s" begin="-${(i * 3).toFixed(1)}s" repeatCount="indefinite"/></ellipse>`).join('');
     const pts = pins.map(([x, y]) => [x * 4, y * 4]);
-    const arcs = pts.slice(1).map(([x2, y2]) => { const [x1, y1] = pts[0]; const cx = (x1 + x2) / 2, cy = Math.min(y1, y2) - 120; return `M${x1} ${y1} Q${cx} ${cy} ${x2} ${y2}`; });
+    // flight paths from the head office (first pin): a gentle curve, higher for longer trips
+    const arcs = pts.slice(1).map(([x2, y2]) => {
+      const [x1, y1] = pts[0];
+      const dist = Math.hypot(x2 - x1, y2 - y1);
+      const cx = (x1 + x2) / 2, cy = Math.max(40, Math.min(y1, y2) - dist * 0.42);
+      return `M${x1} ${y1} Q${cx.toFixed(1)} ${cy.toFixed(1)} ${x2} ${y2}`;
+    });
     return `
     <span class="gb-glow"></span><span class="gb-orbit"><i></i></span>
     <svg class="gb-svg" viewBox="0 0 400 400">
       <defs>
         <radialGradient id="gbFill" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="#3b1670"/><stop offset=".55" stop-color="#1a0b31"/><stop offset="1" stop-color="#0b0614"/></radialGradient>
         <clipPath id="gbClip"><circle cx="200" cy="200" r="150"/></clipPath>
+        <pattern id="gbDots" width="9" height="9" patternUnits="userSpaceOnUse"><circle cx="4.5" cy="4.5" r="1.1" fill="rgba(214,180,255,.22)"/></pattern>
+        <radialGradient id="gbShade" cx="40%" cy="35%" r="70%"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#05030a" stop-opacity=".75"/></radialGradient>
       </defs>
       <circle class="gb-sphere" cx="200" cy="200" r="150" fill="url(#gbFill)"/>
-      <g clip-path="url(#gbClip)">${lat}${mer}</g>
+      <g clip-path="url(#gbClip)"><rect class="gb-dots" x="40" y="40" width="320" height="320" fill="url(#gbDots)"/>${lat}${mer}<circle cx="200" cy="200" r="150" fill="url(#gbShade)"/></g>
       <circle class="gb-rim" cx="200" cy="200" r="150"/>
       ${arcs.map((d) => `<path class="gb-arc" d="${d}" pathLength="1"/><circle class="gb-dot" r="4"><animateMotion dur="3.2s" repeatCount="indefinite" path="${d}" keyPoints="1;0" keyTimes="0;1" calcMode="linear"/></circle>`).join('')}
     </svg>
-    ${pins.map(([x, y, label, sub], i) => `<span class="gb-pin${i === 0 ? ' head' : ''}" style="left:${x}%;top:${y}%"><i></i><b>${esc(label)}${sub ? `<small>${esc(sub)}</small>` : ''}</b></span>`).join('')}`;
+    ${pins.map(([x, y, label, sub, code], i) => `<span class="gb-pin${i === 0 ? ' head' : ''}" style="left:${x}%;top:${y}%"${sub ? ` title="${esc(label)}: ${esc(sub)}"` : ''}><i></i><b style="animation-delay:-${(i * 0.9).toFixed(1)}s"><span class="gb-t">${code ? `<em>${esc(code)}</em>` : ''}${esc(label)}</span>${sub ? `<small>${esc(sub)}</small>` : ''}</b></span>`).join('')}`;
   },
 };
 

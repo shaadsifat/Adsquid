@@ -1467,3 +1467,54 @@ html:has(.lightbox[open]) .cursor { visibility: hidden; }
 .legal-summary ul { margin: 0; }
 .legal .prose code { font-size: .875em; padding: 1px 6px; border-radius: 6px; background: rgba(255, 255, 255, .07); }
 .legal .toc ol { counter-reset: none; }
+
+/* offices: head office across the full width, the other offices two by two */
+@media (min-width: 960px) {
+  .office.is-head { grid-column: 1 / -1; }
+  .office.is-head .office-info { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: clamp(32px, 4vw, 64px); }
+  .office.is-head .office-info > * { grid-column: 1; }
+  .office.is-head .office-info > .office-meta { grid-column: 2; grid-row: 1 / span 3; align-self: end; margin: 0; }
+  .office.is-head .office-info > .btns { grid-column: 2; grid-row: 4; align-self: end; }
+}
+/* hero globe: every office labelled with its country code, country and city */
+.gb-dots { opacity: .9; }
+.gb-pin b { min-width: 96px; text-align: center; padding: 6px 11px 7px; }
+.gb-t { display: flex; align-items: center; justify-content: center; gap: 6px; }
+.gb-t em, .wm-label b em { font-style: normal; font-size: .5625rem; font-weight: 700; letter-spacing: .08em; padding: 2px 5px; border-radius: 5px; color: #fff; background: rgba(136, 0, 212, .55); border: 1px solid rgba(214, 180, 255, .35); }
+.gb-pin.head .gb-t em, .wm-label.head b em { background: rgba(255, 255, 255, .22); border-color: rgba(255, 255, 255, .4); }
+.gb-pin b small { text-transform: none; letter-spacing: .02em; font-size: .6875rem; }
+@media (max-width: 639px) { .gb-pin b { min-width: 0; padding: 4px 8px 5px; font-size: .75rem; } .gb-pin b small { font-size: .625rem; } }
+/* world map: labels can sit below (default), above, left or right of their pin; phones show the country code only */
+.wm-label i { display: none; font-style: normal; }
+.wm-label b { display: flex; align-items: center; justify-content: center; gap: 6px; }
+.wm-label small { text-transform: none; letter-spacing: .02em; font-size: .6875rem; }
+.wm-label.above { margin-top: 0; transform: translate(-50%, calc(-100% - 14px)); }
+.wm-label.left { margin-top: 0; transform: translate(calc(-100% - 14px), -50%); }
+.wm-label.right { margin-top: 0; transform: translate(14px, -50%); }
+@media (max-width: 639px) {
+  .wm-label { padding: 2px 6px; border-radius: 6px; margin-top: 7px; }
+  .wm-label b, .wm-label small { display: none; }
+  .wm-label i { display: block; font-size: .625rem; font-weight: 700; letter-spacing: .06em; }
+  .wm-label.above { transform: translate(-50%, calc(-100% - 7px)); }
+  .wm-label.left { transform: translate(calc(-100% - 7px), -50%); }
+  .wm-label.right { transform: translate(7px, -50%); }
+}
+@media (max-width: 639px) { .gb-pin:not(.head) b small { display: none; } }
+
+/* compact location labels (globe + world map): one small pill, code + country; "HQ" marks the head office; city on hover */
+.gb-pin b, .wm-label { display: block; min-width: 0; padding: 3px 9px 3px 4px; border-radius: 999px; font-size: .6875rem; font-weight: 600; line-height: 1.5; letter-spacing: .01em; white-space: nowrap; box-shadow: 0 8px 18px -10px rgba(0, 0, 0, .9); }
+.gb-pin b { top: 13px; animation-duration: 6s; }
+.wm-label { margin-top: 10px; }
+.gb-pin b small, .wm-label small { display: none; }
+.gb-t, .wm-label b { display: flex; align-items: center; gap: 5px; font-weight: 600; }
+.gb-t em, .wm-label b em { font-size: .5rem; line-height: 1.4; padding: 1px 4px; border-radius: 999px; letter-spacing: .06em; }
+.gb-pin.head .gb-t::after, .wm-label.head b::after { content: "HQ"; font-size: .5rem; font-weight: 700; letter-spacing: .08em; padding: 1px 4px; border-radius: 999px; color: #2a0a4a; background: #F1E4FF; }
+.wm-label.above { transform: translate(-50%, calc(-100% - 10px)); }
+.wm-label.left { transform: translate(calc(-100% - 10px), -50%); }
+.wm-label.right { transform: translate(10px, -50%); }
+@media (max-width: 639px) {
+  .gb-pin b { padding: 2px 7px 2px 3px; font-size: .625rem; }
+  .wm-label { padding: 1px 5px; }
+  .wm-label.above { transform: translate(-50%, calc(-100% - 7px)); }
+  .wm-label.left { transform: translate(calc(-100% - 7px), -50%); }
+}
