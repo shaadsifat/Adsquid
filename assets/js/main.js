@@ -281,7 +281,7 @@
         ['.work-open', 'View'],
         ['.post-card', 'Read'],
         ['.svc-tile, .info-card, .platform', 'Open'],
-        ['.car-track, .reel-stage', 'Drag'],
+        ['.car-track, .reel-stage, .gx-canvas', 'Drag'],
       ];
       const DEG = 180 / Math.PI;
       let mx = -100, my = -100, x = -100, y = -100, vx = 0, vy = 0, rot = 0, press = 0, down = false;
