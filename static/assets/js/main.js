@@ -84,11 +84,16 @@
   const megaBtn = $('.mega-toggle');
   const mega = $('#mega-menu');
   if (megaBtn && mega) {
-    let hoverTimer;
+    let hoverTimer, idleTimer;
+    // While closed the menu is "idle" (not rendered at all). Opening renders it first, so its fade-in still plays;
+    // closing lets the fade-out finish before it goes idle again.
     const setMega = (open) => {
       megaBtn.setAttribute('aria-expanded', String(open));
+      clearTimeout(idleTimer);
+      if (open && mega.classList.contains('idle')) { mega.classList.remove('idle'); void mega.offsetHeight; }
       mega.classList.toggle('open', open);
       if (open) header.classList.remove('is-hidden');
+      else idleTimer = setTimeout(() => { if (!mega.classList.contains('open')) mega.classList.add('idle'); }, 450);
     };
     // Click opens the menu (a second click keeps it open); it closes on mouse leave, Esc, focus leaving or a click outside.
     megaBtn.addEventListener('click', () => setMega(true));

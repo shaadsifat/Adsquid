@@ -411,7 +411,8 @@ body.menu-open { overflow: hidden; }
 
 /* 09 CTA */
 .ch-cta { min-height: 100vh; display: flex; align-items: center; padding: 120px 0; }
-.cta-media { position: absolute; inset: 0; z-index: 0; will-change: transform; background: url(/assets/video/cta-portal-loop-poster.webp) center / cover no-repeat; }
+.cta-media { position: absolute; inset: 0; z-index: 0; will-change: transform; background: center / cover no-repeat; }
+.cta-media.near, html:not(.js) .cta-media { background-image: url(/assets/video/cta-portal-loop-poster.webp); }
 .cta-video { width: 100%; height: 100%; object-fit: cover; }
 .cta-media::after { content: ""; position: absolute; inset: 0; background: radial-gradient(60% 60% at 50% 50%, rgba(7, 5, 13, .25), rgba(7, 5, 13, .75) 75%), linear-gradient(to bottom, #07050D, transparent 14%, transparent 86%, #07050D); }
 .cta-line { position: absolute; left: 0; top: 50%; width: 40vw; height: 200px; transform: translateY(-50%); z-index: 1; display: none; }
@@ -1543,9 +1544,11 @@ html:has(.lightbox[open]) .cursor { visibility: hidden; }
 .wm-lit { animation: none; }
 .wm-arc { fill: none; stroke: rgba(214, 180, 255, .42); stroke-width: 1.4; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 0; animation: none; transition: stroke-dashoffset 1.8s cubic-bezier(.4, 0, .2, 1); }
 .motion .wmap-wrap:not(.in) .wm-arc { stroke-dashoffset: 1; }
-.wm-comet { fill: none; stroke: #fff; stroke-width: 2.4; stroke-linecap: round; stroke-dasharray: .07 1.07; stroke-dashoffset: .07; filter: drop-shadow(0 0 4px #C084FC); animation: wm-comet 3.6s cubic-bezier(.45, 0, .55, 1) infinite; }
-@keyframes wm-comet { from { stroke-dashoffset: .07; } to { stroke-dashoffset: -1; } }
-html:not(.motion) .wm-comet, .motion .wmap-wrap:not(.in) .wm-comet { display: none; }
+html:not(.motion) .wm-packet, .motion .wmap-wrap:not(.in) .wm-packet { display: none; }
+/* flight paths: a soft glow under a fine line, bright at Dhaka and fading toward each office */
+.wm-arc { stroke-width: 1.6; }
+.wm-arc-glow { fill: none; stroke-width: 7; stroke-linecap: round; opacity: .16; stroke-dasharray: 1; stroke-dashoffset: 0; transition: stroke-dashoffset 1.8s cubic-bezier(.4, 0, .2, 1); }
+.motion .wmap-wrap:not(.in) .wm-arc-glow { stroke-dashoffset: 1; }
 .wm-ring { animation-duration: 3.4s; }
 .wm-pin:not(.head) .wm-core { fill: #D8B4FE; stroke-width: 1.5; }
 .gx-br { flex-basis: 100%; height: 0; }
@@ -1580,3 +1583,30 @@ html:not(.motion) .wm-comet, .motion .wmap-wrap:not(.in) .wm-comet { display: no
   .wm-label i { display: block; }
 }
 .work-open:hover .work-go, .work-open:focus-visible .work-go { background: var(--violet); transform: scale(1.06); }
+
+/* ---------- Footer on tablets and phones ---------- */
+@media (max-width: 1023px) {
+  .footer-grid > div:last-child { grid-column: 1 / -1; }               /* Contact gets the full width */
+  .footer-office-top { flex-wrap: nowrap; }
+  .footer-sub { white-space: nowrap; }
+}
+@media (min-width: 640px) and (max-width: 1023px) {
+  .footer-contact { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 32px; }
+}
+@media (max-width: 639px) {
+  .footer-grid { gap: 30px 20px; padding-top: 36px; }
+  .footer-brand p + p { display: none; }                                 /* one short paragraph on phones */
+  .footer-h { margin-bottom: 12px; }
+  .footer-contact { gap: 14px; padding: 18px; border-radius: 18px; border: 1px solid var(--line); background: rgba(18, 14, 28, .6); }
+  .footer-bottom { flex-direction: column; align-items: center; text-align: center; gap: 10px; margin-top: 14px; padding-block: 20px 28px; border-top: 1px solid var(--line); font-size: .8125rem; }
+  .footer-bottom .copy .sep { display: none; }
+  .footer-bottom .copy .cr { display: block; margin-top: 2px; }
+  .footer-bottom .legal { justify-content: center; gap: 6px 18px; }
+}
+
+/* globe box: sizes come from the width (percent margins), so the globe stays round in a taller box */
+.gx-glow { top: 0; margin-top: -6%; }
+.gx-ball { top: 0; margin-top: 4%; }
+@media (max-width: 899px) {
+  .gx-chips { bottom: 0; gap: 6px; row-gap: 8px; }
+}

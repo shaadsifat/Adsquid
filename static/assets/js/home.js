@@ -18,6 +18,15 @@
 
   /* ---------- 09 CTA video (V3): only near the viewport, never on phones / save-data ---------- */
   const video = $('.cta-video');
+  const ctaMedia = $('.cta-media');
+  if (ctaMedia) {
+    // the closing section's picture loads only when the visitor gets close to it
+    const near = () => { ctaMedia.classList.add('near'); if (video && video.dataset.poster) video.poster = video.dataset.poster; };
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver(([en]) => { if (en.isIntersecting) { near(); io.disconnect(); } }, { rootMargin: '900px 0px' });
+      io.observe(ctaMedia);
+    } else near();
+  }
   if (video && 'IntersectionObserver' in window) {
     const allowed = !saveData && !reduce && matchMedia('(min-width: 768px)').matches;
     let loaded = false;

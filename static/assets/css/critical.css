@@ -98,6 +98,7 @@ button { cursor: pointer; background: none; border: 0; padding: 0; }
 .menu-toggle[aria-expanded="true"] .bars::after { transform: translateY(-6px) rotate(-45deg); }
 @media (min-width: 640px) { .header-cta { display: inline-flex; } .menu-toggle { margin-left: 0; } }
 @media (min-width: 1024px) { .nav { display: block; } .header-cta { margin-left: 8px; } .menu-toggle { display: none; } }
+.mega.idle { content-visibility: hidden; }
 .mega { position: fixed; left: 0; right: 0; top: var(--header-h); visibility: hidden; opacity: 0; transform: translateY(-8px); pointer-events: none; }
 .mobile-menu { position: fixed; inset: 0; z-index: 49; overflow-y: auto; overscroll-behavior: contain; }
 
@@ -223,6 +224,7 @@ button { cursor: pointer; background: none; border: 0; padding: 0; }
 .page-hero-visual { position: relative; width: min(80vw, 330px); aspect-ratio: 1; min-height: 0; justify-self: center; margin: 6px 0 34px; visibility: hidden; }
 .page-hero-visual > * { position: absolute; inset: 0; }
 .hero-team .page-hero-visual { width: 100%; max-width: 540px; aspect-ratio: 1.5; }
+@media (max-width: 899px) { .page-hero-visual:has(> .gx) { aspect-ratio: 1 / 1.24; } }
 .page-hero.has-visual { padding-top: calc(var(--header-h) + 28px); }
 .page-hero.has-visual.hero-type { padding-bottom: 40px; }
 .page-hero.has-visual .hero-display { font-size: clamp(2rem, .9rem + 2.9vw, 3.5rem); text-wrap: balance; }

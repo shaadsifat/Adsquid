@@ -37,7 +37,7 @@ function megaMenu() {
           <a class="mega-head" href="${serviceUrl(s)}">${hexIcon(s.icon)}<span><span class="mega-name">${s.name}</span><span class="mega-pitch">${s.pitch}</span></span></a>
           <ul class="mega-subs">${s.subs.map((x) => `<li><a href="${subUrl(s, x)}">${x.title}</a></li>`).join('')}</ul>
         </li>`;
-  return `<div class="mega" id="mega-menu">
+  return `<div class="mega idle" id="mega-menu">
     <div class="container mega-inner">
       <div class="mega-main">
         <p class="mega-label">Our services <span>${services.length}</span></p>
@@ -174,7 +174,7 @@ function footer() {
     <span class="wm-star"></span>
   </div>
   <div class="container footer-bottom">
-    <p class="copy">Copyright &copy; <span class="js-year">${year}</span> | All rights are reserved by Adsquidbd</p>
+    <p class="copy">Copyright &copy; <span class="js-year">${year}</span><span class="sep"> | </span><span class="cr">All rights are reserved by Adsquidbd</span></p>
     <p class="legal"><a href="/privacy-policy/">Privacy Policy</a><a href="/terms/">Terms &amp; Conditions</a></p>
   </div>
 </footer>`;

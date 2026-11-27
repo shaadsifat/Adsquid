@@ -74,7 +74,7 @@ export function homePage({ posts }) {
         <div class="art-float">
           <div class="art-hop">
             <div class="art-pop">
-              <img class="art-img" src="/assets/images/brand/hero-mascot.webp" srcset="/assets/images/brand/hero-mascot-480.webp 480w, /assets/images/brand/hero-mascot.webp 720w" sizes="(min-width: 960px) 46vw, 88vw" width="720" height="475" alt="The Adsquid octopus at work: laptop, pencil, phone and a cup of coffee" fetchpriority="high" decoding="async" draggable="false">
+              <img class="art-img" crossorigin="anonymous" src="/assets/images/brand/hero-mascot.webp" srcset="/assets/images/brand/hero-mascot-480.webp 480w, /assets/images/brand/hero-mascot.webp 720w" sizes="(min-width: 960px) 46vw, 88vw" width="720" height="475" alt="The Adsquid octopus at work: laptop, pencil, phone and a cup of coffee" fetchpriority="high" decoding="async" draggable="false">
               <span class="art-shine" aria-hidden="true"></span>
             </div>
           </div>
@@ -267,7 +267,7 @@ export function homePage({ posts }) {
 
 <section class="ch ch-cta" id="ch-09" data-chapter="9" aria-labelledby="cta-title">
   <div class="cta-media">
-    <video class="cta-video" muted loop playsinline preload="none" poster="/assets/video/cta-portal-loop-poster.webp" width="1280" height="720" aria-hidden="true">
+    <video class="cta-video" muted loop playsinline preload="none" data-poster="/assets/video/cta-portal-loop-poster.webp" width="1280" height="720" aria-hidden="true">
       <source data-src="/assets/video/cta-portal-loop.mp4" type="video/mp4">
     </video>
   </div>
@@ -298,7 +298,7 @@ export function homePage({ posts }) {
     cta: false,
     bodyClass: 'page-home',
     preload: [
-      '<link rel="preload" as="image" imagesrcset="/assets/images/brand/hero-mascot-480.webp 480w, /assets/images/brand/hero-mascot.webp 720w" imagesizes="(min-width: 960px) 46vw, 88vw" fetchpriority="high">',
+      '<link rel="preload" as="image" imagesrcset="/assets/images/brand/hero-mascot-480.webp 480w, /assets/images/brand/hero-mascot.webp 720w" imagesizes="(min-width: 960px) 46vw, 88vw" crossorigin="anonymous" fetchpriority="high">',
     ],
     scripts: ['/assets/js/home.js'],
     schema: [

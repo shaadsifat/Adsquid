@@ -105,7 +105,7 @@ export function worldMap(offices) {
       const t = i / 60, u = 1 - t;
       arcPts.push([u * u * head.x + 2 * u * t * mx + t * t * p.x, u * u * head.y + 2 * u * t * my + t * t * p.y]);
     }
-    return `M${head.x.toFixed(1)} ${head.y.toFixed(1)} Q${mx.toFixed(1)} ${my.toFixed(1)} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`;
+    return { d: `M${head.x.toFixed(1)} ${head.y.toFixed(1)} Q${mx.toFixed(1)} ${my.toFixed(1)} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`, x2: p.x, y2: p.y };
   });
   // label sizes in CSS pixels (see .wm-label in main.css); map units per pixel at the tightest widths
   const deskSize = (o) => [37 + (o.nation || o.country).length * 6.9 + (o.head ? 27 : 0), 24];
@@ -120,11 +120,14 @@ export function worldMap(offices) {
       <clipPath id="wmLand" clip-rule="evenodd"><path clip-rule="evenodd" d="${LAND}"/></clipPath>
       ${lit.map((r) => `<clipPath id="wm-${r}" clip-rule="evenodd"><path clip-rule="evenodd" d="${REGIONS[r].d}"/></clipPath>`).join('')}
       <radialGradient id="wmGlow"><stop offset="0" stop-color="#A855F7" stop-opacity=".4"/><stop offset="1" stop-color="#A855F7" stop-opacity="0"/></radialGradient>
+      <radialGradient id="wmPk"><stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset=".35" stop-color="#E9D5FF" stop-opacity=".55"/><stop offset="1" stop-color="#A855F7" stop-opacity="0"/></radialGradient>
+      ${arcs.map((a, i) => `<linearGradient id="wmArc${i}" gradientUnits="userSpaceOnUse" x1="${head.x.toFixed(1)}" y1="${head.y.toFixed(1)}" x2="${a.x2.toFixed(1)}" y2="${a.y2.toFixed(1)}"><stop offset="0" stop-color="#F4EAFF" stop-opacity=".95"/><stop offset=".5" stop-color="#C99BFF" stop-opacity=".75"/><stop offset="1" stop-color="#A855F7" stop-opacity=".5"/></linearGradient>`).join('')}
     </defs>
     <rect x="0" y="0" width="1000" height="500" fill="url(#wmDot)" clip-path="url(#wmLand)"/>
     ${lit.map((r) => `<g clip-path="url(#wm-${r})"><rect class="wm-lit" x="${X(REGIONS[r].from).toFixed(1)}" y="0" width="${(X(REGIONS[r].to) - X(REGIONS[r].from)).toFixed(1)}" height="500" fill="url(#wmLit)"/></g>`).join('')}
     ${pins.map((p) => `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${p.o.head ? 62 : 46}" fill="url(#wmGlow)"/>`).join('')}
-    ${arcs.map((d, i) => `<path class="wm-arc" d="${d}" pathLength="1" style="transition-delay:${(0.2 + i * 0.18).toFixed(2)}s"/><path class="wm-comet" d="${d}" pathLength="1" style="animation-delay:${(i * 0.9).toFixed(1)}s"/>`).join('')}
+    ${arcs.map((a, i) => `<path class="wm-arc-glow" d="${a.d}" pathLength="1" style="stroke:url(#wmArc${i});transition-delay:${(0.2 + i * 0.18).toFixed(2)}s"/><path class="wm-arc" d="${a.d}" pathLength="1" style="stroke:url(#wmArc${i});transition-delay:${(0.2 + i * 0.18).toFixed(2)}s"/>`).join('')}
+    ${arcs.map((a, i) => `<g class="wm-packet" opacity="0"><circle r="11" fill="url(#wmPk)"/><circle r="2.8" fill="#fff"/><animateMotion dur="4.4s" begin="${(1.8 + i * 1.1).toFixed(1)}s" repeatCount="indefinite" path="${a.d}" keyPoints="0;1;1" keyTimes="0;.64;1" calcMode="spline" keySplines=".42 0 .58 1;0 0 1 1"/><animate attributeName="opacity" dur="4.4s" begin="${(1.8 + i * 1.1).toFixed(1)}s" repeatCount="indefinite" values="0;1;1;0;0" keyTimes="0;.08;.56;.64;1"/></g>`).join('')}
     ${pins.map((p, i) => `<g class="wm-pin${p.o.head ? ' head' : ''}"><circle class="wm-ring" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${p.o.head ? 7 : 5}" style="animation-delay:-${(i * 0.7).toFixed(1)}s"/><circle class="wm-core" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${p.o.head ? 7 : 5}"/></g>`).join('')}
   </svg>
   ${pins.map((p) => { const [l, t] = pct(p.o.geo.lng, p.o.geo.lat); return `<span class="wm-label d-${desk.get(p)} m-${phone.get(p)}${p.o.head ? ' head' : ''}" style="left:${l.toFixed(2)}%;top:${t.toFixed(2)}%" title="${esc(p.o.nation || p.o.country)}: ${p.o.head ? `Head office, ${esc(p.o.city)}` : esc(p.o.city)}"><b><em>${esc(p.o.code)}</em>${esc(p.o.nation || p.o.country)}</b><small>${p.o.head ? `Head office, ${esc(p.o.city)}` : esc(p.o.city)}</small><i aria-hidden="true">${esc(p.o.code)}</i></span>`; }).join('')}

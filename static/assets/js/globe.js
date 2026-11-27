@@ -217,7 +217,7 @@
     H = canvas.height = Math.round(r.height * dpr);
     R = RR * r.width * dpr;
     cx = CX * r.width * dpr;
-    cy = CY * r.height * dpr;
+    cy = CY * r.width * dpr; // from the width: on phones the box is taller, with the chips below the globe
     draw(performance.now());
   };
   new ResizeObserver(resize).observe(box);
